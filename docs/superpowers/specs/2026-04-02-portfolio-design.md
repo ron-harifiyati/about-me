@@ -18,8 +18,8 @@ A live, interactive, API-first personal portfolio website running on AWS. The ba
 │                                   BROWSER                                      │
 │  Alpine.js frontend (HTML/CSS/JS) — fetches all data from Lambda via fetch()   │
 └────────────────────┬───────────────────────────────────┬───────────────────────┘
-                     │ static assets                      │ API calls (JSON)
-                     ▼                                    ▼
+                     │ static assets                     │ API calls (JSON)
+                     ▼                                   ▼
         ┌────────────────────────┐       ┌────────────────────────────────────┐
         │   CloudFront CDN       │       │   Lambda Function URL              │
         │   + S3 Bucket          │       │   (Python 3.12, single handler)    │
