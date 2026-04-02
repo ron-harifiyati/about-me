@@ -52,8 +52,9 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt -t package/ --quiet
-          cp handler.py router.py auth.py db.py utils.py package/
-          cp -r routes/ models/ package/
+          cp handler.py package/
+          for f in router.py auth.py db.py utils.py; do [ -f "$f" ] && cp "$f" package/; done
+          for d in routes models; do [ -d "$d" ] && cp -r "$d" package/; done
           cd package && zip -r ../lambda.zip . -x "*.pyc" -x "*__pycache__*"
 
       - name: Configure AWS credentials
