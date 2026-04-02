@@ -11,7 +11,7 @@ Browser (Alpine.js SPA)
     │
     ├── Static assets ──▶ CloudFront + S3
     │
-    └── API calls ──▶ Lambda Function URL (Python 3.12)
+    └── API calls ──▶ API Gateway HTTP API → Lambda (Python 3.12)
                             │
                 ┌───────────┼──────────────┐
                 ▼           ▼              ▼
@@ -84,7 +84,7 @@ python3 -m http.server 8080
 # Open http://localhost:8080
 ```
 
-Update `DEV_API_URL` in `frontend/assets/js/api.js` to point to your Lambda Function URL.
+Update `DEV_API_URL` in `frontend/assets/js/api.js` to point to your API Gateway URL.
 
 ## Docs
 
@@ -97,9 +97,9 @@ Update `DEV_API_URL` in `frontend/assets/js/api.js` to point to your Lambda Func
 
 The API is publicly accessible and documented interactively.
 
-- **Swagger UI:** `<Lambda Function URL>/api`
-- **OpenAPI spec:** `<Lambda Function URL>/api/spec`
-- **Deploy info:** `<Lambda Function URL>/meta`
+- **Swagger UI:** `<API Gateway URL>/api`
+- **OpenAPI spec:** `<API Gateway URL>/api/spec`
+- **Deploy info:** `<API Gateway URL>/meta`
 
 All responses use the envelope: `{"data": ..., "error": ...}`
 
@@ -111,7 +111,7 @@ All responses use the envelope: `{"data": ..., "error": ...}`
 | Database | DynamoDB single-table (on-demand billing) |
 | Auth | Custom JWT + GitHub OAuth + Google OAuth |
 | Frontend | Alpine.js 3.x, vanilla CSS, Leaflet.js |
-| Hosting | Lambda Function URL, S3, CloudFront |
+| Hosting | API Gateway HTTP API, Lambda, S3, CloudFront |
 | Email | AWS SES |
 | CI/CD | GitHub Actions (path-based triggers) |
 | Tests | pytest, moto |

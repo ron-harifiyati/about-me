@@ -4,7 +4,7 @@
 
 **Goal:** Provision all AWS resources and configure GitHub Actions CI/CD pipelines so that pushing to `dev` or `prod` automatically deploys backend and frontend independently.
 
-**Architecture:** Two Lambda functions (portfolio-dev, portfolio-prod) with Function URLs; two S3+CloudFront distributions; one shared DynamoDB table with 3 GSIs; SES sender identity; path-based GitHub Actions workflows triggered by `backend/**` or `frontend/**` changes.
+**Architecture:** Two API Gateway HTTP APIs (portfolio-dev, portfolio-prod) each proxying a Lambda function; two S3+CloudFront distributions; one shared DynamoDB table with 3 GSIs; SES sender identity; path-based GitHub Actions workflows triggered by `backend/**` or `frontend/**` changes.
 
 **Tech Stack:** AWS CLI v2, GitHub Actions, Python 3.12, DynamoDB (on-demand), S3, CloudFront (OAC), Lambda Function URL, SES
 
@@ -674,13 +674,13 @@ echo "Secret Key: $(echo $KEYS | python3 -c \"import json,sys; print(json.load(s
 **Create GitHub OAuth App:**
 1. github.com/settings/developers → OAuth Apps → New OAuth App
 2. Homepage URL: `https://$PROD_CF_DOMAIN`
-3. Authorization callback URL: `$PROD_URL/auth/oauth/github/callback`
+3. Authorization callback URL: `https://o4o1xcb3wc.execute-api.us-east-1.amazonaws.com/auth/oauth/github/callback`
 4. Copy Client ID and generate Client Secret
 
 **Create Google OAuth Credentials:**
 1. console.cloud.google.com → APIs & Services → Credentials → Create → OAuth 2.0 Client ID
 2. Application type: Web application
-3. Authorized redirect URIs: `$PROD_URL/auth/oauth/google/callback`
+3. Authorized redirect URIs: `https://o4o1xcb3wc.execute-api.us-east-1.amazonaws.com/auth/oauth/google/callback`
 4. Copy Client ID and Client Secret
 
 ---
