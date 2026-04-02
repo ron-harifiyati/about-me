@@ -79,7 +79,8 @@ flake8 . --max-line-length=120 --exclude=tests/,package/
 |----------|-----|------|
 | API Gateway | `portfolio-dev` (`ly0fxfdai9`) | `portfolio-prod` (`o4o1xcb3wc`) |
 | Lambda | `portfolio-dev` | `portfolio-prod` |
-| S3 | `portfolio-frontend-dev` | `portfolio-frontend-prod` |
+| S3 | `portfolio-frontend-dev-993249606359` | `portfolio-frontend-prod-993249606359` |
+| CloudFront | `E3GFM00HUAVU15` (`d3sw9ggppgh9as.cloudfront.net`) | `E1P7C158XTW7UF` (`dkdwnfmhg75yf.cloudfront.net`) |
 | DynamoDB | `portfolio` (shared) | `portfolio` (shared) |
 
 ## Implementation Plans
