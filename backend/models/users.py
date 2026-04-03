@@ -229,3 +229,35 @@ def set_user_status(user_id: str, status: str):
 def delete_user(user_id: str):
     table = get_table()
     table.delete_item(Key={"PK": f"USER#{user_id}", "SK": "PROFILE"})
+
+
+def create_password_reset_token(user_id: str) -> str:
+    table = get_table()
+    token = secrets.token_urlsafe(32)
+    ttl = int(time.time()) + 3600
+    table.put_item(Item={
+        "PK": f"RESET#{token}",
+        "SK": "TOKEN",
+        "user_id": user_id,
+        "ttl": ttl,
+    })
+    return token
+
+
+def consume_password_reset_token(token: str) -> str | None:
+    table = get_table()
+    resp = table.get_item(Key={"PK": f"RESET#{token}", "SK": "TOKEN"})
+    item = resp.get("Item")
+    if not item:
+        return None
+    table.delete_item(Key={"PK": f"RESET#{token}", "SK": "TOKEN"})
+    return item["user_id"]
+
+
+def update_user_password(user_id: str, new_password: str):
+    table = get_table()
+    table.update_item(
+        Key={"PK": f"USER#{user_id}", "SK": "PROFILE"},
+        UpdateExpression="SET password_hash = :h",
+        ExpressionAttributeValues={":h": _hash_password(new_password)},
+    )
