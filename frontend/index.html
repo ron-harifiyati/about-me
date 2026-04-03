@@ -27,27 +27,52 @@
   <div x-data="portfolioApp()" x-init="init()">
 
     <!-- GLOBAL NAV -->
-    <nav x-data="{ mobileOpen: false }" @click.outside="mobileOpen = false" @hashchange.window="mobileOpen = false">
+    <nav x-data="{ mobileOpen: false, moreOpen: false }" @click.outside="mobileOpen = false; moreOpen = false" @hashchange.window="mobileOpen = false; moreOpen = false">
       <div class="container nav-inner">
         <a href="#/" class="nav-brand">Ron Harifiyati</a>
 
         <div class="nav-right">
           <div class="nav-links" :class="{ 'nav-open': mobileOpen }">
+            <!-- Primary links -->
             <a href="#/about" :class="{ active: currentPage === 'about' }">About</a>
             <a href="#/projects" :class="{ active: currentPage === 'projects' }">Projects</a>
             <a href="#/courses" :class="{ active: currentPage === 'courses' }">Courses</a>
             <a href="#/skills" :class="{ active: currentPage === 'skills' }">Skills</a>
-            <a href="#/stats" :class="{ active: currentPage === 'stats' }">Stats</a>
             <a href="#/contact" :class="{ active: currentPage === 'contact' }">Contact</a>
-            <a href="#/guestbook" :class="{ active: currentPage === 'guestbook' }">Guestbook</a>
-            <a href="#/testimonials" :class="{ active: currentPage === 'testimonials' }">Testimonials</a>
-            <a href="#/developer" :class="{ active: currentPage === 'developer' }">Developer</a>
-            <template x-if="isAuthenticated">
-              <a href="#/quiz" :class="{ active: currentPage === 'quiz' }">Quiz</a>
-            </template>
-            <template x-if="isAdmin">
-              <a href="/admin.html" style="color: var(--accent); font-weight: 600;">Admin</a>
-            </template>
+
+            <!-- Desktop: More dropdown -->
+            <div class="nav-more" @click.outside="moreOpen = false">
+              <button class="nav-more-btn" @click="moreOpen = !moreOpen" :class="{ active: moreOpen }">
+                More <span class="nav-more-chevron" :class="{ rotated: moreOpen }">▾</span>
+              </button>
+              <div class="nav-dropdown" :class="{ open: moreOpen }">
+                <a href="#/stats" :class="{ active: currentPage === 'stats' }">Stats</a>
+                <a href="#/guestbook" :class="{ active: currentPage === 'guestbook' }">Guestbook</a>
+                <a href="#/testimonials" :class="{ active: currentPage === 'testimonials' }">Testimonials</a>
+                <a href="#/developer" :class="{ active: currentPage === 'developer' }">Developer</a>
+                <template x-if="isAuthenticated">
+                  <a href="#/quiz" :class="{ active: currentPage === 'quiz' }">Quiz</a>
+                </template>
+                <template x-if="isAdmin">
+                  <a href="/admin.html" class="nav-admin-link">Admin</a>
+                </template>
+              </div>
+            </div>
+
+            <!-- Mobile: secondary links shown flat (hidden on desktop) -->
+            <div class="nav-secondary-mobile">
+              <a href="#/stats" :class="{ active: currentPage === 'stats' }">Stats</a>
+              <a href="#/guestbook" :class="{ active: currentPage === 'guestbook' }">Guestbook</a>
+              <a href="#/testimonials" :class="{ active: currentPage === 'testimonials' }">Testimonials</a>
+              <a href="#/developer" :class="{ active: currentPage === 'developer' }">Developer</a>
+              <template x-if="isAuthenticated">
+                <a href="#/quiz" :class="{ active: currentPage === 'quiz' }">Quiz</a>
+              </template>
+              <template x-if="isAdmin">
+                <a href="/admin.html" class="nav-admin-link">Admin</a>
+              </template>
+            </div>
+
             <template x-if="!isAuthenticated">
               <a href="#/login" class="btn btn-primary btn-sm">Login</a>
             </template>

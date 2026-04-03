@@ -186,6 +186,58 @@ footer {
   color: var(--text-muted);
 }
 
+/* More dropdown */
+.nav-more { position: relative; }
+.nav-more-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.15s;
+}
+.nav-more-btn:hover,
+.nav-more-btn.active { color: var(--accent); }
+.nav-more-chevron {
+  display: inline-block;
+  font-size: 0.75rem;
+  transition: transform 0.15s;
+}
+.nav-more-chevron.rotated { transform: rotate(180deg); }
+
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  min-width: 160px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 0.4rem 0;
+  z-index: 101;
+  flex-direction: column;
+}
+.nav-dropdown.open { display: flex; }
+.nav-dropdown a {
+  padding: 0.55rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-dropdown a:hover { color: var(--accent); background: var(--bg-alt); }
+.nav-dropdown a.active { color: var(--accent); }
+.nav-admin-link { color: var(--accent) !important; font-weight: 600; }
+
+/* Secondary links — shown flat on mobile, hidden on desktop */
+.nav-secondary-mobile { display: none; }
+
 /* Hamburger button */
 .nav-hamburger {
   display: none;
@@ -241,6 +293,12 @@ footer {
     margin: 0.5rem 1.5rem;
     width: calc(100% - 3rem);
     text-align: center;
+  }
+
+  /* Swap More dropdown for flat secondary links on mobile */
+  .nav-more { display: none; }
+  .nav-secondary-mobile {
+    display: contents;
   }
 }
 
