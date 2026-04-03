@@ -1,0 +1,74 @@
+/* frontend/assets/css/theme.css */
+
+/* Default: Light */
+:root {
+  --bg:        #FFFFFF;
+  --bg-alt:    #F8F9FA;
+  --text:      #212529;
+  --text-muted:#6C757D;
+  --accent:    #007BFF;
+  --accent-hover: #0056b3;
+  --border:    #DEE2E6;
+  --card-bg:   #FFFFFF;
+  --shadow:    0 2px 8px rgba(0,0,0,0.08);
+}
+
+[data-theme="dark"] {
+  --bg:        #121212;
+  --bg-alt:    #1E1E1E;
+  --text:      #E0E0E0;
+  --text-muted:#9E9E9E;
+  --accent:    #4FC3F7;
+  --accent-hover: #81D4FA;
+  --border:    #333333;
+  --card-bg:   #1E1E1E;
+  --shadow:    0 2px 8px rgba(0,0,0,0.4);
+}
+
+[data-theme="coffee"] {
+  --bg:        #FAF3E0;
+  --bg-alt:    #F0E6C8;
+  --text:      #5D4037;
+  --text-muted:#8D6E63;
+  --accent:    #A1887F;
+  --accent-hover: #795548;
+  --border:    #D7CCC8;
+  --card-bg:   #FDF6E3;
+  --shadow:    0 2px 8px rgba(93,64,55,0.12);
+}
+
+[data-theme="terminal"] {
+  --bg:        #000000;
+  --bg-alt:    #0A0A0A;
+  --text:      #00FF41;
+  --text-muted:#008F11;
+  --accent:    #008F11;
+  --accent-hover: #00CC33;
+  --border:    #003300;
+  --card-bg:   #050505;
+  --shadow:    0 2px 8px rgba(0,255,65,0.1);
+}
+
+[data-theme="nordic"] {
+  --bg:        #2E3440;
+  --bg-alt:    #3B4252;
+  --text:      #D8DEE9;
+  --text-muted:#B0BAD0;
+  --accent:    #88C0D0;
+  --accent-hover: #81A1C1;
+  --border:    #4C566A;
+  --card-bg:   #3B4252;
+  --shadow:    0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Dark theme — accent buttons need dark text */
+[data-theme="dark"] .btn-primary { color: #121212; }
+
+/* Coffee theme — accent buttons need dark brown text */
+[data-theme="coffee"] .btn-primary { color: #5D4037; }
+
+/* Terminal theme — green buttons use black text */
+[data-theme="terminal"] .btn-primary { color: #000000; }
+
+/* Nordic theme — accent buttons need dark text */
+[data-theme="nordic"] .btn-primary { color: #2E3440; }

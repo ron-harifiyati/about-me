@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Ron Harifiyati</title>
+  <link rel="stylesheet" href="/assets/css/theme.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+  <style>
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+    }
+    .admin-sidebar h2 { font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+    .admin-sidebar a {
+      display: block; padding: 0.5rem 0.75rem;
+      border-radius: 6px; margin-bottom: 0.25rem;
+      color: var(--text-muted); font-size: 0.9rem;
+    }
+    .admin-sidebar a:hover, .admin-sidebar a.active {
+      background: var(--accent); color: #fff; text-decoration: none;
+    }
+    .admin-content { flex: 1; padding: 2rem; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <div x-data="adminApp()" x-init="init()">
+
+    <!-- Auth guard -->
+    <template x-if="!isAdmin && !loading">
+      <div style="text-align: center; padding: 4rem;">
+        <h1>Access denied</h1>
+        <p class="subtitle">Admin access required.</p>
+        <a href="/index.html#/login" class="btn btn-primary" style="display: inline-block; margin-top: 1rem;">Log in</a>
+      </div>
+    </template>
+
+    <div x-show="loading" class="loading-center" style="height: 100vh;"><div class="spinner"></div></div>
+
+    <template x-if="isAdmin">
+      <div class="admin-layout">
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+          <h2>Admin Panel</h2>
+          <a href="#/dashboard"    :class="{ active: section === 'dashboard' }"    @click.prevent="section='dashboard'">Dashboard</a>
+          <a href="#/content"      :class="{ active: section === 'content' }"      @click.prevent="section='content'">Content</a>
+          <a href="#/users"        :class="{ active: section === 'users' }"        @click.prevent="section='users'">Users</a>
+          <a href="#/contacts"     :class="{ active: section === 'contacts' }"     @click.prevent="section='contacts'">Contacts</a>
+          <a href="#/testimonials" :class="{ active: section === 'testimonials' }" @click.prevent="section='testimonials'">Testimonials</a>
+          <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'">Quiz</a>
+          <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
+          <a href="/index.html" style="color: var(--text-muted);">&larr; Back to site</a>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="admin-content">
+
+          <!-- Dashboard -->
+          <div x-show="section === 'dashboard'">
+            <h1>Dashboard</h1>
+            <p class="subtitle">Welcome back, <span x-text="user?.name"></span>.</p>
+            <div class="card-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+              <div class="card" style="text-align: center; cursor: pointer;" @click="section='users'">
+                <div style="font-size: 2rem;" x-text="stats.users || '—'"></div>
+                <p class="subtitle">Users</p>
+              </div>
+              <div class="card" style="text-align: center; cursor: pointer;" @click="section='contacts'">
+                <div style="font-size: 2rem;" x-text="stats.contacts || '—'"></div>
+                <p class="subtitle">Contacts</p>
+              </div>
+              <div class="card" style="text-align: center; cursor: pointer;" @click="section='testimonials'">
+                <div style="font-size: 2rem;" x-text="stats.pending_testimonials || '—'"></div>
+                <p class="subtitle">Pending testimonials</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content editor -->
+          <div x-show="section === 'content'" x-data="adminContent()" x-init="init()">
+            <h1>Content</h1>
+            <div style="display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap;">
+              <button class="btn btn-sm" :class="activeTab==='about'?'btn-primary':'btn-outline'" @click="activeTab='about'">About</button>
+              <button class="btn btn-sm" :class="activeTab==='skills'?'btn-primary':'btn-outline'" @click="activeTab='skills'">Skills (JSON)</button>
+              <button class="btn btn-sm" :class="activeTab==='fun-facts'?'btn-primary':'btn-outline'" @click="activeTab='fun-facts'">Fun Facts</button>
+              <button class="btn btn-sm" :class="activeTab==='learning'?'btn-primary':'btn-outline'" @click="activeTab='learning'">Currently Learning</button>
+            </div>
+            <div x-show="success" class="alert alert-success" x-text="success"></div>
+
+            <!-- About tab -->
+            <div x-show="activeTab === 'about'" class="card">
+              <div class="form-group"><label>Bio</label><textarea x-model="about.bio" class="form-input" rows="5"></textarea></div>
+              <div class="form-group"><label>Mission</label><input x-model="about.mission" class="form-input"></div>
+              <button class="btn btn-primary" @click="save('about', about)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Skills tab -->
+            <div x-show="activeTab === 'skills'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">Edit as JSON. Format: {"languages": ["Python", "JS"], "tools": ["AWS", "Docker"]}</p>
+              <textarea class="form-input" rows="10"
+                        :value="JSON.stringify(skills, null, 2)"
+                        @input="try { skills = JSON.parse($event.target.value) } catch(e) {}"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('skills', skills)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Fun facts tab -->
+            <div x-show="activeTab === 'fun-facts'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">One fact per line.</p>
+              <textarea class="form-input" rows="8"
+                        :value="funFacts.facts.join('\n')"
+                        @input="funFacts.facts = $event.target.value.split('\n').filter(Boolean)"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('fun-fact', funFacts)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Currently learning tab -->
+            <div x-show="activeTab === 'learning'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">Items shown in the ticker. One per line.</p>
+              <textarea class="form-input" rows="6"
+                        :value="(currentlyLearning.items || []).join('\n')"
+                        @input="currentlyLearning.items = $event.target.value.split('\n').filter(Boolean)"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('currently-learning', currentlyLearning)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Users -->
+          <div x-show="section === 'users'" x-data="adminUsers()" x-init="init()">
+            <h1>Users</h1>
+            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1rem;">
+                <template x-if="users.length === 0"><p class="subtitle">No users yet.</p></template>
+                <template x-for="u in users" :key="u.user_id">
+                  <div class="card" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                      <strong x-text="u.name"></strong>
+                      <span class="subtitle" style="margin-left: 0.5rem;" x-text="u.email"></span>
+                      <span class="badge badge-outline" style="margin-left: 0.5rem;" x-text="u.identity"></span>
+                      <span class="badge" style="margin-left: 0.25rem;" x-show="u.status && u.status !== 'active'"
+                            :style="u.status === 'banned' ? 'background:#DC3545' : 'background:#FFC107; color:#212529'"
+                            x-text="u.status"></span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-outline btn-sm" @click="setStatus(u.user_id, 'suspended')"
+                              x-show="u.status !== 'suspended'">Suspend</button>
+                      <button class="btn btn-outline btn-sm" @click="setStatus(u.user_id, 'active')"
+                              x-show="u.status === 'suspended'">Reinstate</button>
+                      <button class="btn btn-danger btn-sm" @click="deleteUser(u.user_id)">Delete</button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- Contacts -->
+          <div x-show="section === 'contacts'" x-data="adminContacts()" x-init="init()">
+            <h1>Contact Submissions</h1>
+            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1rem;">
+                <template x-if="contacts.length === 0"><p class="subtitle">No contact submissions.</p></template>
+                <template x-for="c in contacts" :key="c.contact_id">
+                  <div class="card" style="margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                      <strong x-text="c.name + ' <' + c.email + '>'"></strong>
+                      <span class="subtitle" style="font-size: 0.8rem;" x-text="formatDate(c.created_at)"></span>
+                    </div>
+                    <p x-text="c.message"></p>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- Testimonials -->
+          <div x-show="section === 'testimonials'" x-data="adminTestimonials()" x-init="init()">
+            <h1>Pending Testimonials</h1>
+            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1rem;">
+                <template x-if="pending.length === 0"><p class="subtitle">No pending testimonials.</p></template>
+                <template x-for="t in pending" :key="t.testimonial_id">
+                  <div class="card" style="margin-bottom: 0.75rem;">
+                    <p style="font-style: italic; margin-bottom: 0.75rem;" x-text="'&ldquo;' + t.body + '&rdquo;'"></p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <strong x-text="t.author"></strong>
+                        <span class="badge badge-outline" style="margin-left: 0.5rem;" x-text="t.identity"></span>
+                      </div>
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary btn-sm" @click="action(t.testimonial_id, 'approve')">Approve</button>
+                        <button class="btn btn-danger btn-sm" @click="action(t.testimonial_id, 'reject')">Reject</button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <!-- Quiz -->
+          <div x-show="section === 'quiz'" x-data="adminQuiz()" x-init="init()">
+            <h1>Quiz Questions</h1>
+            <div x-show="error" class="alert alert-error" x-text="error"></div>
+
+            <!-- Add/Edit form -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <h3 x-text="editing ? 'Edit Question' : 'Add Question'"></h3>
+              <div class="form-group"><label>Question</label>
+                <input x-model="form.question" class="form-input" placeholder="What is...?"></div>
+              <div class="form-group"><label>Options (4 choices)</label>
+                <template x-for="(opt, idx) in form.options" :key="idx">
+                  <input x-model="form.options[idx]" class="form-input" style="margin-bottom: 0.4rem;"
+                         :placeholder="`Option ${idx + 1}`">
+                </template>
+              </div>
+              <div class="form-group"><label>Correct answer (must match one option exactly)</label>
+                <input x-model="form.answer" class="form-input" placeholder="Exact text of correct option"></div>
+              <div class="form-group"><label>Topic</label>
+                <input x-model="form.topic" class="form-input" placeholder="general"></div>
+              <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-primary" @click="save()" :disabled="saving">
+                  <span x-text="saving ? 'Saving...' : editing ? 'Update' : 'Add'"></span>
+                </button>
+                <button class="btn btn-outline" x-show="editing" @click="resetForm()">Cancel</button>
+              </div>
+            </div>
+
+            <!-- Questions list -->
+            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div>
+                <template x-if="questions.length === 0"><p class="subtitle">No questions yet.</p></template>
+                <template x-for="q in questions" :key="q.question_id">
+                  <div class="card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                    <div>
+                      <p x-text="q.question" style="font-weight: 500;"></p>
+                      <p class="subtitle" style="font-size: 0.8rem; margin-top: 0.3rem;" x-text="'Answer: ' + q.answer"></p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                      <button class="btn btn-outline btn-sm" @click="editQuestion(q)">Edit</button>
+                      <button class="btn btn-danger btn-sm" @click="deleteQuestion(q.question_id)">Delete</button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+        </main>
+      </div>
+    </template>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/themes.js"></script>
+  <script src="/assets/js/admin-app.js"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>

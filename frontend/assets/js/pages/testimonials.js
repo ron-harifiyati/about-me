@@ -1,0 +1,46 @@
+// frontend/assets/js/pages/testimonials.js
+function testimonialsPage() {
+  return {
+    testimonials: [],
+    filtered: [],
+    activeFilter: "all",
+    identities: ["all", "Jamf", "MCRI", "Friend", "Family", "Other"],
+    form: { body: "", author: "", identity: "Other", anonymous: false },
+    loading: true,
+    submitting: false,
+    error: null,
+    success: null,
+
+    async init() {
+      const resp = await api.get("/testimonials");
+      this.testimonials = resp.data || [];
+      this.filtered = this.testimonials;
+      this.loading = false;
+    },
+
+    setFilter(identity) {
+      this.activeFilter = identity;
+      this.filtered = identity === "all"
+        ? this.testimonials
+        : this.testimonials.filter(t => t.identity === identity);
+    },
+
+    async submit() {
+      this.error = null;
+      this.success = null;
+      if (!this.form.body.trim()) {
+        this.error = "Please write your testimonial.";
+        return;
+      }
+      this.submitting = true;
+      const resp = await api.post("/testimonials", this.form);
+      if (resp.ok) {
+        this.success = "Thank you! Your testimonial is pending approval.";
+        this.form = { body: "", author: "", identity: "Other", anonymous: false };
+      } else {
+        this.error = resp.error;
+      }
+      this.submitting = false;
+    },
+  };
+}
