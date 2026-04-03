@@ -15,8 +15,8 @@ def _send_verification_email(email: str, token: str):
     import boto3
     ses = boto3.client("ses", region_name="us-east-1")
     sender = os.environ["SES_SENDER_EMAIL"]
-    base_url = os.environ.get("FRONTEND_URL", "https://portfolio.example.com")
-    verify_url = f"{base_url}/verify-email?token={token}"
+    base_url = os.environ.get("FRONTEND_URL", "https://dkdwnfmhg75yf.cloudfront.net")
+    verify_url = f"{base_url}/#/verify-email?token={token}"
     ses.send_email(
         Source=sender,
         Destination={"ToAddresses": [email]},
