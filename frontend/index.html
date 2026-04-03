@@ -27,35 +27,48 @@
   <div x-data="portfolioApp()" x-init="init()">
 
     <!-- GLOBAL NAV -->
-    <nav>
+    <nav x-data="{ mobileOpen: false }" @click.outside="mobileOpen = false" @hashchange.window="mobileOpen = false">
       <div class="container nav-inner">
         <a href="#/" class="nav-brand">Ron Harifiyati</a>
 
-        <div class="nav-links">
-          <a href="#/about" :class="{ active: currentPage === 'about' }">About</a>
-          <a href="#/projects" :class="{ active: currentPage === 'projects' }">Projects</a>
-          <a href="#/courses" :class="{ active: currentPage === 'courses' }">Courses</a>
-          <a href="#/skills" :class="{ active: currentPage === 'skills' }">Skills</a>
-          <a href="#/stats" :class="{ active: currentPage === 'stats' }">Stats</a>
-          <a href="#/contact" :class="{ active: currentPage === 'contact' }">Contact</a>
-          <a href="#/guestbook" :class="{ active: currentPage === 'guestbook' }">Guestbook</a>
-          <a href="#/testimonials" :class="{ active: currentPage === 'testimonials' }">Testimonials</a>
-          <a href="#/developer" :class="{ active: currentPage === 'developer' }">Developer</a>
-          <template x-if="isAuthenticated">
-            <a href="#/quiz" :class="{ active: currentPage === 'quiz' }">Quiz</a>
-          </template>
-          <template x-if="isAdmin">
-            <a href="/admin.html" style="color: var(--accent); font-weight: 600;">Admin</a>
-          </template>
-          <template x-if="!isAuthenticated">
-            <a href="#/login" class="btn btn-primary btn-sm">Login</a>
-          </template>
-          <template x-if="isAuthenticated">
-            <button @click="logout()" class="btn btn-outline btn-sm">Logout</button>
-          </template>
+        <div class="nav-right">
+          <div class="nav-links" :class="{ 'nav-open': mobileOpen }">
+            <a href="#/about" :class="{ active: currentPage === 'about' }">About</a>
+            <a href="#/projects" :class="{ active: currentPage === 'projects' }">Projects</a>
+            <a href="#/courses" :class="{ active: currentPage === 'courses' }">Courses</a>
+            <a href="#/skills" :class="{ active: currentPage === 'skills' }">Skills</a>
+            <a href="#/stats" :class="{ active: currentPage === 'stats' }">Stats</a>
+            <a href="#/contact" :class="{ active: currentPage === 'contact' }">Contact</a>
+            <a href="#/guestbook" :class="{ active: currentPage === 'guestbook' }">Guestbook</a>
+            <a href="#/testimonials" :class="{ active: currentPage === 'testimonials' }">Testimonials</a>
+            <a href="#/developer" :class="{ active: currentPage === 'developer' }">Developer</a>
+            <template x-if="isAuthenticated">
+              <a href="#/quiz" :class="{ active: currentPage === 'quiz' }">Quiz</a>
+            </template>
+            <template x-if="isAdmin">
+              <a href="/admin.html" style="color: var(--accent); font-weight: 600;">Admin</a>
+            </template>
+            <template x-if="!isAuthenticated">
+              <a href="#/login" class="btn btn-primary btn-sm">Login</a>
+            </template>
+            <template x-if="isAuthenticated">
+              <button @click="logout()" class="btn btn-outline btn-sm">Logout</button>
+            </template>
+          </div>
+
           <button class="theme-toggle" @click="toggleTheme()"
-                  :title="`Switch theme (current: ${theme})`">
+                  :title="`Switch theme (current: ${theme})`"
+                  aria-label="Toggle theme">
             <span x-text="{ light: '☀️', dark: '🌙', coffee: '☕', terminal: '>_', nordic: '❄️' }[theme] || '☀️'"></span>
+          </button>
+
+          <button class="nav-hamburger" :class="{ open: mobileOpen }"
+                  @click="mobileOpen = !mobileOpen"
+                  aria-label="Toggle navigation"
+                  :aria-expanded="mobileOpen">
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
         </div>
       </div>
