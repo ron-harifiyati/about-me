@@ -38,6 +38,7 @@ Authenticated routes use `@require_auth` or `@require_admin` decorators from `au
 Single-table design. Table name from `os.environ["DYNAMODB_TABLE_NAME"]` (always `"portfolio"`).
 Key patterns are defined in `docs/superpowers/plans/2026-04-02-portfolio-backend.md` — always check before adding new access patterns.
 GSI attribute names: `GSI1PK`, `GSI1SK`, `GSI2PK`, `GSI2SK`, `GSI3PK`, `GSI3SK`.
+Lambda IAM policy (`infra/iam-policy.json`) must include `dynamodb:Scan` — list endpoints use table scans.
 
 ### Models vs Routes
 - `models/` — pure DynamoDB read/write, no HTTP logic
@@ -83,11 +84,17 @@ flake8 . --max-line-length=120 --exclude=tests/,package/
 | CloudFront | `E3GFM00HUAVU15` (`d3sw9ggppgh9as.cloudfront.net`) | `E1P7C158XTW7UF` (`dkdwnfmhg75yf.cloudfront.net`) |
 | DynamoDB | `portfolio` (shared) | `portfolio` (shared) |
 
+## AWS Profiles
+
+- `portfolio-admin` — used for managing AWS infrastructure (IAM, CloudFront, Lambda config)
+- `claude-code-bedrock` — default profile, used for Bedrock only
+
+Use `AWS_PROFILE=portfolio-admin aws ...` for infra commands.
+
 ## Implementation Plans
 
-Execute plans in this order:
-1. `docs/superpowers/plans/2026-04-02-portfolio-infra.md` — AWS setup + CI/CD
-2. `docs/superpowers/plans/2026-04-02-portfolio-backend.md` — Python API
-3. `docs/superpowers/plans/2026-04-02-portfolio-frontend.md` — Alpine.js SPA
+All 3 plans are complete as of 2026-04-03.
 
-Use `superpowers:executing-plans` or `superpowers:subagent-driven-development` to execute them.
+1. `docs/superpowers/plans/2026-04-02-portfolio-infra.md` — ✅ AWS setup + CI/CD
+2. `docs/superpowers/plans/2026-04-02-portfolio-backend.md` — ✅ Python API
+3. `docs/superpowers/plans/2026-04-02-portfolio-frontend.md` — ✅ Alpine.js SPA

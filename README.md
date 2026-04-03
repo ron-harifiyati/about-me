@@ -62,14 +62,23 @@ about-me/
 
 ## Getting Started
 
-### Backend (local)
+### Backend
+
+The backend runs as a Lambda function — there is no local server. The dev Lambda is already deployed and accessible at:
+
+- **Dev API:** `https://ly0fxfdai9.execute-api.us-east-1.amazonaws.com`
+- **Prod API:** `https://o4o1xcb3wc.execute-api.us-east-1.amazonaws.com`
+
+`frontend/assets/js/api.js` auto-detects the environment and points to the correct URL.
+
+For tests and linting:
 
 ```bash
 cd backend
 pip install -r requirements.txt
 pip install pytest pytest-mock "moto[dynamodb,ses]" flake8
 
-# Run tests
+# Run tests (moto mocks DynamoDB — no AWS calls)
 pytest tests/ -v
 
 # Lint
@@ -84,7 +93,7 @@ python3 -m http.server 8080
 # Open http://localhost:8080
 ```
 
-Update `DEV_API_URL` in `frontend/assets/js/api.js` to point to your API Gateway URL.
+The frontend automatically calls the dev Lambda. No configuration needed.
 
 ## Docs
 
@@ -97,9 +106,9 @@ Update `DEV_API_URL` in `frontend/assets/js/api.js` to point to your API Gateway
 
 The API is publicly accessible and documented interactively.
 
-- **Swagger UI:** `<API Gateway URL>/api`
-- **OpenAPI spec:** `<API Gateway URL>/api/spec`
-- **Deploy info:** `<API Gateway URL>/meta`
+- **Swagger UI (dev):** `https://ly0fxfdai9.execute-api.us-east-1.amazonaws.com/api`
+- **OpenAPI spec (dev):** `https://ly0fxfdai9.execute-api.us-east-1.amazonaws.com/api/spec`
+- **Deploy info:** `https://ly0fxfdai9.execute-api.us-east-1.amazonaws.com/meta`
 
 All responses use the envelope: `{"data": ..., "error": ...}`
 
