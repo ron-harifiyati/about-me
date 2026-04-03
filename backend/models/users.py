@@ -3,7 +3,7 @@ import time
 import hashlib
 import secrets
 from db import get_table
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 
 def _hash_password(password: str) -> str:
@@ -204,9 +204,8 @@ def get_or_create_oauth_user(provider: str, provider_id: str, email: str, name: 
 
 def list_all_users() -> list:
     table = get_table()
-    resp = table.query(
-        IndexName="GSI1",
-        KeyConditionExpression=Key("GSI1SK").eq("USER"),
+    resp = table.scan(
+        FilterExpression=Attr("SK").eq("PROFILE") & Attr("PK").begins_with("USER#")
     )
     items = resp.get("Items", [])
     for item in items:

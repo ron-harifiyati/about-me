@@ -1,4 +1,4 @@
-from auth import require_auth, require_admin, get_current_user
+from auth import require_auth, require_admin
 from models import interactions as m
 from models.users import get_user_by_id
 from models.projects import get_project
