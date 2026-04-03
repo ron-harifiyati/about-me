@@ -11,6 +11,12 @@
   --border:    #DEE2E6;
   --card-bg:   #FFFFFF;
   --shadow:    0 2px 8px rgba(0,0,0,0.08);
+  --alert-error-bg:      #fde8e8;
+  --alert-error-text:    #c0392b;
+  --alert-error-border:  #f5c6cb;
+  --alert-success-bg:    #e8f5e9;
+  --alert-success-text:  #2e7d32;
+  --alert-success-border:#c3e6cb;
 }
 
 [data-theme="dark"] {
@@ -23,6 +29,12 @@
   --border:    #333333;
   --card-bg:   #1E1E1E;
   --shadow:    0 2px 8px rgba(0,0,0,0.4);
+  --alert-error-bg:      rgba(220,53,69,0.15);
+  --alert-error-text:    #ff6b6b;
+  --alert-error-border:  rgba(220,53,69,0.35);
+  --alert-success-bg:    rgba(46,125,50,0.15);
+  --alert-success-text:  #69db7c;
+  --alert-success-border:rgba(46,125,50,0.35);
 }
 
 [data-theme="coffee"] {
@@ -35,6 +47,12 @@
   --border:    #D7CCC8;
   --card-bg:   #FDF6E3;
   --shadow:    0 2px 8px rgba(93,64,55,0.12);
+  --alert-error-bg:      #f9e8e6;
+  --alert-error-text:    #8b3a30;
+  --alert-error-border:  #e8b8b0;
+  --alert-success-bg:    #edf4e8;
+  --alert-success-text:  #3d6b35;
+  --alert-success-border:#c0d9b8;
 }
 
 [data-theme="terminal"] {
@@ -47,6 +65,12 @@
   --border:    #003300;
   --card-bg:   #050505;
   --shadow:    0 2px 8px rgba(0,255,65,0.1);
+  --alert-error-bg:      rgba(255,0,0,0.1);
+  --alert-error-text:    #ff4444;
+  --alert-error-border:  rgba(255,0,0,0.3);
+  --alert-success-bg:    rgba(0,255,65,0.08);
+  --alert-success-text:  #00FF41;
+  --alert-success-border:rgba(0,255,65,0.25);
 }
 
 [data-theme="nordic"] {
@@ -59,6 +83,12 @@
   --border:    #4C566A;
   --card-bg:   #3B4252;
   --shadow:    0 2px 8px rgba(0,0,0,0.3);
+  --alert-error-bg:      rgba(191,97,106,0.15);
+  --alert-error-text:    #BF616A;
+  --alert-error-border:  rgba(191,97,106,0.35);
+  --alert-success-bg:    rgba(163,190,140,0.15);
+  --alert-success-text:  #A3BE8C;
+  --alert-success-border:rgba(163,190,140,0.35);
 }
 
 /* Dark theme — accent buttons need dark text */
@@ -72,3 +102,10 @@
 
 /* Nordic theme — accent buttons need dark text */
 [data-theme="nordic"] .btn-primary { color: #2E3440; }
+
+/* Terminal theme — badge accent is too dark; use bright text color instead */
+[data-theme="terminal"] .badge { background: var(--text); color: var(--bg); }
+
+/* Alert colors — use per-theme variables */
+.alert-error   { background: var(--alert-error-bg);   color: var(--alert-error-text);   border-color: var(--alert-error-border); }
+.alert-success { background: var(--alert-success-bg); color: var(--alert-success-text); border-color: var(--alert-success-border); }

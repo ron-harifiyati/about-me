@@ -284,10 +284,13 @@
                 </template>
                 <div style="margin-top: 0.75rem;">
                   <p style="font-size: 0.85rem; color: var(--text-muted);">Your rating:</p>
-                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem; cursor: pointer;">
+                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem;">
                     <template x-for="n in [1,2,3,4,5]" :key="n">
                       <span @click="submitRating(n)"
-                            :style="n <= newRating ? 'color: #F5A623;' : 'color: var(--border);'">★</span>
+                            @mouseover="hoverRating = n"
+                            @mouseleave="hoverRating = 0"
+                            style="cursor: pointer; transition: color 0.1s;"
+                            :style="n <= (hoverRating || newRating) ? 'color: #F5A623;' : 'color: var(--border);'">★</span>
                     </template>
                   </div>
                 </div>
@@ -374,10 +377,13 @@
                 </template>
                 <div style="margin-top: 0.75rem;">
                   <p style="font-size: 0.85rem; color: var(--text-muted);">Your rating:</p>
-                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem; cursor: pointer;">
+                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem;">
                     <template x-for="n in [1,2,3,4,5]" :key="n">
                       <span @click="submitRating(n)"
-                            :style="n <= newRating ? 'color: #F5A623;' : 'color: var(--border);'">★</span>
+                            @mouseover="hoverRating = n"
+                            @mouseleave="hoverRating = 0"
+                            style="cursor: pointer; transition: color 0.1s;"
+                            :style="n <= (hoverRating || newRating) ? 'color: #F5A623;' : 'color: var(--border);'">★</span>
                     </template>
                   </div>
                 </div>
@@ -454,7 +460,7 @@
         <div x-data="contactPage()" x-init="init()">
           <h1>Contact</h1>
           <p class="subtitle">Get in touch.</p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+          <div class="contact-grid">
             <!-- Contact details -->
             <div>
               <h2>Details</h2>
@@ -707,7 +713,7 @@
             <div x-show="state === 'playing'">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h1>Quiz</h1>
-                <span class="subtitle" x-text="`${Object.keys(answers).length} / ${questions.length} answered`"></span>
+                <span class="subtitle" x-text="`Question ${current + 1} of ${questions.length}`"></span>
               </div>
 
               <!-- Progress bar -->
@@ -717,34 +723,44 @@
 
               <div x-show="error" class="alert alert-error" x-text="error"></div>
 
-              <!-- Questions -->
-              <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <template x-for="(q, idx) in questions" :key="q.question_id">
-                  <div class="card">
-                    <p style="font-weight: 600; margin-bottom: 1rem;">
-                      <span x-text="idx + 1 + '. '"></span>
-                      <span x-text="q.question"></span>
-                    </p>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                      <template x-for="option in q.options" :key="option">
-                        <button class="btn"
-                                :class="answers[q.question_id] === option ? 'btn-primary' : 'btn-outline'"
-                                style="text-align: left; justify-content: flex-start;"
-                                @click="selectAnswer(q.question_id, option)"
-                                x-text="option">
-                        </button>
-                      </template>
-                    </div>
+              <!-- Single question -->
+              <template x-if="currentQuestion">
+                <div class="card">
+                  <p style="font-weight: 600; margin-bottom: 1rem;" x-text="currentQuestion.question"></p>
+                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <template x-for="option in currentQuestion.options" :key="option">
+                      <button class="btn"
+                              :class="answers[currentQuestion.question_id] === option ? 'btn-primary' : 'btn-outline'"
+                              style="text-align: left; justify-content: flex-start;"
+                              @click="selectAnswer(currentQuestion.question_id, option)"
+                              x-text="option">
+                      </button>
+                    </template>
                   </div>
-                </template>
-              </div>
+                </div>
+              </template>
 
-              <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                <button class="btn btn-primary"
-                        @click="submitQuiz()"
-                        :disabled="!allAnswered || submitting">
-                  <span x-text="submitting ? 'Submitting...' : 'Submit Quiz'"></span>
+              <!-- Navigation -->
+              <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-outline"
+                        @click="prevQuestion()"
+                        :style="current === 0 ? 'visibility: hidden;' : ''">
+                  ← Back
                 </button>
+                <template x-if="!isLastQuestion">
+                  <button class="btn btn-primary"
+                          @click="nextQuestion()"
+                          :disabled="!currentQuestion || !isAnswered(currentQuestion.question_id)">
+                    Next →
+                  </button>
+                </template>
+                <template x-if="isLastQuestion">
+                  <button class="btn btn-primary"
+                          @click="submitQuiz()"
+                          :disabled="!isAnswered(currentQuestion?.question_id) || submitting">
+                    <span x-text="submitting ? 'Submitting...' : 'Submit Quiz'"></span>
+                  </button>
+                </template>
               </div>
             </div>
 
@@ -788,7 +804,7 @@
                           <span style="font-size: 1.2rem; width: 2rem; text-align: center;"
                                 x-text="idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1) + '.'">
                           </span>
-                          <span x-text="entry.user_id"></span>
+                          <span x-text="formatLeader(entry.user_id)"></span>
                         </div>
                         <span style="font-weight: 700; color: var(--accent);"
                               x-text="`${entry.score} / ${entry.total}`">

@@ -23,6 +23,7 @@ function courseDetailPage() {
     ratings: null,
     newComment: "",
     newRating: 0,
+    hoverRating: 0,
     loading: true,
     submitting: false,
     error: null,

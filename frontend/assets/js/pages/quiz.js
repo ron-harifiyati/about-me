@@ -39,12 +39,29 @@ function quizPage() {
       return questionId in this.answers;
     },
 
+    get currentQuestion() {
+      return this.questions[this.current] || null;
+    },
+
+    get isLastQuestion() {
+      return this.current === this.questions.length - 1;
+    },
+
+    nextQuestion() {
+      if (!this.isLastQuestion) this.current++;
+    },
+
+    prevQuestion() {
+      if (this.current > 0) this.current--;
+    },
+
     get allAnswered() {
       return this.questions.every(q => this.isAnswered(q.question_id));
     },
 
     get progress() {
-      return Math.round((Object.keys(this.answers).length / this.questions.length) * 100);
+      if (!this.questions.length) return 0;
+      return Math.round((this.current / (this.questions.length - 1)) * 100);
     },
 
     async submitQuiz() {
@@ -69,6 +86,15 @@ function quizPage() {
       const resp = await api.get("/quiz/leaderboard");
       this.leaderboard = resp.data || [];
       this.loadingLeaderboard = false;
+    },
+
+    formatLeader(userId) {
+      if (!userId) return 'Anonymous';
+      if (userId.includes('@')) {
+        const [local, domain] = userId.split('@');
+        return local.slice(0, 3) + '***@' + domain;
+      }
+      return userId.slice(0, 8) + '…';
     },
 
     get scorePercent() {

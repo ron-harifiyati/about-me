@@ -158,8 +158,8 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.alert-error { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6cb; }
-.alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c3e6cb; }
+.alert-error { border: 1px solid; }
+.alert-success { border: 1px solid; }
 
 /* Ticker */
 .ticker-wrap {
@@ -175,6 +175,17 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
   animation: ticker 20s linear infinite;
 }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+/* Contact page two-column grid */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+@media (max-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
 
 /* Footer */
 footer {
