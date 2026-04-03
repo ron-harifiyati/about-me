@@ -134,15 +134,29 @@ function portfolioApp() {
 }
 
 // Scroll fade-in observer — attach to elements with class .fade-in
+let _scrollObserver = null;
+
 function initScrollAnimations() {
-  const observer = new IntersectionObserver(
+  // Disconnect previous observer so they don't stack across route changes
+  if (_scrollObserver) {
+    _scrollObserver.disconnect();
+  }
+
+  _scrollObserver = new IntersectionObserver(
     entries => entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
+        _scrollObserver.unobserve(entry.target);
       }
     }),
-    { threshold: 0.1 }
+    { threshold: 0.05 }
   );
-  document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+
+  // Only observe elements that are currently in a visible container
+  // (offsetParent === null means an ancestor has display:none — skip those)
+  document.querySelectorAll(".fade-in:not(.visible)").forEach(el => {
+    if (el.offsetParent !== null) {
+      _scrollObserver.observe(el);
+    }
+  });
 }
