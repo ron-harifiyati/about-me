@@ -157,3 +157,74 @@ def test_verify_email_activates_account(ddb_table, mocker):
 
     fresh = get_user_by_email("ron@example.com")
     assert fresh is not None
+
+
+def test_reset_password_happy_path(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email")
+    mocker.patch("routes.auth_routes._send_reset_email")
+    from router import route
+    from models.users import mark_email_verified, get_user_by_email, create_password_reset_token
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    user = get_user_by_email("ron@example.com")
+    mark_email_verified(user["user_id"])
+    token = create_password_reset_token(user["user_id"])
+
+    resp = route(make_event("POST", "/auth/reset-password", body={
+        "token": token, "new_password": "NewPass123!",
+    }))
+    assert resp["statusCode"] == 200
+
+    login = route(make_event("POST", "/auth/login", body={
+        "email": "ron@example.com", "password": "NewPass123!",
+    }))
+    assert login["statusCode"] == 200
+
+
+def test_reset_password_invalid_token_returns_400(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    resp = route(make_event("POST", "/auth/reset-password", body={
+        "token": "badtoken", "new_password": "NewPass123!",
+    }))
+    assert resp["statusCode"] == 400
+
+
+def test_reset_password_short_password_returns_400(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    resp = route(make_event("POST", "/auth/reset-password", body={
+        "token": "anytoken", "new_password": "short",
+    }))
+    assert resp["statusCode"] == 400
+
+
+def test_forgot_password_unknown_email_returns_200(ddb_table, mocker):
+    mock_send = mocker.patch("routes.auth_routes._send_reset_email")
+    from router import route
+    resp = route(make_event("POST", "/auth/forgot-password", body={"email": "ghost@example.com"}))
+    assert resp["statusCode"] == 200
+    mock_send.assert_not_called()
+
+
+def test_forgot_password_sends_email(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email")
+    mock_send = mocker.patch("routes.auth_routes._send_reset_email")
+    from router import route
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    resp = route(make_event("POST", "/auth/forgot-password", body={"email": "ron@example.com"}))
+    assert resp["statusCode"] == 200
+    mock_send.assert_called_once()
+
+
+def test_forgot_password_oauth_only_user_returns_200(ddb_table, mocker):
+    mock_send = mocker.patch("routes.auth_routes._send_reset_email")
+    from router import route
+    from models.users import create_user
+    create_user("oauth@example.com", "OAuth User", "Other")  # no password
+    resp = route(make_event("POST", "/auth/forgot-password", body={"email": "oauth@example.com"}))
+    assert resp["statusCode"] == 200
+    mock_send.assert_not_called()
