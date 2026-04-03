@@ -1,0 +1,89 @@
+# .github/workflows/deploy-backend.yml
+name: Deploy Backend
+
+on:
+  push:
+    branches: [dev, prod]
+    paths:
+      - 'backend/**'
+      - 'version.txt'
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-mock "moto[dynamodb,ses]" flake8
+
+      - name: Run tests
+        run: |
+          cd backend
+          pytest tests/ -v --tb=short
+
+      - name: Lint
+        run: |
+          cd backend
+          flake8 . --max-line-length=120 --exclude=tests/,package/
+
+      - name: Set deploy environment
+        run: |
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then
+            echo "LAMBDA_NAME=${{ secrets.PROD_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+          else
+            echo "LAMBDA_NAME=${{ secrets.DEV_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+          fi
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Package Lambda
+        run: |
+          cd backend
+          pip install -r requirements.txt -t package/ --quiet
+          cp handler.py package/
+          for f in router.py auth.py db.py utils.py; do [ -f "$f" ] && cp "$f" package/; done
+          for d in routes models; do [ -d "$d" ] && cp -r "$d" package/; done
+          cd package && zip -r ../lambda.zip . -x "*.pyc" -x "*__pycache__*"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Lambda code
+        run: |
+          aws lambda update-function-code \
+            --function-name $LAMBDA_NAME \
+            --zip-file fileb://backend/lambda.zip \
+            --region ${{ secrets.AWS_REGION }}
+          aws lambda wait function-updated \
+            --function-name $LAMBDA_NAME \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Stamp Lambda environment variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name $LAMBDA_NAME \
+            --environment "Variables={GIT_SHA=${{ github.sha }},DEPLOY_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ),ENVIRONMENT=$DEPLOY_ENV,VERSION=$VERSION,JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }},SES_SENDER_EMAIL=${{ secrets.SES_SENDER_EMAIL }},GITHUB_OAUTH_CLIENT_ID=${{ secrets.GH_OAUTH_CLIENT_ID }},GITHUB_OAUTH_CLIENT_SECRET=${{ secrets.GH_OAUTH_CLIENT_SECRET }},GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }},GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }},DYNAMODB_TABLE_NAME=portfolio}" \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Notify Discord
+        if: always()
+        run: |
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"**Backend** deploy to **$DEPLOY_ENV**: ${{ job.status }} | SHA: \`${{ github.sha }}\`\"}" || true

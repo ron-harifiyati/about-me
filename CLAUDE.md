@@ -4,7 +4,7 @@ This file tells Claude how to work in this repository.
 
 ## Project
 
-Personal portfolio site for Ron Harifiyati. API-first architecture: Python Lambda backend + Alpine.js frontend on S3/CloudFront. See `docs/superpowers/specs/2026-04-02-portfolio-design.md` for the full design spec.
+Personal portfolio site for Ron Harifiyati. API-first architecture: Python Lambda backend behind API Gateway HTTP API + Alpine.js frontend on S3/CloudFront. See `docs/superpowers/specs/2026-04-02-portfolio-design.md` for the full design spec.
 
 ## Key Conventions
 
@@ -77,8 +77,10 @@ flake8 . --max-line-length=120 --exclude=tests/,package/
 
 | Resource | Dev | Prod |
 |----------|-----|------|
+| API Gateway | `portfolio-dev` (`ly0fxfdai9`) | `portfolio-prod` (`o4o1xcb3wc`) |
 | Lambda | `portfolio-dev` | `portfolio-prod` |
-| S3 | `portfolio-frontend-dev` | `portfolio-frontend-prod` |
+| S3 | `portfolio-frontend-dev-993249606359` | `portfolio-frontend-prod-993249606359` |
+| CloudFront | `E3GFM00HUAVU15` (`d3sw9ggppgh9as.cloudfront.net`) | `E1P7C158XTW7UF` (`dkdwnfmhg75yf.cloudfront.net`) |
 | DynamoDB | `portfolio` (shared) | `portfolio` (shared) |
 
 ## Implementation Plans

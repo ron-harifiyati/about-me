@@ -1,15 +1,10 @@
-# backend/handler.py
-import json
+from router import route
+from utils import server_error
 
 
 def handler(event, context):
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type,Authorization",
-            "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        },
-        "body": json.dumps({"data": {"message": "Portfolio API"}, "error": None}),
-    }
+    try:
+        return route(event)
+    except Exception as exc:
+        print(f"Unhandled error: {exc}")
+        return server_error()

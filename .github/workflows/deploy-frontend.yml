@@ -1,0 +1,69 @@
+# .github/workflows/deploy-frontend.yml
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [dev, prod]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate HTML
+        run: |
+          pip install html5validator
+          html5validator --root frontend/ || true
+
+      - name: Set deploy environment
+        run: |
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then
+            echo "S3_BUCKET=${{ secrets.PROD_S3_BUCKET }}" >> $GITHUB_ENV
+            echo "CF_DISTRIBUTION=${{ secrets.PROD_CLOUDFRONT_ID }}" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+          else
+            echo "S3_BUCKET=${{ secrets.DEV_S3_BUCKET }}" >> $GITHUB_ENV
+            echo "CF_DISTRIBUTION=${{ secrets.DEV_CLOUDFRONT_ID }}" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Sync assets to S3 (long cache)
+        run: |
+          aws s3 sync frontend/ s3://$S3_BUCKET \
+            --delete \
+            --cache-control "max-age=86400" \
+            --exclude "*.html"
+
+      - name: Sync HTML to S3 (no cache)
+        run: |
+          aws s3 sync frontend/ s3://$S3_BUCKET \
+            --delete \
+            --exclude "*" --include "*.html" \
+            --cache-control "no-cache"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id $CF_DISTRIBUTION \
+            --paths "/*" \
+            --query 'Invalidation.Id' --output text)
+          echo "Invalidation: $INVALIDATION_ID"
+
+      - name: Notify Discord
+        if: always()
+        run: |
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"**Frontend** deploy to **$DEPLOY_ENV**: ${{ job.status }} | SHA: \`${{ github.sha }}\`\"}" || true
