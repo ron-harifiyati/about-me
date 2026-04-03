@@ -83,7 +83,7 @@ function portfolioApp() {
         "verify-email": "verify-email",
       };
 
-      this.currentPage = routes[base] || "not-found";
+      this.currentPage = routes[base ?? ""] || "not-found";
       this.currentParams = { id: rest[0] };
 
       // Scroll to top on navigation
