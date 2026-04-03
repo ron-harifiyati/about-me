@@ -245,6 +245,7 @@ def create_password_reset_token(user_id: str) -> str:
 
 
 def consume_password_reset_token(token: str) -> str | None:
+    """Returns user_id if token is valid, deletes it (single-use)."""
     table = get_table()
     resp = table.get_item(Key={"PK": f"RESET#{token}", "SK": "TOKEN"})
     item = resp.get("Item")
