@@ -8,7 +8,7 @@ from models.users import (
     consume_email_verify_token, create_refresh_token, consume_refresh_token,
     delete_refresh_token, get_or_create_oauth_user,
 )
-from utils import ok, created, bad_request, unauthorized, conflict
+from utils import ok, created, bad_request, unauthorized, conflict, server_error
 
 
 def _send_verification_email(email: str, token: str):
@@ -44,7 +44,13 @@ def register(event, path_params, body, query, headers):
 
     user = create_user(email, name, identity, password)
     token = create_email_verify_token(user["user_id"])
-    _send_verification_email(email, token)
+    try:
+        _send_verification_email(email, token)
+    except Exception:
+        return server_error(
+            "Account created but we couldn't send the verification email. "
+            "Please use 'Resend verification email' to try again."
+        )
     return created({"message": "Account created. Check your email to verify.", "user_id": user["user_id"]})
 
 
@@ -57,6 +63,22 @@ def verify_email(event, path_params, body, query, headers):
         return bad_request("Invalid or expired token")
     mark_email_verified(user_id)
     return ok({"message": "Email verified. You can now log in."})
+
+
+def resend_verification(event, path_params, body, query, headers):
+    email = (body.get("email") or "").strip().lower()
+    if not email:
+        return bad_request("email is required")
+    user = get_user_by_email(email)
+    # Always return 200 to avoid leaking whether an email is registered
+    if not user or user.get("email_verified"):
+        return ok({"message": "If that address is registered and unverified, a new email is on its way."})
+    token = create_email_verify_token(user["user_id"])
+    try:
+        _send_verification_email(email, token)
+    except Exception:
+        return server_error("Could not send verification email. Please try again later.")
+    return ok({"message": "If that address is registered and unverified, a new email is on its way."})
 
 
 def login(event, path_params, body, query, headers):

@@ -92,6 +92,56 @@ def test_update_me_changes_identity(ddb_table, mocker):
     assert json.loads(resp["body"])["data"]["identity"] == "MCRI"
 
 
+def test_register_ses_failure_returns_500(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email", side_effect=Exception("SES sandbox"))
+    from router import route
+    resp = route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com",
+        "password": "Secure123!",
+        "name": "Ron",
+        "identity": "Jamf",
+    }))
+    assert resp["statusCode"] == 500
+    body = json.loads(resp["body"])
+    assert "Resend" in body["error"] or "resend" in body["error"]
+
+
+def test_resend_verification_sends_email(ddb_table, mocker):
+    mock_send = mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    mock_send.reset_mock()
+
+    resp = route(make_event("POST", "/auth/resend-verification", body={"email": "ron@example.com"}))
+    assert resp["statusCode"] == 200
+    mock_send.assert_called_once()
+
+
+def test_resend_verification_unknown_email_returns_200(ddb_table, mocker):
+    mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    resp = route(make_event("POST", "/auth/resend-verification", body={"email": "ghost@example.com"}))
+    assert resp["statusCode"] == 200
+
+
+def test_resend_verification_already_verified_returns_200(ddb_table, mocker):
+    mock_send = mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    from models.users import mark_email_verified, get_user_by_email
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    user = get_user_by_email("ron@example.com")
+    mark_email_verified(user["user_id"])
+    mock_send.reset_mock()
+
+    resp = route(make_event("POST", "/auth/resend-verification", body={"email": "ron@example.com"}))
+    assert resp["statusCode"] == 200
+    mock_send.assert_not_called()
+
+
 def test_verify_email_activates_account(ddb_table, mocker):
     mocker.patch("routes.auth_routes._send_verification_email")
     from router import route
