@@ -1,45 +1,227 @@
-from utils import not_found
+import os
+import json
+import requests as http
+from auth import make_jwt, require_auth
+from models.users import (
+    get_user_by_id, get_user_by_email, create_user, verify_user_password,
+    mark_email_verified, update_user_profile, create_email_verify_token,
+    consume_email_verify_token, create_refresh_token, consume_refresh_token,
+    delete_refresh_token, get_or_create_oauth_user,
+)
+from utils import ok, created, bad_request, unauthorized, conflict
+
+
+def _send_verification_email(email: str, token: str):
+    import boto3
+    ses = boto3.client("ses", region_name="us-east-1")
+    sender = os.environ["SES_SENDER_EMAIL"]
+    base_url = os.environ.get("FRONTEND_URL", "https://portfolio.example.com")
+    verify_url = f"{base_url}/verify-email?token={token}"
+    ses.send_email(
+        Source=sender,
+        Destination={"ToAddresses": [email]},
+        Message={
+            "Subject": {"Data": "Verify your email — Ron's Portfolio"},
+            "Body": {"Text": {"Data": f"Click to verify: {verify_url}"}},
+        },
+    )
 
 
 def register(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    email = (body.get("email") or "").strip().lower()
+    password = body.get("password", "")
+    name = (body.get("name") or "").strip()
+    identity = body.get("identity", "Other")
+
+    if not email or not password or not name:
+        return bad_request("email, password, and name are required")
+    if len(password) < 8:
+        return bad_request("password must be at least 8 characters")
+    if identity not in ("Jamf", "MCRI", "Friend", "Family", "Other"):
+        return bad_request("invalid identity")
+    if get_user_by_email(email):
+        return conflict("An account with this email already exists")
+
+    user = create_user(email, name, identity, password)
+    token = create_email_verify_token(user["user_id"])
+    _send_verification_email(email, token)
+    return created({"message": "Account created. Check your email to verify.", "user_id": user["user_id"]})
 
 
 def verify_email(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    token = body.get("token") or query.get("token", "")
+    if not token:
+        return bad_request("token is required")
+    user_id = consume_email_verify_token(token)
+    if not user_id:
+        return bad_request("Invalid or expired token")
+    mark_email_verified(user_id)
+    return ok({"message": "Email verified. You can now log in."})
 
 
 def login(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    email = (body.get("email") or "").strip().lower()
+    password = body.get("password", "")
+    remember_me = bool(body.get("remember_me", False))
+
+    if not email or not password:
+        return bad_request("email and password are required")
+
+    user = verify_user_password(email, password)
+    if not user:
+        return unauthorized("Invalid email or password")
+    if not user.get("email_verified"):
+        return unauthorized("Please verify your email before logging in")
+
+    access_token = make_jwt(user["user_id"], user["role"], remember_me=remember_me)
+    refresh_token = create_refresh_token(user["user_id"], user["role"])
+    return ok({
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "user": user,
+    })
 
 
 def logout(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    token = body.get("refresh_token", "")
+    if token:
+        delete_refresh_token(token)
+    return ok({"message": "Logged out"})
 
 
 def refresh(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    token = body.get("refresh_token", "")
+    if not token:
+        return bad_request("refresh_token is required")
+    data = consume_refresh_token(token)
+    if not data:
+        return unauthorized("Invalid or expired refresh token")
+    new_access = make_jwt(data["user_id"], data["role"])
+    new_refresh = create_refresh_token(data["user_id"], data["role"])
+    return ok({"access_token": new_access, "refresh_token": new_refresh})
 
 
-def get_me(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+@require_auth
+def get_me(event, path_params, body, query, headers, user):
+    profile = get_user_by_id(user["sub"])
+    return ok(profile)
 
 
-def update_me(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+@require_auth
+def update_me(event, path_params, body, query, headers, user):
+    if "identity" in body and body["identity"] not in ("Jamf", "MCRI", "Friend", "Family", "Other"):
+        return bad_request("invalid identity")
+    updated = update_user_profile(user["sub"], body)
+    return ok(updated)
 
+
+# --- OAuth ---
 
 def oauth_github_init(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    client_id = os.environ["GITHUB_OAUTH_CLIENT_ID"]
+    state = os.urandom(16).hex()
+    url = (
+        f"https://github.com/login/oauth/authorize"
+        f"?client_id={client_id}&scope=user:email&state={state}"
+    )
+    return {
+        "statusCode": 302,
+        "headers": {"Location": url, "Access-Control-Allow-Origin": "*"},
+        "body": "",
+    }
 
 
 def oauth_github_callback(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    code = query.get("code", "")
+    if not code:
+        return bad_request("code is required")
+
+    token_resp = http.post(
+        "https://github.com/login/oauth/access_token",
+        json={
+            "client_id": os.environ["GITHUB_OAUTH_CLIENT_ID"],
+            "client_secret": os.environ["GITHUB_OAUTH_CLIENT_SECRET"],
+            "code": code,
+        },
+        headers={"Accept": "application/json"},
+        timeout=10,
+    )
+    gh_token = token_resp.json().get("access_token")
+    if not gh_token:
+        return unauthorized("GitHub OAuth failed")
+
+    user_resp = http.get(
+        "https://api.github.com/user",
+        headers={"Authorization": f"Bearer {gh_token}", "Accept": "application/vnd.github+json"},
+        timeout=10,
+    )
+    gh_user = user_resp.json()
+
+    email = gh_user.get("email")
+    if not email:
+        emails_resp = http.get(
+            "https://api.github.com/user/emails",
+            headers={"Authorization": f"Bearer {gh_token}", "Accept": "application/vnd.github+json"},
+            timeout=10,
+        )
+        primary = next((e for e in emails_resp.json() if e.get("primary")), None)
+        email = primary["email"] if primary else f"{gh_user['login']}@github.noemail"
+
+    user = get_or_create_oauth_user("github", str(gh_user["id"]), email, gh_user.get("name") or gh_user["login"])
+    access_token = make_jwt(user["user_id"], user["role"])
+    refresh_token = create_refresh_token(user["user_id"], user["role"])
+    return ok({"access_token": access_token, "refresh_token": refresh_token, "user": user})
 
 
 def oauth_google_init(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    client_id = os.environ["GOOGLE_OAUTH_CLIENT_ID"]
+    redirect_uri = os.environ.get("GOOGLE_REDIRECT_URI", "")
+    url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth"
+        f"?client_id={client_id}"
+        f"&redirect_uri={redirect_uri}"
+        f"&response_type=code"
+        f"&scope=openid%20email%20profile"
+    )
+    return {
+        "statusCode": 302,
+        "headers": {"Location": url, "Access-Control-Allow-Origin": "*"},
+        "body": "",
+    }
 
 
 def oauth_google_callback(event, path_params, body, query, headers):
-    return not_found("Not implemented yet")
+    code = query.get("code", "")
+    if not code:
+        return bad_request("code is required")
+
+    redirect_uri = os.environ.get("GOOGLE_REDIRECT_URI", "")
+    token_resp = http.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "code": code,
+            "client_id": os.environ["GOOGLE_OAUTH_CLIENT_ID"],
+            "client_secret": os.environ["GOOGLE_OAUTH_CLIENT_SECRET"],
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        },
+        timeout=10,
+    )
+    tokens = token_resp.json()
+    id_token = tokens.get("id_token")
+    if not id_token:
+        return unauthorized("Google OAuth failed")
+
+    import base64
+    parts = id_token.split(".")
+    padded = parts[1] + "=" * (4 - len(parts[1]) % 4)
+    payload = json.loads(base64.urlsafe_b64decode(padded))
+
+    email = payload.get("email", "")
+    name = payload.get("name", email.split("@")[0])
+    google_id = payload.get("sub", "")
+
+    user = get_or_create_oauth_user("google", google_id, email, name)
+    access_token = make_jwt(user["user_id"], user["role"])
+    refresh_token = create_refresh_token(user["user_id"], user["role"])
+    return ok({"access_token": access_token, "refresh_token": refresh_token, "user": user})

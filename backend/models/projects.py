@@ -1,7 +1,7 @@
 import uuid
 import time
 from db import get_table
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Attr
 
 
 def list_projects() -> list:
