@@ -773,7 +773,18 @@
             <h1>Login</h1>
             <p class="subtitle">Welcome back.</p>
 
-            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;" x-text="error"></div>
+            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
+              <span x-text="error"></span>
+              <template x-if="unverifiedEmail">
+                <div style="margin-top: 0.75rem;">
+                  <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
+                    <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
+                  </button>
+                  <span x-show="resendSent" style="margin-left: 0.5rem; font-size: 0.85rem; color: green;">Email sent!</span>
+                  <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: red;"></span>
+                </div>
+              </template>
+            </div>
 
             <!-- OAuth buttons -->
             <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
@@ -813,6 +824,8 @@
             </form>
 
             <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+              <a href="#/forgot-password">Forgot password?</a>
+              &nbsp;&middot;&nbsp;
               Don't have an account? <a href="#/register">Sign up</a>
             </p>
           </div>
@@ -827,7 +840,17 @@
             <p class="subtitle">Join and unlock interactive features.</p>
 
             <div x-show="error" class="alert alert-error" style="margin-top: 1rem;" x-text="error"></div>
-            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;" x-text="success"></div>
+            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;">
+              <span x-text="success"></span>
+              <div style="margin-top: 0.75rem;">
+                <p style="font-size: 0.85rem; margin-bottom: 0.4rem;">Didn't receive it?</p>
+                <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
+                  <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
+                </button>
+                <span x-show="resendSent" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: green;">New email sent!</span>
+                <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: red;"></span>
+              </div>
+            </div>
 
             <form @submit.prevent="submit()" style="margin-top: 1.5rem;" x-show="!success">
               <div class="form-group">
@@ -891,6 +914,61 @@
         </div>
       </div>
 
+      <!-- FORGOT PASSWORD -->
+      <div x-show="currentPage === 'forgot-password'" class="page">
+        <div x-data="forgotPasswordPage()">
+          <div style="max-width: 400px; margin: 3rem auto;">
+            <h1>Forgot password?</h1>
+            <p class="subtitle">Enter your email and we'll send you a reset link. Valid for 1 hour.</p>
+            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;" x-text="error"></div>
+            <div x-show="sent" class="alert alert-success" style="margin-top: 1rem;">
+              If that address is registered, a reset link is on its way. Check your inbox.
+            </div>
+            <form @submit.prevent="submit()" style="margin-top: 1.5rem;" x-show="!sent">
+              <div class="form-group">
+                <label>Email</label>
+                <input x-model="form.email" type="email" class="form-input" placeholder="you@example.com" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;" :disabled="submitting">
+                <span x-text="submitting ? 'Sending...' : 'Send reset link'"></span>
+              </button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+              <a href="#/login">&larr; Back to login</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESET PASSWORD -->
+      <div x-show="currentPage === 'reset-password'" class="page">
+        <div x-data="resetPasswordPage()" x-init="init()">
+          <div style="max-width: 400px; margin: 3rem auto;">
+            <h1>Set a new password</h1>
+            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
+              <span x-text="error"></span>
+              <a href="#/forgot-password" style="display: block; margin-top: 0.5rem; font-size: 0.85rem;">Request a new link &rarr;</a>
+            </div>
+            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;">
+              Password updated! Redirecting to login...
+            </div>
+            <form @submit.prevent="submit()" style="margin-top: 1.5rem;" x-show="!success && token">
+              <div class="form-group">
+                <label>New password</label>
+                <input x-model="form.new_password" type="password" class="form-input" placeholder="Min. 8 characters" required>
+              </div>
+              <div class="form-group">
+                <label>Confirm password</label>
+                <input x-model="form.confirm_password" type="password" class="form-input" placeholder="Repeat password" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;" :disabled="submitting">
+                <span x-text="submitting ? 'Updating...' : 'Reset password'"></span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <!-- 404 -->
       <div x-show="currentPage === 'not-found'" class="page">
         <h1>404</h1>
@@ -926,6 +1004,9 @@
   <script src="/assets/js/pages/login.js"></script>
   <script src="/assets/js/pages/register.js"></script>
   <script src="/assets/js/pages/verify-email.js"></script>
+
+  <script src="/assets/js/pages/forgot-password.js"></script>
+  <script src="/assets/js/pages/reset-password.js"></script>
 
   <!-- Alpine.js (loaded last) -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
