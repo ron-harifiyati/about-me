@@ -6,6 +6,10 @@ function registerPage() {
     submitting: false,
     error: null,
     success: null,
+    submittedEmail: null,
+    resendSending: false,
+    resendSent: false,
+    resendError: null,
 
     async init() {
       const token = localStorage.getItem("access_token");
@@ -26,12 +30,26 @@ function registerPage() {
       this.submitting = true;
       const resp = await api.post("/auth/register", this.form);
       if (resp.ok) {
+        this.submittedEmail = this.form.email;
         this.success = "Account created! Check your email to verify your account.";
         this.form = { name: "", email: "", password: "", identity: "Other" };
       } else {
         this.error = resp.error;
       }
       this.submitting = false;
+    },
+
+    async resendVerification() {
+      this.resendSending = true;
+      this.resendSent = false;
+      this.resendError = null;
+      const resp = await api.post("/auth/resend-verification", { email: this.submittedEmail });
+      if (resp.ok) {
+        this.resendSent = true;
+      } else {
+        this.resendError = resp.error || "Could not resend. Please try again.";
+      }
+      this.resendSending = false;
     },
   };
 }
