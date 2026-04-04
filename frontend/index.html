@@ -195,44 +195,44 @@
           <section style="padding: 2rem 0; border-bottom: 1px solid var(--border);">
             <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
             <div x-show="!loading">
-            <div class="home-two-col">
-              <!-- Testimonial pull quote -->
-              <template x-if="testimonial">
-                <div class="card testimonial-quote">
-                  <p x-text="'&ldquo;' + testimonial.body + '&rdquo;'" style="font-style: italic; line-height: 1.7; margin-bottom: 0.75rem;"></p>
-                  <p style="font-size: 0.82rem; color: var(--text-muted);">
-                    &mdash; <span x-text="testimonial.author || 'Anonymous'"></span>
-                    <template x-if="testimonial.identity">
-                      <span x-text="' · ' + testimonial.identity"></span>
-                    </template>
-                  </p>
-                  <a href="#/testimonials" style="display: inline-block; margin-top: 0.75rem; font-size: 0.82rem;">Read more testimonials &rarr;</a>
-                </div>
-              </template>
-              <template x-if="!testimonial">
-                <div class="card testimonial-quote" style="display: flex; align-items: center; justify-content: center; min-height: 100px;">
-                  <a href="#/testimonials" class="subtitle" style="font-size: 0.9rem;">Leave a testimonial &rarr;</a>
-                </div>
-              </template>
+              <div class="home-two-col">
+                <!-- Testimonial pull quote -->
+                <template x-if="testimonial">
+                  <div class="card testimonial-quote">
+                    <p x-text="'&ldquo;' + testimonial.body + '&rdquo;'" style="font-style: italic; line-height: 1.7; margin-bottom: 0.75rem;"></p>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">
+                      &mdash; <span x-text="testimonial.author || 'Anonymous'"></span>
+                      <template x-if="testimonial.identity">
+                        <span x-text="' · ' + testimonial.identity"></span>
+                      </template>
+                    </p>
+                    <a href="#/testimonials" style="display: inline-block; margin-top: 0.75rem; font-size: 0.82rem;">Read more testimonials &rarr;</a>
+                  </div>
+                </template>
+                <template x-if="!testimonial">
+                  <div class="card testimonial-quote" style="display: flex; align-items: center; justify-content: center; min-height: 100px;">
+                    <a href="#/testimonials" class="subtitle" style="font-size: 0.9rem;">Leave a testimonial &rarr;</a>
+                  </div>
+                </template>
 
-              <!-- Stats -->
-              <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-                <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
-                  <span class="subtitle" style="font-size: 0.85rem;">Visitors from</span>
-                  <span style="font-size: 1.1rem; font-weight: 700;">
-                    <span x-text="visitorCountries !== null ? visitorCountries + ' countries' : '—'"></span>
-                  </span>
-                </div>
-                <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
-                  <span class="subtitle" style="font-size: 0.85rem;">Projects built</span>
-                  <span style="font-size: 1.1rem; font-weight: 700;" x-text="projectCount !== null ? projectCount : '—'"></span>
-                </div>
-                <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
-                  <span class="subtitle" style="font-size: 0.85rem;">Courses completed</span>
-                  <span style="font-size: 1.1rem; font-weight: 700;" x-text="courseCount !== null ? courseCount : '—'"></span>
+                <!-- Stats -->
+                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
+                    <span class="subtitle" style="font-size: 0.85rem;">Visitors from</span>
+                    <span style="font-size: 1.1rem; font-weight: 700;">
+                      <span x-text="visitorCountries !== null ? visitorCountries + ' countries' : '—'"></span>
+                    </span>
+                  </div>
+                  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
+                    <span class="subtitle" style="font-size: 0.85rem;">Projects built</span>
+                    <span style="font-size: 1.1rem; font-weight: 700;" x-text="projectCount !== null ? projectCount : '—'"></span>
+                  </div>
+                  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem;">
+                    <span class="subtitle" style="font-size: 0.85rem;">Courses completed</span>
+                    <span style="font-size: 1.1rem; font-weight: 700;" x-text="courseCount !== null ? courseCount : '—'"></span>
+                  </div>
                 </div>
               </div>
-            </div>
             </div>
           </section>
 
