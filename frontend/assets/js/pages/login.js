@@ -7,6 +7,7 @@ function loginPage() {
     unverifiedEmail: null,
     resendSending: false,
     resendSent: false,
+    resendError: null,
 
     async init() {
       const token = localStorage.getItem("access_token");
@@ -43,8 +44,13 @@ function loginPage() {
     async resendVerification() {
       this.resendSending = true;
       this.resendSent = false;
-      await api.post("/auth/resend-verification", { email: this.unverifiedEmail });
-      this.resendSent = true;
+      this.resendError = null;
+      const resp = await api.post("/auth/resend-verification", { email: this.unverifiedEmail });
+      if (resp.ok) {
+        this.resendSent = true;
+      } else {
+        this.resendError = resp.error || "Could not resend. Please try again.";
+      }
       this.resendSending = false;
     },
 
