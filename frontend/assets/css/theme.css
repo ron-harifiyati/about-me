@@ -11,6 +11,7 @@
   --border:    #DEE2E6;
   --card-bg:   #FFFFFF;
   --shadow:    0 2px 8px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.14);
   --alert-error-bg:      #fde8e8;
   --alert-error-text:    #c0392b;
   --alert-error-border:  #f5c6cb;
@@ -29,6 +30,7 @@
   --border:    #333333;
   --card-bg:   #1E1E1E;
   --shadow:    0 2px 8px rgba(0,0,0,0.4);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.6);
   --alert-error-bg:      rgba(220,53,69,0.15);
   --alert-error-text:    #ff6b6b;
   --alert-error-border:  rgba(220,53,69,0.35);
@@ -47,6 +49,7 @@
   --border:    #D7CCC8;
   --card-bg:   #FDF6E3;
   --shadow:    0 2px 8px rgba(93,64,55,0.12);
+  --shadow-hover: 0 4px 16px rgba(93,64,55,0.22);
   --alert-error-bg:      #f9e8e6;
   --alert-error-text:    #8b3a30;
   --alert-error-border:  #e8b8b0;
@@ -65,6 +68,7 @@
   --border:    #003300;
   --card-bg:   #050505;
   --shadow:    0 2px 8px rgba(0,255,65,0.1);
+  --shadow-hover: 0 4px 16px rgba(0,255,65,0.18);
   --alert-error-bg:      rgba(255,0,0,0.1);
   --alert-error-text:    #ff4444;
   --alert-error-border:  rgba(255,0,0,0.3);
@@ -83,6 +87,7 @@
   --border:    #4C566A;
   --card-bg:   #3B4252;
   --shadow:    0 2px 8px rgba(0,0,0,0.3);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.5);
   --alert-error-bg:      rgba(191,97,106,0.15);
   --alert-error-text:    #BF616A;
   --alert-error-border:  rgba(191,97,106,0.35);
@@ -93,15 +98,19 @@
 
 /* Dark theme — accent buttons need dark text */
 [data-theme="dark"] .btn-primary { color: #121212; }
+[data-theme="dark"] .btn-outline:hover { color: #121212; }
 
 /* Coffee theme — accent buttons need dark brown text */
 [data-theme="coffee"] .btn-primary { color: #5D4037; }
+[data-theme="coffee"] .btn-outline:hover { color: #5D4037; }
 
 /* Terminal theme — green buttons use black text */
 [data-theme="terminal"] .btn-primary { color: #000000; }
+[data-theme="terminal"] .btn-outline:hover { color: #000000; }
 
 /* Nordic theme — accent buttons need dark text */
 [data-theme="nordic"] .btn-primary { color: #2E3440; }
+[data-theme="nordic"] .btn-outline:hover { color: #2E3440; }
 
 /* Terminal theme — badge accent is too dark; use bright text color instead */
 [data-theme="terminal"] .badge { background: var(--text); color: var(--bg); }

@@ -17,6 +17,16 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
 .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
 .page { padding: 2rem 0; min-height: calc(100vh - 64px - 60px); }
 
+/* Active nav link — non-color indicator */
+.nav-links a.active {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.nav-dropdown a.active {
+  font-weight: 600;
+}
+
 /* Nav */
 nav {
   background: var(--bg-alt);
@@ -67,7 +77,7 @@ nav {
   box-shadow: var(--shadow);
   transition: box-shadow 0.2s;
 }
-.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.card:hover { box-shadow: var(--shadow-hover); }
 
 .card-grid {
   display: grid;
@@ -158,10 +168,9 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.alert-error { border: 1px solid; }
-.alert-success { border: 1px solid; }
 
-/* Ticker */
+/* Ticker — pause on hover */
+.ticker-wrap:hover .ticker-text { animation-play-state: paused; }
 .ticker-wrap {
   overflow: hidden;
   white-space: nowrap;
@@ -331,4 +340,15 @@ footer {
 @keyframes pageEnter {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fade-in { opacity: 1; transform: none; }
+  .fade-in.visible { opacity: 1; transform: none; }
 }

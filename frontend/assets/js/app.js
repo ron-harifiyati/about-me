@@ -91,8 +91,17 @@ function portfolioApp() {
       // Scroll to top on navigation
       window.scrollTo(0, 0);
 
-      // Re-attach scroll observers after page change
-      this.$nextTick(() => initScrollAnimations());
+      // Re-attach scroll observers after page change and restart page animation
+      this.$nextTick(() => {
+        initScrollAnimations();
+        // Force page enter animation to replay on each navigation
+        const page = document.querySelector(".page");
+        if (page) {
+          page.style.animation = "none";
+          page.offsetHeight; // reflow
+          page.style.animation = "";
+        }
+      });
     },
 
     navigate(page) {

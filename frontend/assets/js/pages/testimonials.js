@@ -4,7 +4,7 @@ function testimonialsPage() {
     testimonials: [],
     filtered: [],
     activeFilter: "all",
-    identities: ["all", "Jamf", "MCRI", "Friend", "Family", "Other"],
+    identities: ["all"],
     form: { body: "", author: "", identity: "Other", anonymous: false },
     loading: true,
     submitting: false,
@@ -15,6 +15,9 @@ function testimonialsPage() {
       const resp = await api.get("/testimonials");
       this.testimonials = resp.data || [];
       this.filtered = this.testimonials;
+      // Build identity filter list from actual data
+      const seen = new Set(this.testimonials.map(t => t.identity).filter(Boolean));
+      this.identities = ["all", ...Array.from(seen)];
       this.loading = false;
     },
 
