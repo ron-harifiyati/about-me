@@ -76,6 +76,8 @@ def route(event: dict) -> dict:
         ("POST",   "/auth/register",                  auth_routes.register),
         ("POST",   "/auth/verify-email",              auth_routes.verify_email),
         ("POST",   "/auth/resend-verification",       auth_routes.resend_verification),
+        ("POST",   "/auth/forgot-password",           auth_routes.forgot_password),
+        ("POST",   "/auth/reset-password",            auth_routes.reset_password),
         ("POST",   "/auth/login",                     auth_routes.login),
         ("POST",   "/auth/logout",                    auth_routes.logout),
         ("POST",   "/auth/refresh",                   auth_routes.refresh),

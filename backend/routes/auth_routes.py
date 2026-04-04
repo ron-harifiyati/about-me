@@ -7,6 +7,7 @@ from models.users import (
     mark_email_verified, update_user_profile, create_email_verify_token,
     consume_email_verify_token, create_refresh_token, consume_refresh_token,
     delete_refresh_token, get_or_create_oauth_user,
+    create_password_reset_token, consume_password_reset_token, update_user_password,
 )
 from utils import ok, created, bad_request, unauthorized, conflict, server_error
 
@@ -79,6 +80,52 @@ def resend_verification(event, path_params, body, query, headers):
     except Exception:
         return server_error("Could not send verification email. Please try again later.")
     return ok({"message": "If that address is registered and unverified, a new email is on its way."})
+
+
+def _send_reset_email(email: str, token: str):
+    import boto3
+    ses = boto3.client("ses", region_name="us-east-1")
+    sender = os.environ["SES_SENDER_EMAIL"]
+    base_url = os.environ.get("FRONTEND_URL", "https://dkdwnfmhg75yf.cloudfront.net")
+    reset_url = f"{base_url}/#/reset-password?token={token}"
+    ses.send_email(
+        Source=sender,
+        Destination={"ToAddresses": [email]},
+        Message={
+            "Subject": {"Data": "Reset your password — Ron's Portfolio"},
+            "Body": {"Text": {"Data": f"Click to reset your password: {reset_url}\n\nThis link expires in 1 hour."}},
+        },
+    )
+
+
+def forgot_password(event, path_params, body, query, headers):
+    email = (body.get("email") or "").strip().lower()
+    if not email:
+        return bad_request("email is required")
+    safe_msg = "If that address is registered, a reset link is on its way."
+    user = get_user_by_email(email)
+    if not user or not user.get("password_hash"):
+        return ok({"message": safe_msg})
+    token = create_password_reset_token(user["user_id"])
+    try:
+        _send_reset_email(email, token)
+    except Exception:
+        return server_error("Could not send reset email. Please try again later.")
+    return ok({"message": safe_msg})
+
+
+def reset_password(event, path_params, body, query, headers):
+    token = (body.get("token") or "").strip()
+    new_password = body.get("new_password", "")
+    if not token or not new_password:
+        return bad_request("token and new_password are required")
+    if len(new_password) < 8:
+        return bad_request("password must be at least 8 characters")
+    user_id = consume_password_reset_token(token)
+    if not user_id:
+        return bad_request("Invalid or expired reset link")
+    update_user_password(user_id, new_password)
+    return ok({"message": "Password updated. You can now log in."})
 
 
 def login(event, path_params, body, query, headers):
