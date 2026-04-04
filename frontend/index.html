@@ -199,7 +199,7 @@
                 <!-- Testimonial pull quote -->
                 <template x-if="testimonial">
                   <div class="card testimonial-quote">
-                    <p x-text="'&ldquo;' + testimonial.body + '&rdquo;'" style="font-style: italic; line-height: 1.7; margin-bottom: 0.75rem;"></p>
+                    <p x-text="'\u201C' + testimonial.body + '\u201D'" style="font-style: italic; line-height: 1.7; margin-bottom: 0.75rem;"></p>
                     <p style="font-size: 0.82rem; color: var(--text-muted);">
                       &mdash; <span x-text="testimonial.author || 'Anonymous'"></span>
                       <template x-if="testimonial.identity">
@@ -694,7 +694,7 @@
             <div class="card-grid fade-in">
               <template x-for="t in filtered" :key="t.testimonial_id">
                 <div class="card">
-                  <p x-text="'&ldquo;' + t.body + '&rdquo;'" style="font-style: italic; margin-bottom: 1rem;"></p>
+                  <p x-text="'\u201C' + t.body + '\u201D'" style="font-style: italic; margin-bottom: 1rem;"></p>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong x-text="t.author"></strong>
                     <span class="badge badge-outline" x-text="t.identity" x-show="t.identity"></span>

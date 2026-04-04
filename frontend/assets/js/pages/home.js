@@ -62,7 +62,7 @@ function homePage() {
     },
 
     refreshFact() {
-      api.get("/fun-fact").then(r => { this.funFact = r.data?.fact || null; });
+      api.get("/fun-fact").then(r => { this.funFact = r.data?.fact || null; }).catch(() => {});
     },
   };
 }
