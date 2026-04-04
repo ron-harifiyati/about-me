@@ -192,7 +192,9 @@
           </section>
 
           <!-- ④ TESTIMONIAL + STATS -->
-          <section x-show="!loading" style="padding: 2rem 0; border-bottom: 1px solid var(--border);">
+          <section style="padding: 2rem 0; border-bottom: 1px solid var(--border);">
+            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <div x-show="!loading">
             <div class="home-two-col">
               <!-- Testimonial pull quote -->
               <template x-if="testimonial">
@@ -230,6 +232,7 @@
                   <span style="font-size: 1.1rem; font-weight: 700;" x-text="courseCount !== null ? courseCount : '—'"></span>
                 </div>
               </div>
+            </div>
             </div>
           </section>
 
