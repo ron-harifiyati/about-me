@@ -192,7 +192,9 @@ function adminGuestbook() {
 
 function adminComments() {
   return {
-    groups: [],
+    tab: "projects",
+    projectGroups: [],
+    courseGroups: [],
     loading: true,
 
     async init() {
@@ -203,26 +205,37 @@ function adminComments() {
       const projects = pResp.data || [];
       const courses = cResp.data || [];
 
-      const fetches = [
-        ...projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` })),
-        ...courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` })),
-      ];
+      const pFetches = projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` }));
+      const cFetches = courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` }));
 
-      const results = await Promise.all(fetches.map(f => api.get(f.path)));
-      this.groups = fetches
-        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: results[i].data || [] }))
+      const [pResults, cResults] = await Promise.all([
+        Promise.all(pFetches.map(f => api.get(f.path))),
+        Promise.all(cFetches.map(f => api.get(f.path))),
+      ]);
+
+      this.projectGroups = pFetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: pResults[i].data || [] }))
+        .filter(g => g.comments.length > 0);
+
+      this.courseGroups = cFetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: cResults[i].data || [] }))
         .filter(g => g.comments.length > 0);
 
       this.loading = false;
     },
 
-    async deleteComment(commentId, entityPk, groupIndex, commentIndex) {
+    get activeGroups() {
+      return this.tab === "projects" ? this.projectGroups : this.courseGroups;
+    },
+
+    async deleteComment(commentId, entityPk) {
       if (!confirm("Delete this comment?")) return;
       const resp = await api.delete(`/comments/${commentId}?entity_pk=${encodeURIComponent(entityPk)}`);
       if (resp.ok) {
-        this.groups[groupIndex].comments.splice(commentIndex, 1);
-        if (this.groups[groupIndex].comments.length === 0) {
-          this.groups.splice(groupIndex, 1);
+        const groups = this.tab === "projects" ? this.projectGroups : this.courseGroups;
+        for (const g of groups) {
+          const idx = g.comments.findIndex(c => c.comment_id === commentId);
+          if (idx !== -1) { g.comments.splice(idx, 1); break; }
         }
       }
     },

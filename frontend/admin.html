@@ -455,18 +455,25 @@
           <!-- Comments -->
           <div x-show="section === 'comments'" x-data="adminComments()" x-init="init()">
             <h1>Comments</h1>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+              <button class="btn btn-sm" :class="tab === 'projects' ? 'btn-primary' : 'btn-outline'" @click="tab = 'projects'">
+                Projects <span x-show="projectGroups.length > 0" x-text="'(' + projectGroups.reduce((s, g) => s + g.comments.length, 0) + ')'"></span>
+              </button>
+              <button class="btn btn-sm" :class="tab === 'courses' ? 'btn-primary' : 'btn-outline'" @click="tab = 'courses'">
+                Courses <span x-show="courseGroups.length > 0" x-text="'(' + courseGroups.reduce((s, g) => s + g.comments.length, 0) + ')'"></span>
+              </button>
+            </div>
             <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
             <template x-if="!loading">
               <div style="margin-top: 1.25rem;">
-                <template x-if="groups.length === 0"><p class="subtitle">No comments yet.</p></template>
-                <template x-for="(group, gi) in groups" :key="group.entityPk">
+                <template x-if="activeGroups.length === 0"><p class="subtitle">No comments yet.</p></template>
+                <template x-for="group in activeGroups" :key="group.entityPk">
                   <div style="margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                      <span class="badge badge-outline" x-text="group.entityPk.startsWith('PROJECT') ? 'Project' : 'Course'"></span>
                       <strong x-text="group.label"></strong>
-                      <span class="subtitle" style="font-size: 0.8rem;" x-text="`(${group.comments.length})`"></span>
+                      <span class="subtitle" style="font-size: 0.8rem;" x-text="'(' + group.comments.length + ')'"></span>
                     </div>
-                    <template x-for="(c, ci) in group.comments" :key="c.comment_id">
+                    <template x-for="c in group.comments" :key="c.comment_id">
                       <div class="card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
                         <div style="flex: 1; min-width: 0;">
                           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
@@ -477,7 +484,7 @@
                           <p style="font-size: 0.9rem;" x-text="c.body"></p>
                         </div>
                         <button class="btn btn-danger btn-sm" style="flex-shrink: 0;"
-                                @click="deleteComment(c.comment_id, group.entityPk, gi, ci)">Delete</button>
+                                @click="deleteComment(c.comment_id, group.entityPk)">Delete</button>
                       </div>
                     </template>
                   </div>
