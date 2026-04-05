@@ -7,6 +7,10 @@ def get_visitor_locations(event, path_params, body, query, headers):
     return ok(visit_model.get_visitor_locations())
 
 
+def get_pageviews(event, path_params, body, query, headers):
+    return ok(visit_model.get_pageviews())
+
+
 @require_admin
 def get_analytics(event, path_params, body, query, headers, user):
     return ok(visit_model.get_analytics())
