@@ -53,6 +53,7 @@ function statsPage() {
       this.map = L.map("visitor-map", {
         zoomControl: true,
         minZoom: 2,
+        maxZoom: 18,
         scrollWheelZoom: false,
       }).setView([20, 0], 2);
 
