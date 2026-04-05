@@ -186,6 +186,10 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
 }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
+/* Stats / Visitor map */
+.visitor-map { height: 420px; border-radius: 10px; border: 1px solid var(--border); margin-top: 1rem; }
+@media (max-width: 768px) { .visitor-map { height: 280px; } }
+
 /* Quiz */
 .quiz-center { text-align: center; padding: 3rem 0; }
 .quiz-center .btn { margin-top: 1rem; }
