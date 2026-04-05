@@ -24,6 +24,15 @@ def route(event: dict) -> dict:
     if method == "OPTIONS":
         return cors_response(200, {})
 
+    # Record visit (best-effort)
+    ip = ctx.get("sourceIp", "")
+    if ip:
+        try:
+            from models.visits import record_visit
+            record_visit(ip, path)
+        except Exception:
+            pass
+
     # Import route handlers here to keep imports lazy
     from routes import (
         meta, content, projects, courses, github,
