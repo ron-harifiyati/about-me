@@ -74,8 +74,10 @@ def resend_verification(event, path_params, body, query, headers):
     if not email:
         return bad_request("email is required")
     user = get_user_by_email(email)
-    # Always return 200 to avoid leaking whether an email is registered
-    if not user or user.get("email_verified"):
+    if user and user.get("email_verified"):
+        return ok({"message": "This email is already verified. You can log in now."})
+    # Return the same vague message whether not found or unverified to avoid leaking registration status
+    if not user:
         return ok({"message": "If that address is registered and unverified, a new email is on its way."})
     token = create_email_verify_token(user["user_id"])
     try:
