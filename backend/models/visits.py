@@ -38,7 +38,7 @@ def record_visit(ip: str, page: str, user: dict | None = None):
 def _lookup_ip(ip: str) -> dict:
     if ip in ("127.0.0.1", "::1", "testclient"):
         return {}
-    resp = requests.get(f"http://ip-api.com/json/{ip}?fields=country,city,lat,lon", timeout=3)
+    resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,country,city,lat,lon", timeout=3)
     if resp.status_code == 200 and resp.json().get("status") == "success":
         return resp.json()
     return {}
