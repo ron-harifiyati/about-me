@@ -74,3 +74,29 @@ def test_upsert_visitor_preserves_geo_on_failed_lookup(ddb_table, monkeypatch):
     assert len(locs) == 1
     assert locs[0]["country"] == "US"   # preserved from first call
     assert locs[0]["lat"] == "40.7"     # preserved from first call
+
+
+def test_post_visits_records_visitor_and_pageview(ddb_table, monkeypatch):
+    monkeypatch.setattr("models.visits._lookup_ip", lambda ip: {})
+    from router import route
+    from models.visits import get_pageviews
+    event = make_event("POST", "/visits", body={"page": "home"})
+    event["requestContext"]["http"]["sourceIp"] = "1.2.3.4"
+    resp = route(event)
+    assert resp["statusCode"] == 200
+    assert get_pageviews()["total"] == 1
+    assert get_pageviews()["by_page"]["home"] == 1
+
+
+def test_post_visits_requires_page(ddb_table):
+    from router import route
+    event = make_event("POST", "/visits", body={})
+    event["requestContext"]["http"]["sourceIp"] = "1.2.3.4"
+    resp = route(event)
+    assert resp["statusCode"] == 400
+
+
+def test_post_visits_requires_source_ip(ddb_table):
+    from router import route
+    resp = route(make_event("POST", "/visits", body={"page": "home"}))
+    assert resp["statusCode"] == 400
