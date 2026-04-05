@@ -108,7 +108,7 @@ nav {
 
 /* Forms */
 .form-group { margin-bottom: 1rem; }
-.form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.9rem; color: var(--text-muted); }
+.form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.9rem; color: var(--text); }
 .form-input {
   width: 100%;
   padding: 0.6rem 0.9rem;
@@ -369,3 +369,25 @@ footer {
   border-left: 3px solid var(--accent);
   padding-left: 1rem;
 }
+
+/* Auth pages */
+.auth-wrapper { max-width: 420px; margin: 3rem auto; }
+.auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-muted); }
+
+/* OAuth buttons */
+.oauth-buttons { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0; }
+.btn-oauth { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; }
+.btn-github { background: #24292e; color: #fff; border-color: #24292e; }
+.btn-github:hover { background: #1a1e22; color: #fff; border-color: #1a1e22; }
+.btn-google { border-color: var(--border); color: var(--text); }
+.btn-google:hover { background: var(--bg-alt); color: var(--text); border-color: var(--border); }
+
+/* Auth divider */
+.auth-divider { display: flex; align-items: center; gap: 1rem; margin: 1.25rem 0; color: var(--text-muted); font-size: 0.85rem; }
+.auth-divider-line { flex: 1; height: 1px; background: var(--border); }
+
+/* Password strength */
+.password-strength { margin-top: 0.4rem; }
+.password-strength-label { font-size: 0.8rem; display: block; margin-bottom: 0.3rem; }
+.password-strength-bar { height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
+.password-strength-bar-fill { height: 100%; border-radius: 2px; transition: width 0.2s, background 0.2s; }
