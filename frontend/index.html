@@ -670,11 +670,16 @@
       <!-- TESTIMONIALS -->
       <template x-if="currentPage === 'testimonials'">
         <div class="page" x-data="testimonialsPage()">
-          <h1>Testimonials</h1>
-          <p class="subtitle">What people say.</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h1>Testimonials</h1>
+              <p class="subtitle">What people say.</p>
+            </div>
+            <button class="btn btn-primary" @click="showModal = true">Leave a testimonial</button>
+          </div>
 
           <!-- Identity filter -->
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem;">
+          <div class="filter-pills">
             <template x-for="identity in identities" :key="identity">
               <button class="btn btn-sm"
                       :class="activeFilter === identity ? 'btn-primary' : 'btn-outline'"
@@ -688,14 +693,14 @@
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <div x-show="!loading" style="margin-top: 1.5rem;">
             <template x-if="filtered.length === 0">
-              <p class="subtitle">No testimonials yet.</p>
+              <div class="comment-empty">No testimonials yet — be the first to submit one below!</div>
             </template>
             <div class="card-grid">
               <template x-for="t in filtered" :key="t.testimonial_id">
                 <div class="card">
-                  <p x-text="'\u201C' + t.body + '\u201D'" style="font-style: italic; margin-bottom: 1rem;"></p>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong x-text="t.author"></strong>
+                  <p x-text="'\u201C' + t.body + '\u201D'" class="testimonial-body"></p>
+                  <div class="testimonial-author">
+                    <strong x-text="t.anonymous ? 'Anonymous' : t.author"></strong>
                     <span class="badge badge-outline" x-text="t.identity" x-show="t.identity"></span>
                   </div>
                 </div>
@@ -703,37 +708,42 @@
             </div>
           </div>
 
-          <!-- Submit form -->
-          <div class="card" style="max-width: 500px; margin-top: 2.5rem;">
-            <h3>Submit a testimonial</h3>
-            <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 1rem;">Pending admin approval before going live.</p>
-            <div x-show="error" class="alert alert-error" x-text="error"></div>
-            <div x-show="success" class="alert alert-success" x-text="success"></div>
-            <div class="form-group">
-              <label>Your testimonial</label>
-              <textarea x-model="form.body" class="form-input" rows="4" placeholder="What would you like to say?"></textarea>
+          <!-- Modal -->
+          <div class="modal-backdrop" x-show="showModal" @click.self="showModal = false">
+            <div class="modal">
+              <div class="modal-header">
+                <h3>Leave a testimonial</h3>
+                <button class="modal-close" @click="showModal = false">&times;</button>
+              </div>
+              <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 1rem;">Pending admin approval before going live.</p>
+              <div x-show="error" class="alert alert-error" x-text="error"></div>
+              <div x-show="success" class="alert alert-success" x-text="success"></div>
+              <div class="form-group">
+                <label>Your testimonial</label>
+                <textarea x-model="form.body" class="form-input" rows="4" placeholder="What would you like to say?"></textarea>
+              </div>
+              <div class="form-group" x-show="!form.anonymous">
+                <label>Your name (optional)</label>
+                <input x-model="form.author" class="form-input" placeholder="Leave blank to be anonymous">
+              </div>
+              <div class="form-group">
+                <label>Identity</label>
+                <select x-model="form.identity" class="form-input">
+                  <option>Jamf</option>
+                  <option>MCRI</option>
+                  <option>Friend</option>
+                  <option>Family</option>
+                  <option selected>Other</option>
+                </select>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" x-model="form.anonymous" id="anon">
+                <label for="anon">Submit anonymously</label>
+              </div>
+              <button class="btn btn-primary" style="margin-top: 1rem;" @click="submit()" :disabled="submitting">
+                <span x-text="submitting ? 'Submitting...' : 'Submit'"></span>
+              </button>
             </div>
-            <div class="form-group" x-show="!form.anonymous">
-              <label>Your name (optional)</label>
-              <input x-model="form.author" class="form-input" placeholder="Leave blank to be anonymous">
-            </div>
-            <div class="form-group">
-              <label>Identity</label>
-              <select x-model="form.identity" class="form-input">
-                <option>Jamf</option>
-                <option>MCRI</option>
-                <option>Friend</option>
-                <option>Family</option>
-                <option selected>Other</option>
-              </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="checkbox" x-model="form.anonymous" id="anon">
-              <label for="anon" style="margin: 0; cursor: pointer;">Submit anonymously</label>
-            </div>
-            <button class="btn btn-primary" @click="submit()" :disabled="submitting">
-              <span x-text="submitting ? 'Submitting...' : 'Submit'"></span>
-            </button>
           </div>
         </div>
       </template>
@@ -1179,7 +1189,7 @@
   <script src="/assets/js/pages/stats.js?v=1.9"></script>
   <script src="/assets/js/pages/contact.js?v=1.9"></script>
   <script src="/assets/js/pages/guestbook.js?v=1.9"></script>
-  <script src="/assets/js/pages/testimonials.js?v=1.9"></script>
+  <script src="/assets/js/pages/testimonials.js?v=2.0"></script>
   <script src="/assets/js/pages/developer.js?v=1.9"></script>
   <script src="/assets/js/pages/quiz.js?v=1.9"></script>
   <script src="/assets/js/pages/login.js?v=1.9"></script>
