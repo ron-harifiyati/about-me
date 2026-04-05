@@ -12,8 +12,6 @@ function homePage() {
     visitorCountries: null,
     projectCount: null,
     courseCount: null,
-    socialLinks: null,
-
     async init() {
       try {
         const [
@@ -23,7 +21,6 @@ function homePage() {
           testimonialsResp,
           visitorsResp,
           coursesResp,
-          aboutResp,
         ] = await Promise.all([
           api.get("/fun-fact"),
           api.get("/currently-learning"),
@@ -31,7 +28,6 @@ function homePage() {
           api.get("/testimonials"),
           api.get("/stats/visitors"),
           api.get("/courses"),
-          api.get("/about"),
         ]);
 
         this.funFact      = factResp.data?.fact || null;
@@ -49,13 +45,6 @@ function homePage() {
         this.visitorCountries = countries.size;
 
         this.courseCount   = (coursesResp.data || []).length;
-
-        const about        = aboutResp.data;
-        this.socialLinks   = {
-          github:   about?.social_links?.github   || null,
-          linkedin: about?.social_links?.linkedin || null,
-          email:    about?.contact?.email         || null,
-        };
       } finally {
         this.loading = false;
       }
