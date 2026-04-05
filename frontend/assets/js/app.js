@@ -62,7 +62,8 @@ function portfolioApp() {
 
     handleRoute(hash) {
       const path = hash.replace(/^#/, "") || "/";
-      const [base, ...rest] = path.split("/").filter(Boolean);
+      const [rawBase, ...rest] = path.split("/").filter(Boolean);
+      const base = (rawBase || "").split("?")[0];
 
       // Route table
       const routes = {
