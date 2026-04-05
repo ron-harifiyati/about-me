@@ -207,6 +207,10 @@ SPEC = {
             "get": {"summary": "List contacts (admin)", "tags": ["Admin"], "security": [{"bearerAuth": []}],
                     "responses": {"200": {"description": "OK"}}}
         },
+        "/admin/contacts/{id}": {
+            "delete": {"summary": "Delete contact (admin)", "tags": ["Admin"], "security": [{"bearerAuth": []}],
+                       "responses": {"200": {"description": "OK"}}},
+        },
         "/admin/testimonials/pending": {
             "get": {"summary": "List pending testimonials (admin)", "tags": ["Admin"],
                     "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}

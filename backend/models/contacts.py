@@ -54,5 +54,9 @@ def list_contacts() -> list:
     items = resp.get("Items", [])
     for item in items:
         item.pop("PK", None)
-        item.pop("SK", None)
     return sorted(items, key=lambda x: x.get("created_at", 0), reverse=True)
+
+
+def delete_contact_by_sk(sk: str):
+    table = get_table()
+    table.delete_item(Key={"PK": "CONTACTS", "SK": sk})

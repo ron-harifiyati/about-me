@@ -111,6 +111,7 @@ def route(event: dict) -> dict:
         ("PUT",    r"/admin/users/(?P<id>[^/]+)$",    admin.update_user),
         ("DELETE", r"/admin/users/(?P<id>[^/]+)$",    admin.delete_user),
         ("GET",    "/admin/contacts",                 admin.list_contacts),
+        ("DELETE", r"/admin/contacts/(?P<id>[^/]+)$", admin.delete_contact),
         ("GET",    "/admin/testimonials/pending",     admin.list_pending_testimonials),
         ("PUT",    r"/admin/testimonials/(?P<id>[^/]+)$", admin.update_testimonial),
         ("GET",    "/admin/quiz/questions",           admin.list_quiz_questions),

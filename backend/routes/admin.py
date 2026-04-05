@@ -1,6 +1,6 @@
 from auth import require_admin
 from models.users import list_all_users, set_user_status, delete_user as delete_user_model, get_user_by_id
-from models.contacts import list_contacts as list_contacts_model
+from models.contacts import list_contacts as list_contacts_model, delete_contact_by_sk
 from models.testimonials import list_pending, approve_testimonial, reject_testimonial
 from models import quiz as quiz_model
 from utils import ok, created, bad_request, not_found
@@ -35,6 +35,15 @@ def delete_user(event, path_params, body, query, headers, user):
 @require_admin
 def list_contacts(event, path_params, body, query, headers, user):
     return ok(list_contacts_model())
+
+
+@require_admin
+def delete_contact(event, path_params, body, query, headers, user):
+    sk = query.get("sk", "")
+    if not sk:
+        return bad_request("sk is required")
+    delete_contact_by_sk(sk)
+    return ok({"deleted": True})
 
 
 @require_admin
