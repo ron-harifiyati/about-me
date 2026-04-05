@@ -123,6 +123,27 @@ function adminTestimonials() {
   };
 }
 
+function adminGuestbook() {
+  return {
+    entries: [],
+    loading: true,
+
+    async init() {
+      const resp = await api.get("/guestbook");
+      this.entries = resp.data || [];
+      this.loading = false;
+    },
+
+    async deleteEntry(entry) {
+      if (!confirm("Delete this guestbook entry?")) return;
+      const resp = await api.delete(`/guestbook/${entry.entry_id}?sk=${encodeURIComponent(entry.SK)}`);
+      if (resp.ok) this.entries = this.entries.filter(e => e.entry_id !== entry.entry_id);
+    },
+
+    formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ""; },
+  };
+}
+
 function adminComments() {
   return {
     groups: [],

@@ -150,6 +150,10 @@ SPEC = {
             "post": {"summary": "Sign guestbook", "tags": ["Guestbook"],
                      "responses": {"201": {"description": "Created"}}},
         },
+        "/guestbook/{id}": {
+            "delete": {"summary": "Delete guestbook entry (admin)", "tags": ["Admin"],
+                       "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
         "/quiz/questions": {
             "get": {"summary": "Get quiz questions", "tags": ["Quiz"], "responses": {"200": {"description": "OK"}}}
         },

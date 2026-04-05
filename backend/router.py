@@ -90,6 +90,7 @@ def route(event: dict) -> dict:
         # Guestbook
         ("GET",    "/guestbook",                      guestbook.list_entries),
         ("POST",   "/guestbook",                      guestbook.create_entry),
+        ("DELETE", r"/guestbook/(?P<id>[^/]+)$",      guestbook.delete_entry),
         # Quiz
         ("GET",    "/quiz/questions",                 quiz.get_questions),
         ("POST",   "/quiz/submit",                    quiz.submit_answers),

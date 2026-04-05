@@ -55,6 +55,7 @@
           <a href="#/projects"     :class="{ active: section === 'projects' }"     @click.prevent="section='projects'">Projects</a>
           <a href="#/courses"      :class="{ active: section === 'courses' }"      @click.prevent="section='courses'">Courses</a>
           <a href="#/comments"     :class="{ active: section === 'comments' }"     @click.prevent="section='comments'">Comments</a>
+          <a href="#/guestbook"    :class="{ active: section === 'guestbook' }"    @click.prevent="section='guestbook'">Guestbook</a>
           <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'">Quiz</a>
           <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
           <a href="/index.html" style="color: var(--text-muted);">&larr; Back to site</a>
@@ -342,6 +343,32 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Guestbook -->
+          <div x-show="section === 'guestbook'" x-data="adminGuestbook()" x-init="init()">
+            <h1>Guestbook</h1>
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1.25rem;">
+                <template x-if="entries.length === 0"><p class="subtitle">No entries yet.</p></template>
+                <template x-for="e in entries" :key="e.entry_id">
+                  <div class="card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <strong style="font-size: 0.9rem;" x-text="e.name"></strong>
+                        <span class="badge badge-outline" x-show="e.identity" x-text="e.identity"></span>
+                        <span class="badge badge-outline" x-show="!e.is_authenticated">guest</span>
+                        <span class="subtitle" style="font-size: 0.75rem;" x-text="formatDate(e.created_at)"></span>
+                      </div>
+                      <p style="font-size: 0.9rem;" x-text="e.message"></p>
+                    </div>
+                    <button class="btn btn-danger btn-sm" style="flex-shrink: 0;"
+                            @click="deleteEntry(e)">Delete</button>
+                  </div>
+                </template>
+              </div>
+            </template>
           </div>
 
           <!-- Comments -->
