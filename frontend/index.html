@@ -110,8 +110,8 @@
     <main class="container">
 
       <!-- HOME -->
-      <div x-show="currentPage === 'home'" class="page">
-        <div x-data="homePage()" x-init="init()">
+      <template x-if="currentPage === 'home'">
+        <div class="page" x-data="homePage()" x-init="init()">
 
           <!-- ① HERO -->
           <section style="padding: 3rem 0 2rem; border-bottom: 1px solid var(--border);">
@@ -240,11 +240,11 @@
           </section>
 
         </div>
-      </div>
+      </template>
 
       <!-- ABOUT -->
-      <div x-show="currentPage === 'about'" class="page">
-        <div x-data="aboutPage()" x-init="init()">
+      <template x-if="currentPage === 'about'">
+        <div class="page" x-data="aboutPage()" x-init="init()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && about">
             <div>
@@ -287,11 +287,11 @@
             <p class="subtitle">About content coming soon.</p>
           </template>
         </div>
-      </div>
+      </template>
 
       <!-- PROJECTS LIST -->
-      <div x-show="currentPage === 'projects'" class="page">
-        <div x-data="projectsPage()" x-init="init()">
+      <template x-if="currentPage === 'projects'">
+        <div class="page" x-data="projectsPage()" x-init="init()">
           <h1>Projects</h1>
           <p class="subtitle">Things I've built.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -315,11 +315,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- PROJECT DETAIL -->
-      <div x-show="currentPage === 'project-detail'" class="page">
-        <div x-data="projectDetailPage()" x-init="init()">
+      <template x-if="currentPage === 'project-detail'">
+        <div class="page" x-data="projectDetailPage()" x-init="init()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && project">
             <div>
@@ -395,11 +395,11 @@
             </div>
           </template>
         </div>
-      </div>
+      </template>
 
       <!-- COURSES LIST -->
-      <div x-show="currentPage === 'courses'" class="page">
-        <div x-data="coursesPage()" x-init="init()">
+      <template x-if="currentPage === 'courses'">
+        <div class="page" x-data="coursesPage()" x-init="init()">
           <h1>Courses</h1>
           <p class="subtitle">Things I've studied.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -419,11 +419,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- COURSE DETAIL -->
-      <div x-show="currentPage === 'course-detail'" class="page">
-        <div x-data="courseDetailPage()" x-init="init()">
+      <template x-if="currentPage === 'course-detail'">
+        <div class="page" x-data="courseDetailPage()" x-init="init()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && course">
             <div>
@@ -481,11 +481,11 @@
             </div>
           </template>
         </div>
-      </div>
+      </template>
 
       <!-- SKILLS -->
-      <div x-show="currentPage === 'skills'" class="page">
-        <div x-data="skillsPage()" x-init="init()">
+      <template x-if="currentPage === 'skills'">
+        <div class="page" x-data="skillsPage()" x-init="init()">
           <h1>Skills</h1>
           <p class="subtitle">My technical toolkit.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -507,7 +507,7 @@
             <p class="subtitle" style="margin-top: 2rem;">Skills coming soon.</p>
           </template>
         </div>
-      </div>
+      </template>
 
       <!-- STATS -->
       <div x-show="currentPage === 'stats'" class="page" x-data="statsPage()"
@@ -524,8 +524,8 @@
       </div>
 
       <!-- CONTACT -->
-      <div x-show="currentPage === 'contact'" class="page">
-        <div x-data="contactPage()" x-init="init()">
+      <template x-if="currentPage === 'contact'">
+        <div class="page" x-data="contactPage()" x-init="init()">
           <h1>Contact</h1>
           <p class="subtitle">Get in touch.</p>
           <div class="contact-grid">
@@ -584,11 +584,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- GUESTBOOK -->
-      <div x-show="currentPage === 'guestbook'" class="page">
-        <div x-data="guestbookPage()" x-init="init()">
+      <template x-if="currentPage === 'guestbook'">
+        <div class="page" x-data="guestbookPage()" x-init="init()">
           <h1>Guestbook</h1>
           <p class="subtitle">Say hello — everyone's welcome.</p>
 
@@ -642,11 +642,11 @@
             </template>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- TESTIMONIALS -->
-      <div x-show="currentPage === 'testimonials'" class="page">
-        <div x-data="testimonialsPage()" x-init="init()">
+      <template x-if="currentPage === 'testimonials'">
+        <div class="page" x-data="testimonialsPage()" x-init="init()">
           <h1>Testimonials</h1>
           <p class="subtitle">What people say.</p>
 
@@ -713,11 +713,11 @@
             </button>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- DEVELOPER -->
-      <div x-show="currentPage === 'developer'" class="page">
-        <div x-data="developerPage()" x-init="init()">
+      <template x-if="currentPage === 'developer'">
+        <div class="page" x-data="developerPage()" x-init="init()">
           <h1>Developer</h1>
           <p class="subtitle">Explore the API that powers this portfolio.</p>
 
@@ -759,7 +759,7 @@
             </template>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- QUIZ (auth required) -->
       <div x-show="currentPage === 'quiz'" class="page">
@@ -901,8 +901,8 @@
       </div>
 
       <!-- LOGIN -->
-      <div x-show="currentPage === 'login'" class="page">
-        <div x-data="loginPage()" x-init="init()">
+      <template x-if="currentPage === 'login'">
+        <div class="page" x-data="loginPage()" x-init="init()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Login</h1>
             <p class="subtitle">Welcome back.</p>
@@ -964,11 +964,11 @@
             </p>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- REGISTER -->
-      <div x-show="currentPage === 'register'" class="page">
-        <div x-data="registerPage()" x-init="init()">
+      <template x-if="currentPage === 'register'">
+        <div class="page" x-data="registerPage()" x-init="init()">
           <div style="max-width: 420px; margin: 3rem auto;">
             <h1>Create account</h1>
             <p class="subtitle">Join and unlock interactive features.</p>
@@ -1031,11 +1031,11 @@
             </p>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- VERIFY EMAIL -->
-      <div x-show="currentPage === 'verify-email'" class="page">
-        <div x-data="verifyEmailPage()" x-init="init()">
+      <template x-if="currentPage === 'verify-email'">
+        <div class="page" x-data="verifyEmailPage()" x-init="init()">
           <div style="max-width: 400px; margin: 4rem auto; text-align: center;">
             <div x-show="status === 'loading'" class="loading-center"><div class="spinner"></div></div>
             <div x-show="status === 'success'">
@@ -1052,11 +1052,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- FORGOT PASSWORD -->
-      <div x-show="currentPage === 'forgot-password'" class="page">
-        <div x-data="forgotPasswordPage()">
+      <template x-if="currentPage === 'forgot-password'">
+        <div class="page" x-data="forgotPasswordPage()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Forgot password?</h1>
             <p class="subtitle">Enter your email and we'll send you a reset link. Valid for 1 hour.</p>
@@ -1078,11 +1078,11 @@
             </p>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- RESET PASSWORD -->
-      <div x-show="currentPage === 'reset-password'" class="page">
-        <div x-data="resetPasswordPage()" x-init="init()">
+      <template x-if="currentPage === 'reset-password'">
+        <div class="page" x-data="resetPasswordPage()" x-init="init()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Set a new password</h1>
             <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
@@ -1107,7 +1107,7 @@
             </form>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- 404 -->
       <div x-show="currentPage === 'not-found'" class="page">
