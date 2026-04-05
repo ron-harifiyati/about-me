@@ -19,6 +19,7 @@ function testimonialsPage() {
       const seen = new Set(this.testimonials.map(t => t.identity).filter(Boolean));
       this.identities = ["all", ...Array.from(seen)];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
 
     setFilter(identity) {

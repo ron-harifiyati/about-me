@@ -13,6 +13,7 @@ function aboutPage() {
       this.about = aboutResp.data;
       this.timeline = timelineResp.data?.events || [];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
   };
 }

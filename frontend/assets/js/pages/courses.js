@@ -7,6 +7,7 @@ function coursesPage() {
       const resp = await api.get("/courses");
       this.courses = resp.data || [];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
     starsDisplay(avg) {
       if (!avg) return "No ratings yet";

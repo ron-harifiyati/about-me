@@ -7,6 +7,7 @@ function projectsPage() {
       const resp = await api.get("/projects");
       this.projects = resp.data || [];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
     starsDisplay(avg) {
       if (!avg) return "No ratings yet";
