@@ -792,10 +792,10 @@
       <!-- QUIZ (auth required) -->
       <div x-show="currentPage === 'quiz'" class="page">
         <template x-if="!isAuthenticated">
-          <div style="text-align: center; padding: 4rem 0;">
+          <div class="quiz-center" style="padding: 4rem 0;">
             <h1>Quiz</h1>
             <p class="subtitle">Log in to take the quiz and compete on the leaderboard.</p>
-            <a href="#/login" class="btn btn-primary" style="margin-top: 1.5rem; display: inline-block;">Log in</a>
+            <a href="#/login" class="btn btn-primary">Log in</a>
           </div>
         </template>
         <template x-if="isAuthenticated">
@@ -805,28 +805,24 @@
             <div x-show="state === 'loading'" class="loading-center"><div class="spinner"></div></div>
 
             <!-- Start screen -->
-            <div x-show="state === 'start'" style="text-align: center; padding: 3rem 0;">
+            <div x-show="state === 'start'" class="quiz-center">
               <h1>Quiz</h1>
               <p class="subtitle" x-text="`${questions.length} questions · Test your knowledge`"></p>
               <div x-show="error" class="alert alert-error" style="max-width: 400px; margin: 1rem auto;" x-text="error"></div>
-              <button class="btn btn-primary" style="margin-top: 1.5rem;" @click="startQuiz()" x-show="questions.length > 0">
-                Start Quiz
-              </button>
-              <button class="btn btn-outline" style="margin-top: 1rem; display: block; margin-left: auto; margin-right: auto;" @click="showLeaderboard()">
-                View Leaderboard
-              </button>
+              <button class="btn btn-primary" @click="startQuiz()" x-show="questions.length > 0">Start Quiz</button>
+              <button class="btn btn-outline" style="display: block; margin: 0.5rem auto 0;" @click="showLeaderboard()">View Leaderboard</button>
             </div>
 
             <!-- Playing -->
             <div x-show="state === 'playing'">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div class="quiz-header">
                 <h1>Quiz</h1>
                 <span class="subtitle" x-text="`Question ${current + 1} of ${questions.length}`"></span>
               </div>
 
               <!-- Progress bar -->
-              <div style="height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 2rem;">
-                <div :style="`width: ${progress}%; background: var(--accent); height: 100%; border-radius: 3px; transition: width 0.3s;`"></div>
+              <div class="quiz-progress">
+                <div class="quiz-progress-fill" :style="`width: ${progress}%`"></div>
               </div>
 
               <div x-show="error" class="alert alert-error" x-text="error"></div>
@@ -834,12 +830,11 @@
               <!-- Single question -->
               <template x-if="currentQuestion">
                 <div class="card">
-                  <p style="font-weight: 600; margin-bottom: 1rem;" x-text="currentQuestion.question"></p>
-                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <p class="quiz-question" x-text="currentQuestion.question"></p>
+                  <div class="quiz-options">
                     <template x-for="option in currentQuestion.options" :key="option">
-                      <button class="btn"
+                      <button class="btn quiz-option"
                               :class="answers[currentQuestion.question_id] === option ? 'btn-primary' : 'btn-outline'"
-                              style="text-align: left; justify-content: flex-start;"
                               @click="selectAnswer(currentQuestion.question_id, option)"
                               x-text="option">
                       </button>
@@ -849,7 +844,7 @@
               </template>
 
               <!-- Navigation -->
-              <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <div class="quiz-nav">
                 <button class="btn btn-outline"
                         @click="prevQuestion()"
                         :style="current === 0 ? 'visibility: hidden;' : ''">
@@ -873,21 +868,21 @@
             </div>
 
             <!-- Result -->
-            <div x-show="state === 'result'" style="text-align: center; padding: 3rem 0;">
-              <div style="font-size: 3rem;" x-text="scorePercent === 100 ? '🏆' : scorePercent >= 80 ? '🎉' : '📝'"></div>
+            <div x-show="state === 'result'" class="quiz-center">
+              <div class="quiz-emoji" x-text="scorePercent === 100 ? '🏆' : scorePercent >= 80 ? '🎉' : '📝'"></div>
               <h1 x-text="scoreMessage()" style="margin-top: 1rem;"></h1>
               <template x-if="result">
                 <div>
-                  <p class="subtitle" style="font-size: 1.2rem; margin-top: 0.5rem;">
+                  <p class="subtitle quiz-result-score">
                     <span x-text="result.score"></span> / <span x-text="result.total"></span>
                     (<span x-text="scorePercent"></span>%)
                   </p>
-                  <div style="height: 12px; background: var(--border); border-radius: 6px; max-width: 300px; margin: 1.5rem auto;">
-                    <div :style="`width: ${scorePercent}%; background: var(--accent); height: 100%; border-radius: 6px; transition: width 1s;`"></div>
+                  <div class="quiz-result-bar">
+                    <div class="quiz-result-bar-fill" :style="`width: ${scorePercent}%`"></div>
                   </div>
                 </div>
               </template>
-              <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+              <div class="quiz-result-actions">
                 <button class="btn btn-outline" @click="startQuiz()">Try again</button>
                 <button class="btn btn-primary" @click="showLeaderboard()">Leaderboard</button>
               </div>
@@ -895,7 +890,7 @@
 
             <!-- Leaderboard -->
             <div x-show="state === 'leaderboard'">
-              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="leaderboard-header">
                 <h1>Leaderboard</h1>
                 <button class="btn btn-outline btn-sm" @click="state = 'start'">&larr; Back</button>
               </div>
@@ -903,20 +898,18 @@
               <template x-if="!loadingLeaderboard">
                 <div>
                   <template x-if="leaderboard.length === 0">
-                    <p class="subtitle">No scores yet. Be the first!</p>
+                    <div class="comment-empty">No scores yet — be the first to play!</div>
                   </template>
-                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div class="leaderboard-list">
                     <template x-for="(entry, idx) in leaderboard" :key="entry.attempt_id">
-                      <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                          <span style="font-size: 1.2rem; width: 2rem; text-align: center;"
+                      <div class="card leaderboard-entry">
+                        <div class="leaderboard-entry-left">
+                          <span class="leaderboard-rank"
                                 x-text="idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1) + '.'">
                           </span>
                           <span x-text="formatLeader(entry.user_id)"></span>
                         </div>
-                        <span style="font-weight: 700; color: var(--accent);"
-                              x-text="`${entry.score} / ${entry.total}`">
-                        </span>
+                        <span class="leaderboard-score" x-text="`${entry.score} / ${entry.total}`"></span>
                       </div>
                     </template>
                   </div>
@@ -977,9 +970,9 @@
                   <label>Password</label>
                   <input x-model="form.password" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <div class="form-check" style="margin-bottom: 1rem;">
                   <input type="checkbox" x-model="form.remember_me" id="remember">
-                  <label for="remember" style="margin: 0; cursor: pointer; font-size: 0.9rem; color: var(--text-muted);">Remember me (7 days)</label>
+                  <label for="remember">Remember me (7 days)</label>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;" :disabled="submitting">
                   <span x-text="submitting ? 'Logging in...' : 'Log in'"></span>

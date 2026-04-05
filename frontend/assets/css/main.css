@@ -114,7 +114,7 @@ nav {
   width: 100%;
   padding: 0.6rem 0.9rem;
   background: var(--bg-alt);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-input, var(--border));
   border-radius: 6px;
   color: var(--text);
   font-size: 0.95rem;
@@ -185,6 +185,28 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
   animation: ticker 20s linear infinite;
 }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+/* Quiz */
+.quiz-center { text-align: center; padding: 3rem 0; }
+.quiz-center .btn { margin-top: 1rem; }
+.quiz-progress { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 2rem; }
+.quiz-progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.quiz-question { font-weight: 600; margin-bottom: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.quiz-option { text-align: left; justify-content: flex-start; }
+.quiz-nav { margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.quiz-emoji { font-size: 3rem; }
+.quiz-result-score { font-size: 1.2rem; margin-top: 0.5rem; }
+.quiz-result-bar { height: 12px; background: var(--border); border-radius: 6px; max-width: 300px; margin: 1.5rem auto; }
+.quiz-result-bar-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 1s; }
+.quiz-result-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+.leaderboard-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.leaderboard-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.leaderboard-entry { display: flex; align-items: center; justify-content: space-between; }
+.leaderboard-entry-left { display: flex; align-items: center; gap: 1rem; }
+.leaderboard-rank { font-size: 1.2rem; width: 2rem; text-align: center; }
+.leaderboard-score { font-weight: 700; color: var(--accent); }
 
 /* Developer page */
 .stack-cards { display: flex; flex-direction: column; gap: 1rem; max-width: 600px; margin-top: 2rem; }
