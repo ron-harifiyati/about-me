@@ -96,6 +96,13 @@
   --alert-success-border:rgba(163,190,140,0.35);
 }
 
+/* Light mode — strengthen input borders so they're visible on white card background */
+:root { --border-input: #ADB5BD; }
+[data-theme="dark"]    { --border-input: #444444; }
+[data-theme="coffee"]  { --border-input: #C4A882; }
+[data-theme="terminal"] { --border-input: #005500; }
+[data-theme="nordic"]  { --border-input: #5C6882; }
+
 /* Dark theme — accent buttons need dark text */
 [data-theme="dark"] .btn-primary { color: #121212; }
 [data-theme="dark"] .btn-outline:hover { color: #121212; }

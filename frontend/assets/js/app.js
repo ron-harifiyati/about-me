@@ -39,7 +39,7 @@ function portfolioApp() {
       if (token) {
         this.accessToken = token;
         const resp = await api.get("/auth/me");
-        if (resp.ok) {
+        if (resp.ok && resp.data) {
           this.user = resp.data;
           // Sync server theme
           if (resp.data.theme) {
