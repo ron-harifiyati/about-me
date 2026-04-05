@@ -40,6 +40,10 @@ Key patterns are defined in `docs/superpowers/plans/2026-04-02-portfolio-backend
 GSI attribute names: `GSI1PK`, `GSI1SK`, `GSI2PK`, `GSI2SK`, `GSI3PK`, `GSI3SK`.
 Lambda IAM policy (`infra/iam-policy.json`) must include `dynamodb:Scan` — list endpoints use table scans.
 
+**Visitor analytics partitions** (added 2026-04-05):
+- `PK=VISITORS, SK=VISITOR#{ip}` — one item per unique IP, upserted on each page visit (geo data, first/last seen)
+- `PK=PAGEVIEWS, SK=VIEW#{timestamp}#{uuid}` — one record per page navigation (page name, ip, created_at)
+
 ### Models vs Routes
 - `models/` — pure DynamoDB read/write, no HTTP logic
 - `routes/` — HTTP handling only, call models for data
@@ -93,8 +97,7 @@ Use `AWS_PROFILE=portfolio-admin aws ...` for infra commands.
 
 ## Implementation Plans
 
-All 3 plans are complete as of 2026-04-03.
-
 1. `docs/superpowers/plans/2026-04-02-portfolio-infra.md` — ✅ AWS setup + CI/CD
 2. `docs/superpowers/plans/2026-04-02-portfolio-backend.md` — ✅ Python API
 3. `docs/superpowers/plans/2026-04-02-portfolio-frontend.md` — ✅ Alpine.js SPA
+4. `docs/superpowers/plans/2026-04-05-visitor-analytics.md` — ✅ Visitor map + page view analytics
