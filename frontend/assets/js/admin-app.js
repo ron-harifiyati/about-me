@@ -5,6 +5,7 @@ function adminApp() {
     user: null,
     loading: true,
     section: "dashboard",
+    sidebarOpen: false,
     stats: {},
 
     async init() {
@@ -415,6 +416,7 @@ function adminQuiz() {
   return {
     questions: [],
     loading: true,
+    showModal: false,
     form: { question: "", options: ["", "", "", ""], answer: "", topic: "general" },
     editing: null,
     saving: false,
@@ -424,6 +426,26 @@ function adminQuiz() {
       const resp = await api.get("/admin/quiz/questions");
       this.questions = resp.data || [];
       this.loading = false;
+    },
+
+    openCreate() {
+      this.editing = null;
+      this.form = { question: "", options: ["", "", "", ""], answer: "", topic: "general" };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    openEdit(q) {
+      this.editing = q.question_id;
+      this.form = { question: q.question, options: [...q.options], answer: q.answer, topic: q.topic };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.editing = null;
+      this.error = null;
     },
 
     async save() {
@@ -438,27 +460,17 @@ function adminQuiz() {
       if (resp.ok) {
         const resp2 = await api.get("/admin/quiz/questions");
         this.questions = resp2.data || [];
-        this.resetForm();
+        this.closeModal();
       } else {
         this.error = resp.error;
       }
       this.saving = false;
     },
 
-    editQuestion(q) {
-      this.editing = q.question_id;
-      this.form = { question: q.question, options: [...q.options], answer: q.answer, topic: q.topic };
-    },
-
     async deleteQuestion(id) {
       if (!confirm("Delete this question?")) return;
       await api.delete(`/admin/quiz/questions/${id}`);
       this.questions = this.questions.filter(q => q.question_id !== id);
-    },
-
-    resetForm() {
-      this.editing = null;
-      this.form = { question: "", options: ["", "", "", ""], answer: "", topic: "general" };
     },
   };
 }

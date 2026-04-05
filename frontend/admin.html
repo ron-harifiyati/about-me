@@ -9,11 +9,14 @@
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <style>
     .admin-layout { display: flex; min-height: 100vh; }
+
+    /* Sidebar — desktop */
     .admin-sidebar {
       width: 220px; flex-shrink: 0;
       background: var(--bg-alt);
       border-right: 1px solid var(--border);
       padding: 1.5rem 1rem;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
     }
     .admin-sidebar h2 { font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-muted); }
     .admin-sidebar a {
@@ -24,8 +27,47 @@
     .admin-sidebar a:hover, .admin-sidebar a.active {
       background: var(--accent); color: #fff; text-decoration: none;
     }
-    .admin-content { flex: 1; padding: 2rem; overflow-y: auto; }
-    @media (max-width: 768px) { .admin-dashboard-cols { grid-template-columns: 1fr !important; } }
+
+    .admin-content { flex: 1; padding: 2rem; overflow-y: auto; min-width: 0; }
+
+    /* Mobile top bar */
+    .admin-topbar {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--bg-alt); border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      align-items: center; justify-content: space-between;
+    }
+    .admin-topbar-title { font-weight: 600; font-size: 1rem; }
+    .admin-hamburger {
+      background: none; border: none; cursor: pointer;
+      padding: 0.25rem; color: var(--text); line-height: 1;
+    }
+
+    /* Sidebar backdrop */
+    .admin-sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0; z-index: 1001;
+      background: rgba(0,0,0,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .admin-topbar { display: flex; }
+      .admin-layout { display: block; padding-top: 48px; }
+
+      .admin-sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0; z-index: 1002;
+        width: 260px; height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        padding-top: 1rem;
+      }
+      .admin-sidebar.is-open { transform: translateX(0); }
+      .admin-sidebar-backdrop.is-open { display: block; }
+
+      .admin-content { padding: 1.25rem 1rem; }
+      .admin-dashboard-cols { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
@@ -45,20 +87,36 @@
     <template x-if="isAdmin">
       <div class="admin-layout">
 
+        <!-- Mobile top bar -->
+        <div class="admin-topbar">
+          <span class="admin-topbar-title">Admin Panel</span>
+          <button class="admin-hamburger" @click="sidebarOpen = !sidebarOpen" aria-label="Toggle navigation">
+            <svg x-show="!sidebarOpen" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+            <svg x-show="sidebarOpen" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sidebar backdrop -->
+        <div class="admin-sidebar-backdrop" :class="{ 'is-open': sidebarOpen }" @click="sidebarOpen = false"></div>
+
         <!-- Sidebar -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" :class="{ 'is-open': sidebarOpen }">
           <h2>Admin Panel</h2>
-          <a href="#/dashboard"    :class="{ active: section === 'dashboard' }"    @click.prevent="section='dashboard'">Dashboard</a>
-          <a href="#/analytics"    :class="{ active: section === 'analytics' }"    @click.prevent="section='analytics'">Analytics</a>
-          <a href="#/content"      :class="{ active: section === 'content' }"      @click.prevent="section='content'">Content</a>
-          <a href="#/users"        :class="{ active: section === 'users' }"        @click.prevent="section='users'">Users</a>
-          <a href="#/contacts"     :class="{ active: section === 'contacts' }"     @click.prevent="section='contacts'">Contacts</a>
-          <a href="#/testimonials" :class="{ active: section === 'testimonials' }" @click.prevent="section='testimonials'">Testimonials</a>
-          <a href="#/projects"     :class="{ active: section === 'projects' }"     @click.prevent="section='projects'">Projects</a>
-          <a href="#/courses"      :class="{ active: section === 'courses' }"      @click.prevent="section='courses'">Courses</a>
-          <a href="#/comments"     :class="{ active: section === 'comments' }"     @click.prevent="section='comments'">Comments</a>
-          <a href="#/guestbook"    :class="{ active: section === 'guestbook' }"    @click.prevent="section='guestbook'">Guestbook</a>
-          <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'">Quiz</a>
+          <a href="#/dashboard"    :class="{ active: section === 'dashboard' }"    @click.prevent="section='dashboard'; sidebarOpen=false">Dashboard</a>
+          <a href="#/analytics"    :class="{ active: section === 'analytics' }"    @click.prevent="section='analytics'; sidebarOpen=false">Analytics</a>
+          <a href="#/content"      :class="{ active: section === 'content' }"      @click.prevent="section='content'; sidebarOpen=false">Content</a>
+          <a href="#/users"        :class="{ active: section === 'users' }"        @click.prevent="section='users'; sidebarOpen=false">Users</a>
+          <a href="#/contacts"     :class="{ active: section === 'contacts' }"     @click.prevent="section='contacts'; sidebarOpen=false">Contacts</a>
+          <a href="#/testimonials" :class="{ active: section === 'testimonials' }" @click.prevent="section='testimonials'; sidebarOpen=false">Testimonials</a>
+          <a href="#/projects"     :class="{ active: section === 'projects' }"     @click.prevent="section='projects'; sidebarOpen=false">Projects</a>
+          <a href="#/courses"      :class="{ active: section === 'courses' }"      @click.prevent="section='courses'; sidebarOpen=false">Courses</a>
+          <a href="#/comments"     :class="{ active: section === 'comments' }"     @click.prevent="section='comments'; sidebarOpen=false">Comments</a>
+          <a href="#/guestbook"    :class="{ active: section === 'guestbook' }"    @click.prevent="section='guestbook'; sidebarOpen=false">Guestbook</a>
+          <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'; sidebarOpen=false">Quiz</a>
           <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
           <a href="/index.html" style="color: var(--text-muted);">&larr; Back to site</a>
         </aside>
@@ -590,57 +648,66 @@
 
           <!-- Quiz -->
           <div x-show="section === 'quiz'" x-data="adminQuiz()" x-init="init()">
-            <h1>Quiz Questions</h1>
-            <div x-show="error" class="alert alert-error" x-text="error"></div>
-
-            <!-- Add/Edit form -->
-            <div class="card" style="margin-bottom: 1.5rem;">
-              <h3 x-text="editing ? 'Edit Question' : 'Add Question'"></h3>
-              <div class="form-group"><label>Question</label>
-                <input x-model="form.question" class="form-input" placeholder="What is...?"></div>
-              <div class="form-group"><label>Options (4 choices)</label>
-                <template x-for="(opt, idx) in form.options" :key="idx">
-                  <input x-model="form.options[idx]" class="form-input" style="margin-bottom: 0.4rem;"
-                         :placeholder="`Option ${idx + 1}`">
-                </template>
-              </div>
-              <div class="form-group"><label>Correct answer</label>
-                <select x-model="form.answer" class="form-input">
-                  <option value="">— Select the correct option —</option>
-                  <template x-for="opt in form.options.filter(o => o.trim())" :key="opt">
-                    <option :value="opt" x-text="opt"></option>
-                  </template>
-                </select>
-              </div>
-              <div class="form-group"><label>Topic</label>
-                <input x-model="form.topic" class="form-input" placeholder="general"></div>
-              <div style="display: flex; gap: 0.75rem;">
-                <button class="btn btn-primary" @click="save()" :disabled="saving">
-                  <span x-text="saving ? 'Saving...' : editing ? 'Update' : 'Add'"></span>
-                </button>
-                <button class="btn btn-outline" x-show="editing" @click="resetForm()">Cancel</button>
-              </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h1>Quiz Questions</h1>
+              <button class="btn btn-primary btn-sm" @click="openCreate()">+ Add Question</button>
             </div>
 
             <!-- Questions list -->
-            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
             <template x-if="!loading">
-              <div>
+              <div style="margin-top: 1.25rem;">
                 <template x-if="questions.length === 0"><p class="subtitle">No questions yet.</p></template>
                 <template x-for="q in questions" :key="q.question_id">
                   <div class="card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-                    <div>
+                    <div style="flex: 1; min-width: 0;">
                       <p x-text="q.question" style="font-weight: 500;"></p>
                       <p class="subtitle" style="font-size: 0.8rem; margin-top: 0.3rem;" x-text="'Answer: ' + q.answer"></p>
+                      <p class="subtitle" style="font-size: 0.75rem; margin-top: 0.15rem;" x-text="'Topic: ' + q.topic"></p>
                     </div>
                     <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
-                      <button class="btn btn-outline btn-sm" @click="editQuestion(q)">Edit</button>
+                      <button class="btn btn-outline btn-sm" @click="openEdit(q)">Edit</button>
                       <button class="btn btn-danger btn-sm" @click="deleteQuestion(q.question_id)">Delete</button>
                     </div>
                   </div>
                 </template>
               </div>
             </template>
+
+            <!-- Modal -->
+            <div class="modal-backdrop" x-show="showModal" @click.self="closeModal()">
+              <div class="modal">
+                <div class="modal-header">
+                  <h3 x-text="editing ? 'Edit Question' : 'Add Question'"></h3>
+                  <button class="modal-close" @click="closeModal()">✕</button>
+                </div>
+                <div x-show="error" class="alert alert-error" style="margin-bottom: 1rem;" x-text="error"></div>
+                <div class="form-group"><label>Question</label>
+                  <input x-model="form.question" class="form-input" placeholder="What is...?"></div>
+                <div class="form-group"><label>Options</label>
+                  <template x-for="(opt, idx) in form.options" :key="idx">
+                    <input x-model="form.options[idx]" class="form-input" style="margin-bottom: 0.4rem;"
+                           :placeholder="`Option ${idx + 1}`">
+                  </template>
+                </div>
+                <div class="form-group"><label>Correct answer</label>
+                  <select x-model="form.answer" class="form-input">
+                    <option value="">— Select the correct option —</option>
+                    <template x-for="opt in form.options.filter(o => o.trim())" :key="opt">
+                      <option :value="opt" x-text="opt"></option>
+                    </template>
+                  </select>
+                </div>
+                <div class="form-group"><label>Topic</label>
+                  <input x-model="form.topic" class="form-input" placeholder="general"></div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                  <button class="btn btn-primary" @click="save()" :disabled="saving">
+                    <span x-text="saving ? 'Saving...' : editing ? 'Update' : 'Add'"></span>
+                  </button>
+                  <button class="btn btn-outline" @click="closeModal()">Cancel</button>
+                </div>
+              </div>
+            </div>
           </div>
 
         </main>
