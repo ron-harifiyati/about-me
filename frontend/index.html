@@ -24,7 +24,7 @@
   <link rel="alternate icon" href="/assets/images/favicon.ico">
 </head>
 <body>
-  <div x-data="portfolioApp()" x-init="init()">
+  <div x-data="portfolioApp()">
 
     <!-- GLOBAL NAV -->
     <nav x-data="{ mobileOpen: false, moreOpen: false }" @click.outside="mobileOpen = false; moreOpen = false" @hashchange.window="mobileOpen = false; moreOpen = false">
@@ -111,7 +111,7 @@
 
       <!-- HOME -->
       <template x-if="currentPage === 'home'">
-        <div class="page" x-data="homePage()" x-init="init()">
+        <div class="page" x-data="homePage()">
 
           <!-- ① HERO -->
           <section style="padding: 3rem 0 2rem; border-bottom: 1px solid var(--border);">
@@ -244,7 +244,7 @@
 
       <!-- ABOUT -->
       <template x-if="currentPage === 'about'">
-        <div class="page" x-data="aboutPage()" x-init="init()">
+        <div class="page" x-data="aboutPage()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && about">
             <div>
@@ -291,7 +291,7 @@
 
       <!-- PROJECTS LIST -->
       <template x-if="currentPage === 'projects'">
-        <div class="page" x-data="projectsPage()" x-init="init()">
+        <div class="page" x-data="projectsPage()">
           <h1>Projects</h1>
           <p class="subtitle">Things I've built.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -319,7 +319,7 @@
 
       <!-- PROJECT DETAIL -->
       <template x-if="currentPage === 'project-detail'">
-        <div class="page" x-data="projectDetailPage()" x-init="init()">
+        <div class="page" x-data="projectDetailPage()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && project">
             <div>
@@ -399,7 +399,7 @@
 
       <!-- COURSES LIST -->
       <template x-if="currentPage === 'courses'">
-        <div class="page" x-data="coursesPage()" x-init="init()">
+        <div class="page" x-data="coursesPage()">
           <h1>Courses</h1>
           <p class="subtitle">Things I've studied.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -423,7 +423,7 @@
 
       <!-- COURSE DETAIL -->
       <template x-if="currentPage === 'course-detail'">
-        <div class="page" x-data="courseDetailPage()" x-init="init()">
+        <div class="page" x-data="courseDetailPage()">
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && course">
             <div>
@@ -485,7 +485,7 @@
 
       <!-- SKILLS -->
       <template x-if="currentPage === 'skills'">
-        <div class="page" x-data="skillsPage()" x-init="init()">
+        <div class="page" x-data="skillsPage()">
           <h1>Skills</h1>
           <p class="subtitle">My technical toolkit.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -511,7 +511,7 @@
 
       <!-- STATS -->
       <div x-show="currentPage === 'stats'" class="page" x-data="statsPage()"
-           x-init="init()" @hashchange.window="destroy()">
+           @hashchange.window="destroy()">
         <h1>Visitor Map</h1>
         <p class="subtitle">People who've visited from around the world.</p>
         <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
@@ -525,7 +525,7 @@
 
       <!-- CONTACT -->
       <template x-if="currentPage === 'contact'">
-        <div class="page" x-data="contactPage()" x-init="init()">
+        <div class="page" x-data="contactPage()">
           <h1>Contact</h1>
           <p class="subtitle">Get in touch.</p>
           <div class="contact-grid">
@@ -588,7 +588,7 @@
 
       <!-- GUESTBOOK -->
       <template x-if="currentPage === 'guestbook'">
-        <div class="page" x-data="guestbookPage()" x-init="init()">
+        <div class="page" x-data="guestbookPage()">
           <h1>Guestbook</h1>
           <p class="subtitle">Say hello — everyone's welcome.</p>
 
@@ -646,7 +646,7 @@
 
       <!-- TESTIMONIALS -->
       <template x-if="currentPage === 'testimonials'">
-        <div class="page" x-data="testimonialsPage()" x-init="init()">
+        <div class="page" x-data="testimonialsPage()">
           <h1>Testimonials</h1>
           <p class="subtitle">What people say.</p>
 
@@ -717,7 +717,7 @@
 
       <!-- DEVELOPER -->
       <template x-if="currentPage === 'developer'">
-        <div class="page" x-data="developerPage()" x-init="init()">
+        <div class="page" x-data="developerPage()">
           <h1>Developer</h1>
           <p class="subtitle">Explore the API that powers this portfolio.</p>
 
@@ -771,7 +771,7 @@
           </div>
         </template>
         <template x-if="isAuthenticated">
-          <div x-data="quizPage()" x-init="init()">
+          <div x-data="quizPage()">
 
             <!-- Loading -->
             <div x-show="state === 'loading'" class="loading-center"><div class="spinner"></div></div>
@@ -902,7 +902,7 @@
 
       <!-- LOGIN -->
       <template x-if="currentPage === 'login'">
-        <div class="page" x-data="loginPage()" x-init="init()">
+        <div class="page" x-data="loginPage()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Login</h1>
             <p class="subtitle">Welcome back.</p>
@@ -968,7 +968,7 @@
 
       <!-- REGISTER -->
       <template x-if="currentPage === 'register'">
-        <div class="page" x-data="registerPage()" x-init="init()">
+        <div class="page" x-data="registerPage()">
           <div style="max-width: 420px; margin: 3rem auto;">
             <h1>Create account</h1>
             <p class="subtitle">Join and unlock interactive features.</p>
@@ -1035,7 +1035,7 @@
 
       <!-- VERIFY EMAIL -->
       <div x-show="currentPage === 'verify-email'" class="page">
-        <div x-data="verifyEmailPage()" x-init="init()">
+        <div x-data="verifyEmailPage()">
           <div style="max-width: 400px; margin: 4rem auto; text-align: center;">
             <div x-show="status === 'loading'" class="loading-center"><div class="spinner"></div></div>
             <div x-show="status === 'success'">
@@ -1085,7 +1085,7 @@
 
       <!-- RESET PASSWORD -->
       <div x-show="currentPage === 'reset-password'" class="page">
-        <div x-data="resetPasswordPage()" x-init="init()">
+        <div x-data="resetPasswordPage()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Set a new password</h1>
             <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
@@ -1133,28 +1133,28 @@
   </div>
 
   <!-- Scripts — load order matters -->
-  <script src="/assets/js/api.js?v=1.5"></script>
-  <script src="/assets/js/themes.js?v=1.5"></script>
-  <script src="/assets/js/app.js?v=1.5"></script>
+  <script src="/assets/js/api.js?v=1.6"></script>
+  <script src="/assets/js/themes.js?v=1.6"></script>
+  <script src="/assets/js/app.js?v=1.6"></script>
 
   <!-- Page components -->
-  <script src="/assets/js/pages/home.js?v=1.5"></script>
-  <script src="/assets/js/pages/about.js?v=1.5"></script>
-  <script src="/assets/js/pages/projects.js?v=1.5"></script>
-  <script src="/assets/js/pages/courses.js?v=1.5"></script>
-  <script src="/assets/js/pages/skills.js?v=1.5"></script>
-  <script src="/assets/js/pages/stats.js?v=1.5"></script>
-  <script src="/assets/js/pages/contact.js?v=1.5"></script>
-  <script src="/assets/js/pages/guestbook.js?v=1.5"></script>
-  <script src="/assets/js/pages/testimonials.js?v=1.5"></script>
-  <script src="/assets/js/pages/developer.js?v=1.5"></script>
-  <script src="/assets/js/pages/quiz.js?v=1.5"></script>
-  <script src="/assets/js/pages/login.js?v=1.5"></script>
-  <script src="/assets/js/pages/register.js?v=1.5"></script>
-  <script src="/assets/js/pages/verify-email.js?v=1.5"></script>
+  <script src="/assets/js/pages/home.js?v=1.6"></script>
+  <script src="/assets/js/pages/about.js?v=1.6"></script>
+  <script src="/assets/js/pages/projects.js?v=1.6"></script>
+  <script src="/assets/js/pages/courses.js?v=1.6"></script>
+  <script src="/assets/js/pages/skills.js?v=1.6"></script>
+  <script src="/assets/js/pages/stats.js?v=1.6"></script>
+  <script src="/assets/js/pages/contact.js?v=1.6"></script>
+  <script src="/assets/js/pages/guestbook.js?v=1.6"></script>
+  <script src="/assets/js/pages/testimonials.js?v=1.6"></script>
+  <script src="/assets/js/pages/developer.js?v=1.6"></script>
+  <script src="/assets/js/pages/quiz.js?v=1.6"></script>
+  <script src="/assets/js/pages/login.js?v=1.6"></script>
+  <script src="/assets/js/pages/register.js?v=1.6"></script>
+  <script src="/assets/js/pages/verify-email.js?v=1.6"></script>
 
-  <script src="/assets/js/pages/forgot-password.js?v=1.5"></script>
-  <script src="/assets/js/pages/reset-password.js?v=1.5"></script>
+  <script src="/assets/js/pages/forgot-password.js?v=1.6"></script>
+  <script src="/assets/js/pages/reset-password.js?v=1.6"></script>
 
   <!-- Alpine.js (loaded last) -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
