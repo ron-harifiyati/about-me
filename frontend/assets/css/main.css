@@ -185,6 +185,12 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
 }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
+/* Contact detail items */
+.contact-detail-item { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; font-size: 0.95rem; }
+.contact-detail-item strong { color: var(--text); font-weight: 700; min-width: 90px; }
+.contact-detail-item a { color: var(--text); }
+.contact-detail-item a:hover { color: var(--accent); }
+
 /* Contact page two-column grid */
 .contact-grid {
   display: grid;
