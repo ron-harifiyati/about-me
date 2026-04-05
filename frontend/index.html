@@ -249,33 +249,45 @@
           <template x-if="!loading && about">
             <div>
               <h1>About me</h1>
-              <p class="subtitle" style="margin-bottom: 1.5rem;" x-text="about.mission"></p>
-              <p x-text="about.bio" class="fade-in" style="margin-bottom: 2rem; line-height: 1.8;"></p>
+
+              <!-- Mission + bio -->
+              <p class="about-mission fade-in" x-text="about.mission"></p>
+              <p class="about-body fade-in" x-text="about.bio"></p>
 
               <!-- Social links -->
-              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+              <div class="about-links">
                 <template x-if="about.contact?.email">
-                  <a :href="'mailto:' + about.contact.email" class="btn btn-outline btn-sm">Email</a>
+                  <a :href="'mailto:' + about.contact.email" class="btn btn-outline btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    Email
+                  </a>
                 </template>
                 <template x-if="about.social_links?.github">
-                  <a :href="about.social_links.github" target="_blank" class="btn btn-outline btn-sm">GitHub</a>
+                  <a :href="about.social_links.github" target="_blank" class="btn btn-github btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    GitHub
+                  </a>
                 </template>
                 <template x-if="about.social_links?.linkedin">
-                  <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm">LinkedIn</a>
+                  <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm about-linkedin">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                    LinkedIn
+                  </a>
                 </template>
               </div>
 
               <!-- Timeline -->
               <template x-if="timeline.length > 0">
                 <div>
+                  <hr class="about-divider">
                   <h2>Journey</h2>
-                  <div style="border-left: 2px solid var(--accent); padding-left: 1.5rem; margin-top: 1rem;">
+                  <div class="timeline">
                     <template x-for="event in timeline" :key="event.date">
-                      <div style="margin-bottom: 1.5rem; position: relative;" class="fade-in">
-                        <div style="position: absolute; left: -1.85rem; top: 0.2rem; width: 12px; height: 12px; background: var(--accent); border-radius: 50%;"></div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);" x-text="event.date"></p>
-                        <h3 x-text="event.title" style="margin: 0.2rem 0;"></h3>
-                        <p x-text="event.description" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+                      <div class="timeline-item fade-in">
+                        <div class="timeline-dot"></div>
+                        <p class="timeline-date" x-text="event.date"></p>
+                        <h3 class="timeline-title" x-text="event.title"></h3>
+                        <p class="timeline-desc" x-text="event.description"></p>
                       </div>
                     </template>
                   </div>
