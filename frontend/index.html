@@ -133,36 +133,12 @@
               <span class="badge badge-outline">Docker</span>
               <a href="#/skills" style="font-size: 0.78rem; padding: 0.2rem 0.4rem; color: var(--accent);">+ more &rarr;</a>
             </div>
-            <!-- CTAs + social links -->
-            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.4rem;">
+            <!-- CTAs -->
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.4rem;">
               <a href="#/projects" class="btn btn-primary">See my work</a>
               <a href="#/contact" class="btn btn-outline">Get in touch</a>
-              <template x-if="socialLinks">
-                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                  <span style="width: 1px; height: 20px; background: var(--border);"></span>
-                  <template x-if="socialLinks.github">
-                    <a :href="socialLinks.github" target="_blank" rel="noopener" style="font-size: 0.85rem;">GitHub</a>
-                  </template>
-                  <template x-if="socialLinks.linkedin">
-                    <a :href="socialLinks.linkedin" target="_blank" rel="noopener" style="font-size: 0.85rem;">LinkedIn</a>
-                  </template>
-                  <template x-if="socialLinks.email">
-                    <a :href="'mailto:' + socialLinks.email" style="font-size: 0.85rem;">Email</a>
-                  </template>
-                </div>
-              </template>
             </div>
           </section>
-
-          <!-- ② CURRENTLY LEARNING TICKER -->
-          <template x-if="ticker.length > 0">
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border);">
-              <span style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap;">Now learning</span>
-              <div class="ticker-wrap" style="flex: 1;">
-                <span class="ticker-text" x-text="ticker.join('  ·  ')"></span>
-              </div>
-            </div>
-          </template>
 
           <!-- ③ FEATURED PROJECTS -->
           <section style="padding: 2rem 0; border-bottom: 1px solid var(--border);">
@@ -175,7 +151,7 @@
               <template x-if="projects.length === 0">
                 <p class="subtitle">No projects yet — check back soon.</p>
               </template>
-              <div class="card-grid fade-in">
+              <div class="card-grid fade-in" x-show="projects.length > 0">
                 <template x-for="p in projects" :key="p.id">
                   <a :href="'#/projects/' + p.id" class="card" style="text-decoration: none; display: block;">
                     <h3 x-text="p.title"></h3>
@@ -1143,6 +1119,11 @@
 
     <!-- FOOTER -->
     <footer>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.25rem; margin-bottom: 0.5rem;">
+        <a href="https://github.com/ron-harifiyati" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ron-harifiyati-723391350/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:ronshadreck@gmail.com">ronshadreck@gmail.com</a>
+      </div>
       <p>Built by Ron Harifiyati &mdash; <span x-text="new Date().getFullYear()"></span></p>
     </footer>
 
