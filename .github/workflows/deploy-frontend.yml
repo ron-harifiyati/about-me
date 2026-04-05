@@ -6,6 +6,8 @@ on:
     branches: [dev, prod]
     paths:
       - 'frontend/**'
+  pull_request:
+    branches: [dev, prod]
 
 jobs:
   deploy:
@@ -21,6 +23,7 @@ jobs:
           html5validator --root frontend/ || true
 
       - name: Set deploy environment
+        if: github.event_name == 'push'
         run: |
           if [[ "${{ github.ref_name }}" == "prod" ]]; then
             echo "S3_BUCKET=${{ secrets.PROD_S3_BUCKET }}" >> $GITHUB_ENV
@@ -33,6 +36,7 @@ jobs:
           fi
 
       - name: Configure AWS credentials
+        if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -40,6 +44,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Sync assets to S3 (long cache)
+        if: github.event_name == 'push'
         run: |
           aws s3 sync frontend/ s3://$S3_BUCKET \
             --delete \
@@ -47,6 +52,7 @@ jobs:
             --exclude "*.html"
 
       - name: Sync HTML to S3 (no cache)
+        if: github.event_name == 'push'
         run: |
           aws s3 sync frontend/ s3://$S3_BUCKET \
             --delete \
@@ -54,6 +60,7 @@ jobs:
             --cache-control "no-cache"
 
       - name: Invalidate CloudFront cache
+        if: github.event_name == 'push'
         run: |
           INVALIDATION_ID=$(aws cloudfront create-invalidation \
             --distribution-id $CF_DISTRIBUTION \
@@ -62,7 +69,7 @@ jobs:
           echo "Invalidation: $INVALIDATION_ID"
 
       - name: Notify Discord
-        if: always()
+        if: github.event_name == 'push' && always()
         run: |
           curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
             -H "Content-Type: application/json" \
