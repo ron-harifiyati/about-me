@@ -623,25 +623,25 @@
           <p class="subtitle">Say hello — everyone's welcome.</p>
 
           <!-- Submit form -->
-          <div class="card" style="max-width: 500px; margin-top: 1.5rem;">
+          <div class="card submit-card">
             <h3>Leave a message</h3>
             <template x-if="!isAuthenticated">
               <p class="subtitle" style="margin-top: 0.75rem;">
-                <a href="#/login">Log in</a> or <a href="#/register">create an account</a> to leave a message.
+                <a href="#/login" class="text-link">Log in</a> or <a href="#/register" class="text-link">create an account</a> to leave a message.
               </p>
             </template>
             <template x-if="isAuthenticated">
-              <div>
-                <div x-show="error" class="alert alert-error" x-text="error" style="margin-top: 0.75rem;"></div>
-                <div x-show="success" class="alert alert-success" x-text="success" style="margin-top: 0.75rem;"></div>
-                <div class="form-group" style="margin-top: 0.75rem;">
+              <div style="margin-top: 0.75rem;">
+                <div x-show="error" class="alert alert-error" x-text="error"></div>
+                <div x-show="success" class="alert alert-success" x-text="success"></div>
+                <div class="form-group">
                   <label>Name</label>
                   <input x-model="form.name" class="form-input" placeholder="Your name" autocomplete="name">
                 </div>
                 <div class="form-group">
-                  <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <div class="label-row">
                     <label>Message</label>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);" x-text="messageCharsLeft + ' left'"></span>
+                    <span class="label-row-counter" x-text="messageCharsLeft + ' left'"></span>
                   </div>
                   <textarea x-model="form.message" class="form-input" rows="3" placeholder="What's on your mind?" maxlength="500"></textarea>
                 </div>
@@ -656,16 +656,16 @@
           <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
           <div x-show="!loading" style="margin-top: 2rem;">
             <template x-if="entries.length === 0">
-              <p class="subtitle">No entries yet. Be the first!</p>
+              <div class="comment-empty">No entries yet — be the first to say hello!</div>
             </template>
             <template x-for="entry in entries" :key="entry.entry_id">
-              <div class="card" style="margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div class="card guestbook-entry">
+                <div class="guestbook-entry-header">
+                  <div class="guestbook-entry-author">
                     <strong x-text="entry.name"></strong>
                     <span class="badge badge-outline" x-text="entry.identity" x-show="entry.identity"></span>
                   </div>
-                  <span style="font-size: 0.8rem; color: var(--text-muted);" x-text="formatDate(entry.created_at)"></span>
+                  <span class="guestbook-entry-date" x-text="formatDate(entry.created_at)"></span>
                 </div>
                 <p x-text="entry.message"></p>
               </div>

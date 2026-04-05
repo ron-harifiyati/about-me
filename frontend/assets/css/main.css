@@ -12,6 +12,7 @@ body {
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); text-decoration: underline; }
+.text-link { text-decoration: underline; text-underline-offset: 2px; }
 
 /* Layout */
 .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
@@ -184,6 +185,14 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
   animation: ticker 20s linear infinite;
 }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+/* Guestbook */
+.guestbook-entry { margin-bottom: 0.75rem; }
+.guestbook-entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.guestbook-entry-author { display: flex; align-items: center; gap: 0.5rem; }
+.guestbook-entry-date { font-size: 0.8rem; color: var(--text-muted); }
+.label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.label-row-counter { font-size: 0.8rem; color: var(--text-muted); }
 
 /* Contact detail items */
 .contact-detail-item { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; font-size: 0.95rem; }
