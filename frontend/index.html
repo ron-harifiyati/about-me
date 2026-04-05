@@ -533,18 +533,19 @@
       </template>
 
       <!-- STATS -->
-      <div x-show="currentPage === 'stats'" class="page" x-data="statsPage()"
-           @hashchange.window="destroy()">
-        <h1>Visitor Map</h1>
-        <p class="subtitle">People who've visited from around the world.</p>
-        <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
-        <template x-if="!loading">
-          <div>
-            <p class="subtitle" style="margin: 0.75rem 0;" x-text="`${total} visit locations recorded`"></p>
-            <div id="visitor-map" class="visitor-map"></div>
-          </div>
-        </template>
-      </div>
+      <template x-if="currentPage === 'stats'">
+        <div class="page" x-data="statsPage()">
+          <h1>Visitor Map</h1>
+          <p class="subtitle">People who've visited from around the world.</p>
+          <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+          <template x-if="!loading">
+            <div>
+              <p class="subtitle" style="margin: 0.75rem 0;" x-text="`${total} visit locations recorded`"></p>
+              <div id="visitor-map" class="visitor-map"></div>
+            </div>
+          </template>
+        </div>
+      </template>
 
       <!-- CONTACT -->
       <template x-if="currentPage === 'contact'">
