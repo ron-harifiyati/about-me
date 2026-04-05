@@ -1034,8 +1034,8 @@
       </template>
 
       <!-- VERIFY EMAIL -->
-      <template x-if="currentPage === 'verify-email'">
-        <div class="page" x-data="verifyEmailPage()" x-init="init()">
+      <div x-show="currentPage === 'verify-email'" class="page">
+        <div x-data="verifyEmailPage()" x-init="init()">
           <div style="max-width: 400px; margin: 4rem auto; text-align: center;">
             <div x-show="status === 'loading'" class="loading-center"><div class="spinner"></div></div>
             <div x-show="status === 'success'">
@@ -1052,7 +1052,7 @@
             </div>
           </div>
         </div>
-      </template>
+      </div>
 
       <!-- FORGOT PASSWORD -->
       <template x-if="currentPage === 'forgot-password'">
@@ -1081,8 +1081,8 @@
       </template>
 
       <!-- RESET PASSWORD -->
-      <template x-if="currentPage === 'reset-password'">
-        <div class="page" x-data="resetPasswordPage()" x-init="init()">
+      <div x-show="currentPage === 'reset-password'" class="page">
+        <div x-data="resetPasswordPage()" x-init="init()">
           <div style="max-width: 400px; margin: 3rem auto;">
             <h1>Set a new password</h1>
             <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
@@ -1107,7 +1107,7 @@
             </form>
           </div>
         </div>
-      </template>
+      </div>
 
       <!-- 404 -->
       <div x-show="currentPage === 'not-found'" class="page">
