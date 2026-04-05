@@ -27,7 +27,9 @@ function verifyEmailPage() {
         setTimeout(() => { window.location.hash = "#/login"; }, 3000);
       } else {
         this.status = "error";
-        this.message = resp.error || "Verification failed. The link may have expired.";
+        this.message = resp.error === "Invalid or expired token"
+          ? "This link has already been used or has expired. If you verified recently, try logging in."
+          : (resp.error || "Verification failed. The link may have expired.");
       }
     },
   };
