@@ -52,6 +52,8 @@
           <a href="#/users"        :class="{ active: section === 'users' }"        @click.prevent="section='users'">Users</a>
           <a href="#/contacts"     :class="{ active: section === 'contacts' }"     @click.prevent="section='contacts'">Contacts</a>
           <a href="#/testimonials" :class="{ active: section === 'testimonials' }" @click.prevent="section='testimonials'">Testimonials</a>
+          <a href="#/projects"     :class="{ active: section === 'projects' }"     @click.prevent="section='projects'">Projects</a>
+          <a href="#/courses"      :class="{ active: section === 'courses' }"      @click.prevent="section='courses'">Courses</a>
           <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'">Quiz</a>
           <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
           <a href="/index.html" style="color: var(--text-muted);">&larr; Back to site</a>
@@ -208,6 +210,137 @@
                 </template>
               </div>
             </template>
+          </div>
+
+          <!-- Projects -->
+          <div x-show="section === 'projects'" x-data="adminProjects()" x-init="init()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h1>Projects</h1>
+              <button class="btn btn-primary btn-sm" @click="openCreate()">+ Add Project</button>
+            </div>
+            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;" x-text="success"></div>
+
+            <!-- Project list -->
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1.25rem;">
+                <template x-if="projects.length === 0"><p class="subtitle">No projects yet.</p></template>
+                <template x-for="p in projects" :key="p.id">
+                  <div class="card" style="margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                      <div style="flex: 1; min-width: 0;">
+                        <p style="font-weight: 600; margin-bottom: 0.25rem;" x-text="p.title"></p>
+                        <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 0.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" x-text="p.description || 'No description'"></p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
+                          <template x-for="tag in (p.tech_stack || [])" :key="tag">
+                            <span class="badge badge-outline" x-text="tag"></span>
+                          </template>
+                          <template x-if="p.links?.github">
+                            <a :href="p.links.github" target="_blank" class="subtitle" style="font-size: 0.8rem; margin-left: 0.25rem;">GitHub ↗</a>
+                          </template>
+                          <template x-if="p.links?.live">
+                            <a :href="p.links.live" target="_blank" class="subtitle" style="font-size: 0.8rem; margin-left: 0.25rem;">Live ↗</a>
+                          </template>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                        <button class="btn btn-outline btn-sm" @click="openEdit(p)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @click="deleteProject(p.id)">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Modal -->
+            <div class="modal-backdrop" x-show="showModal" @click.self="closeModal()">
+              <div class="modal">
+                <div class="modal-header">
+                  <h3 x-text="editing ? 'Edit Project' : 'Add Project'"></h3>
+                  <button class="modal-close" @click="closeModal()">✕</button>
+                </div>
+                <div x-show="error" class="alert alert-error" style="margin-bottom: 1rem;" x-text="error"></div>
+                <div class="form-group"><label>Title *</label>
+                  <input x-model="form.title" class="form-input" placeholder="My Project"></div>
+                <div class="form-group"><label>Description</label>
+                  <textarea x-model="form.description" class="form-input" rows="3"></textarea></div>
+                <div class="form-group"><label>Tech stack <span class="subtitle">(comma-separated)</span></label>
+                  <input x-model="form.tech_stack" class="form-input" placeholder="Python, AWS, Docker"></div>
+                <div class="form-group"><label>GitHub URL</label>
+                  <input x-model="form.github" class="form-input" placeholder="https://github.com/..."></div>
+                <div class="form-group"><label>Live URL</label>
+                  <input x-model="form.live" class="form-input" placeholder="https://..."></div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                  <button class="btn btn-primary" @click="save()" :disabled="saving">
+                    <span x-text="saving ? 'Saving...' : editing ? 'Update' : 'Add'"></span>
+                  </button>
+                  <button class="btn btn-outline" @click="closeModal()">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Courses -->
+          <div x-show="section === 'courses'" x-data="adminCourses()" x-init="init()">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h1>Courses</h1>
+              <button class="btn btn-primary btn-sm" @click="openCreate()">+ Add Course</button>
+            </div>
+            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;" x-text="success"></div>
+
+            <!-- Course list -->
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1.25rem;">
+                <template x-if="courses.length === 0"><p class="subtitle">No courses yet.</p></template>
+                <template x-for="c in courses" :key="c.id">
+                  <div class="card" style="margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                          <p style="font-weight: 600;" x-text="c.title"></p>
+                          <span class="badge badge-outline" x-show="c.platform" x-text="c.platform"></span>
+                        </div>
+                        <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 0.5rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" x-text="c.description || 'No description'"></p>
+                        <template x-if="c.link">
+                          <a :href="c.link" target="_blank" class="subtitle" style="font-size: 0.8rem;">View course ↗</a>
+                        </template>
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                        <button class="btn btn-outline btn-sm" @click="openEdit(c)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @click="deleteCourse(c.id)">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Modal -->
+            <div class="modal-backdrop" x-show="showModal" @click.self="closeModal()">
+              <div class="modal">
+                <div class="modal-header">
+                  <h3 x-text="editing ? 'Edit Course' : 'Add Course'"></h3>
+                  <button class="modal-close" @click="closeModal()">✕</button>
+                </div>
+                <div x-show="error" class="alert alert-error" style="margin-bottom: 1rem;" x-text="error"></div>
+                <div class="form-group"><label>Title *</label>
+                  <input x-model="form.title" class="form-input" placeholder="Course name"></div>
+                <div class="form-group"><label>Description</label>
+                  <textarea x-model="form.description" class="form-input" rows="3"></textarea></div>
+                <div class="form-group"><label>Platform</label>
+                  <input x-model="form.platform" class="form-input" placeholder="Udemy, Coursera, ..."></div>
+                <div class="form-group"><label>URL</label>
+                  <input x-model="form.link" class="form-input" placeholder="https://..."></div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                  <button class="btn btn-primary" @click="save()" :disabled="saving">
+                    <span x-text="saving ? 'Saving...' : editing ? 'Update' : 'Add'"></span>
+                  </button>
+                  <button class="btn btn-outline" @click="closeModal()">Cancel</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Quiz -->
