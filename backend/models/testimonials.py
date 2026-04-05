@@ -40,10 +40,14 @@ def list_approved(identity_filter: str | None = None) -> list:
         items = [i for i in items if i.get("identity") == identity_filter]
     for item in items:
         item.pop("PK", None)
-        item.pop("SK", None)
         item.pop("GSI2PK", None)
         item.pop("GSI2SK", None)
     return items
+
+
+def delete_testimonial(testimonial_id: str):
+    table = get_table()
+    table.delete_item(Key={"PK": "TESTIMONIALS", "SK": f"TESTIMONIAL#{testimonial_id}"})
 
 
 def list_pending() -> list:

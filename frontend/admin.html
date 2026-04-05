@@ -242,24 +242,53 @@
 
           <!-- Testimonials -->
           <div x-show="section === 'testimonials'" x-data="adminTestimonials()" x-init="init()">
-            <h1>Pending Testimonials</h1>
-            <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
+            <h1>Testimonials</h1>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+              <button class="btn btn-sm" :class="tab === 'pending' ? 'btn-primary' : 'btn-outline'" @click="tab = 'pending'">
+                Pending <span x-show="pending.length > 0" x-text="'(' + pending.length + ')'"></span>
+              </button>
+              <button class="btn btn-sm" :class="tab === 'approved' ? 'btn-primary' : 'btn-outline'" @click="tab = 'approved'">
+                Approved <span x-show="approved.length > 0" x-text="'(' + approved.length + ')'"></span>
+              </button>
+            </div>
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
             <template x-if="!loading">
               <div style="margin-top: 1rem;">
-                <template x-if="pending.length === 0"><p class="subtitle">No pending testimonials.</p></template>
-                <template x-for="t in pending" :key="t.testimonial_id">
-                  <div class="card" style="margin-bottom: 0.75rem;">
-                    <p style="font-style: italic; margin-bottom: 0.75rem;" x-text="'&ldquo;' + t.body + '&rdquo;'"></p>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <div>
-                        <strong x-text="t.author"></strong>
-                        <span class="badge badge-outline" style="margin-left: 0.5rem;" x-text="t.identity"></span>
+                <template x-if="tab === 'pending'">
+                  <div>
+                    <template x-if="pending.length === 0"><p class="subtitle">No pending testimonials.</p></template>
+                    <template x-for="t in pending" :key="t.testimonial_id">
+                      <div class="card" style="margin-bottom: 0.75rem;">
+                        <p style="font-style: italic; margin-bottom: 0.75rem;" x-text="'\u201c' + t.body + '\u201d'"></p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <div>
+                            <strong x-text="t.author"></strong>
+                            <span class="badge badge-outline" style="margin-left: 0.5rem;" x-text="t.identity"></span>
+                          </div>
+                          <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary btn-sm" @click="action(t.testimonial_id, 'approve')">Approve</button>
+                            <button class="btn btn-danger btn-sm" @click="action(t.testimonial_id, 'reject')">Reject</button>
+                          </div>
+                        </div>
                       </div>
-                      <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-primary btn-sm" @click="action(t.testimonial_id, 'approve')">Approve</button>
-                        <button class="btn btn-danger btn-sm" @click="action(t.testimonial_id, 'reject')">Reject</button>
+                    </template>
+                  </div>
+                </template>
+                <template x-if="tab === 'approved'">
+                  <div>
+                    <template x-if="approved.length === 0"><p class="subtitle">No approved testimonials.</p></template>
+                    <template x-for="t in approved" :key="t.testimonial_id">
+                      <div class="card" style="margin-bottom: 0.75rem;">
+                        <p style="font-style: italic; margin-bottom: 0.75rem;" x-text="'\u201c' + t.body + '\u201d'"></p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <div>
+                            <strong x-text="t.author"></strong>
+                            <span class="badge badge-outline" style="margin-left: 0.5rem;" x-text="t.identity"></span>
+                          </div>
+                          <button class="btn btn-danger btn-sm" @click="deleteApproved(t)">Remove</button>
+                        </div>
                       </div>
-                    </div>
+                    </template>
                   </div>
                 </template>
               </div>

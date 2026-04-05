@@ -215,9 +215,15 @@ SPEC = {
             "get": {"summary": "List pending testimonials (admin)", "tags": ["Admin"],
                     "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
         },
+        "/admin/testimonials/approved": {
+            "get": {"summary": "List approved testimonials (admin)", "tags": ["Admin"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+        },
         "/admin/testimonials/{id}": {
             "put": {"summary": "Approve/reject testimonial (admin)", "tags": ["Admin"],
-                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}}
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+            "delete": {"summary": "Delete testimonial (admin)", "tags": ["Admin"],
+                       "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
         },
         "/admin/quiz/questions": {
             "get": {"summary": "List all quiz questions (admin)", "tags": ["Admin"],

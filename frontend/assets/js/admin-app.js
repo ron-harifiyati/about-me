@@ -115,18 +115,31 @@ function adminContacts() {
 
 function adminTestimonials() {
   return {
+    tab: "pending",
     pending: [],
+    approved: [],
     loading: true,
 
     async init() {
-      const resp = await api.get("/admin/testimonials/pending");
-      this.pending = resp.data || [];
+      this.loading = true;
+      const [p, a] = await Promise.all([
+        api.get("/admin/testimonials/pending"),
+        api.get("/admin/testimonials/approved"),
+      ]);
+      this.pending = p.data || [];
+      this.approved = a.data || [];
       this.loading = false;
     },
 
     async action(id, action) {
       await api.put(`/admin/testimonials/${id}`, { action });
       this.pending = this.pending.filter(t => t.testimonial_id !== id);
+    },
+
+    async deleteApproved(t) {
+      if (!confirm("Remove this approved testimonial?")) return;
+      const resp = await api.delete(`/admin/testimonials/${t.testimonial_id}`);
+      if (resp.ok) this.approved = this.approved.filter(a => a.testimonial_id !== t.testimonial_id);
     },
   };
 }
