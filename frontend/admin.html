@@ -54,6 +54,7 @@
           <a href="#/testimonials" :class="{ active: section === 'testimonials' }" @click.prevent="section='testimonials'">Testimonials</a>
           <a href="#/projects"     :class="{ active: section === 'projects' }"     @click.prevent="section='projects'">Projects</a>
           <a href="#/courses"      :class="{ active: section === 'courses' }"      @click.prevent="section='courses'">Courses</a>
+          <a href="#/comments"     :class="{ active: section === 'comments' }"     @click.prevent="section='comments'">Comments</a>
           <a href="#/quiz"         :class="{ active: section === 'quiz' }"         @click.prevent="section='quiz'">Quiz</a>
           <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
           <a href="/index.html" style="color: var(--text-muted);">&larr; Back to site</a>
@@ -341,6 +342,40 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Comments -->
+          <div x-show="section === 'comments'" x-data="adminComments()" x-init="init()">
+            <h1>Comments</h1>
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
+            <template x-if="!loading">
+              <div style="margin-top: 1.25rem;">
+                <template x-if="groups.length === 0"><p class="subtitle">No comments yet.</p></template>
+                <template x-for="(group, gi) in groups" :key="group.entityPk">
+                  <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                      <span class="badge badge-outline" x-text="group.entityPk.startsWith('PROJECT') ? 'Project' : 'Course'"></span>
+                      <strong x-text="group.label"></strong>
+                      <span class="subtitle" style="font-size: 0.8rem;" x-text="`(${group.comments.length})`"></span>
+                    </div>
+                    <template x-for="(c, ci) in group.comments" :key="c.comment_id">
+                      <div class="card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                        <div style="flex: 1; min-width: 0;">
+                          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <strong style="font-size: 0.9rem;" x-text="c.name"></strong>
+                            <span class="badge badge-outline" x-text="c.identity"></span>
+                            <span class="subtitle" style="font-size: 0.75rem;" x-text="formatDate(c.created_at)"></span>
+                          </div>
+                          <p style="font-size: 0.9rem;" x-text="c.body"></p>
+                        </div>
+                        <button class="btn btn-danger btn-sm" style="flex-shrink: 0;"
+                                @click="deleteComment(c.comment_id, group.entityPk, gi, ci)">Delete</button>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </template>
           </div>
 
           <!-- Quiz -->

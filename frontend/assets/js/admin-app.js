@@ -123,6 +123,47 @@ function adminTestimonials() {
   };
 }
 
+function adminComments() {
+  return {
+    groups: [],
+    loading: true,
+
+    async init() {
+      const [pResp, cResp] = await Promise.all([
+        api.get("/projects"),
+        api.get("/courses"),
+      ]);
+      const projects = pResp.data || [];
+      const courses = cResp.data || [];
+
+      const fetches = [
+        ...projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` })),
+        ...courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` })),
+      ];
+
+      const results = await Promise.all(fetches.map(f => api.get(f.path)));
+      this.groups = fetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: results[i].data || [] }))
+        .filter(g => g.comments.length > 0);
+
+      this.loading = false;
+    },
+
+    async deleteComment(commentId, entityPk, groupIndex, commentIndex) {
+      if (!confirm("Delete this comment?")) return;
+      const resp = await api.delete(`/comments/${commentId}?entity_pk=${encodeURIComponent(entityPk)}`);
+      if (resp.ok) {
+        this.groups[groupIndex].comments.splice(commentIndex, 1);
+        if (this.groups[groupIndex].comments.length === 0) {
+          this.groups.splice(groupIndex, 1);
+        }
+      }
+    },
+
+    formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ""; },
+  };
+}
+
 function adminProjects() {
   return {
     projects: [],
