@@ -1,12 +1,9 @@
 // frontend/assets/js/pages/home.js
 function homePage() {
   return {
-    // Existing
     funFact: null,
     ticker: [],
     loading: true,
-
-    // New
     projects: [],
     testimonial: null,
     visitorCountries: null,
