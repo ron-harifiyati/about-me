@@ -513,13 +513,13 @@
           <p class="subtitle">My technical toolkit.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && skills">
-            <div style="margin-top: 2rem;">
+            <div class="skills-grid">
               <template x-for="cat in categories()" :key="cat">
-                <div style="margin-bottom: 2rem;">
-                  <h2 style="text-transform: capitalize;" x-text="cat.replace('_', ' ')"></h2>
-                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <div class="card">
+                  <p class="skill-category-title" x-text="cat.replace(/_/g, ' ')"></p>
+                  <div class="skill-tags">
                     <template x-for="skill in skills[cat]" :key="skill">
-                      <span class="badge" x-text="skill"></span>
+                      <span class="badge badge-outline" x-text="skill"></span>
                     </template>
                   </div>
                 </div>

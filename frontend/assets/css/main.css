@@ -429,6 +429,23 @@ footer {
 .timeline-title { margin: 0 0 0.25rem; }
 .timeline-desc { color: var(--text-muted); font-size: 0.9rem; }
 
+/* Skills page */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.skill-category-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
 /* Auth pages */
 .auth-wrapper { max-width: 420px; margin: 3rem auto; }
 .auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-muted); }
