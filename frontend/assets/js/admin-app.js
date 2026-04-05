@@ -123,6 +123,222 @@ function adminTestimonials() {
   };
 }
 
+function adminGuestbook() {
+  return {
+    entries: [],
+    loading: true,
+
+    async init() {
+      const resp = await api.get("/guestbook");
+      this.entries = resp.data || [];
+      this.loading = false;
+    },
+
+    async deleteEntry(entry) {
+      if (!confirm("Delete this guestbook entry?")) return;
+      const resp = await api.delete(`/guestbook/${entry.entry_id}?sk=${encodeURIComponent(entry.SK)}`);
+      if (resp.ok) this.entries = this.entries.filter(e => e.entry_id !== entry.entry_id);
+    },
+
+    formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ""; },
+  };
+}
+
+function adminComments() {
+  return {
+    groups: [],
+    loading: true,
+
+    async init() {
+      const [pResp, cResp] = await Promise.all([
+        api.get("/projects"),
+        api.get("/courses"),
+      ]);
+      const projects = pResp.data || [];
+      const courses = cResp.data || [];
+
+      const fetches = [
+        ...projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` })),
+        ...courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` })),
+      ];
+
+      const results = await Promise.all(fetches.map(f => api.get(f.path)));
+      this.groups = fetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: results[i].data || [] }))
+        .filter(g => g.comments.length > 0);
+
+      this.loading = false;
+    },
+
+    async deleteComment(commentId, entityPk, groupIndex, commentIndex) {
+      if (!confirm("Delete this comment?")) return;
+      const resp = await api.delete(`/comments/${commentId}?entity_pk=${encodeURIComponent(entityPk)}`);
+      if (resp.ok) {
+        this.groups[groupIndex].comments.splice(commentIndex, 1);
+        if (this.groups[groupIndex].comments.length === 0) {
+          this.groups.splice(groupIndex, 1);
+        }
+      }
+    },
+
+    formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ""; },
+  };
+}
+
+function adminProjects() {
+  return {
+    projects: [],
+    loading: true,
+    saving: false,
+    error: null,
+    success: null,
+    showModal: false,
+    editing: null,
+    form: { title: "", description: "", tech_stack: "", github: "", live: "" },
+
+    async init() {
+      const resp = await api.get("/projects");
+      this.projects = resp.data || [];
+      this.loading = false;
+    },
+
+    openCreate() {
+      this.editing = null;
+      this.form = { title: "", description: "", tech_stack: "", github: "", live: "" };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    openEdit(p) {
+      this.editing = p.id;
+      this.form = {
+        title: p.title || "",
+        description: p.description || "",
+        tech_stack: (p.tech_stack || []).join(", "),
+        github: p.links?.github || "",
+        live: p.links?.live || "",
+      };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.editing = null;
+      this.error = null;
+    },
+
+    async save() {
+      this.error = null;
+      if (!this.form.title.trim()) { this.error = "Title is required."; return; }
+      this.saving = true;
+      const payload = {
+        title: this.form.title.trim(),
+        description: this.form.description.trim(),
+        tech_stack: this.form.tech_stack.split(",").map(s => s.trim()).filter(Boolean),
+        links: {
+          github: this.form.github.trim() || null,
+          live: this.form.live.trim() || null,
+        },
+      };
+      const resp = this.editing
+        ? await api.put(`/projects/${this.editing}`, payload)
+        : await api.post("/projects", payload);
+      if (resp.ok) {
+        const r = await api.get("/projects");
+        this.projects = r.data || [];
+        this.success = this.editing ? "Project updated." : "Project created.";
+        this.closeModal();
+        setTimeout(() => { this.success = null; }, 3000);
+      } else {
+        this.error = resp.error;
+      }
+      this.saving = false;
+    },
+
+    async deleteProject(id) {
+      if (!confirm("Delete this project? This cannot be undone.")) return;
+      await api.delete(`/projects/${id}`);
+      this.projects = this.projects.filter(p => p.id !== id);
+    },
+  };
+}
+
+function adminCourses() {
+  return {
+    courses: [],
+    loading: true,
+    saving: false,
+    error: null,
+    success: null,
+    showModal: false,
+    editing: null,
+    form: { title: "", description: "", platform: "", link: "" },
+
+    async init() {
+      const resp = await api.get("/courses");
+      this.courses = resp.data || [];
+      this.loading = false;
+    },
+
+    openCreate() {
+      this.editing = null;
+      this.form = { title: "", description: "", platform: "", link: "" };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    openEdit(c) {
+      this.editing = c.id;
+      this.form = {
+        title: c.title || "",
+        description: c.description || "",
+        platform: c.platform || "",
+        link: c.link || "",
+      };
+      this.error = null;
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.editing = null;
+      this.error = null;
+    },
+
+    async save() {
+      this.error = null;
+      if (!this.form.title.trim()) { this.error = "Title is required."; return; }
+      this.saving = true;
+      const payload = {
+        title: this.form.title.trim(),
+        description: this.form.description.trim(),
+        platform: this.form.platform.trim(),
+        link: this.form.link.trim() || null,
+      };
+      const resp = this.editing
+        ? await api.put(`/courses/${this.editing}`, payload)
+        : await api.post("/courses", payload);
+      if (resp.ok) {
+        const r = await api.get("/courses");
+        this.courses = r.data || [];
+        this.success = this.editing ? "Course updated." : "Course created.";
+        this.closeModal();
+        setTimeout(() => { this.success = null; }, 3000);
+      } else {
+        this.error = resp.error;
+      }
+      this.saving = false;
+    },
+
+    async deleteCourse(id) {
+      if (!confirm("Delete this course? This cannot be undone.")) return;
+      await api.delete(`/courses/${id}`);
+      this.courses = this.courses.filter(c => c.id !== id);
+    },
+  };
+}
+
 function adminQuiz() {
   return {
     questions: [],

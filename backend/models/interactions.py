@@ -1,7 +1,7 @@
 import uuid
 import time
 from db import get_table
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 
 def list_comments(entity_pk: str) -> list:
@@ -46,8 +46,7 @@ def find_comment_pk_sk(comment_id: str, entity_pk: str) -> tuple:
     table = get_table()
     resp = table.query(
         KeyConditionExpression=Key("PK").eq(entity_pk) & Key("SK").begins_with("COMMENT#"),
-        FilterExpression="comment_id = :cid",
-        ExpressionAttributeValues={":cid": comment_id},
+        FilterExpression=Attr("comment_id").eq(comment_id),
     )
     items = resp.get("Items", [])
     if items:
