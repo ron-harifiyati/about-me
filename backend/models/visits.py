@@ -5,9 +5,11 @@ from db import get_table
 from boto3.dynamodb.conditions import Key
 
 
-def record_visit(ip: str, page: str, user: dict | None = None):
+def upsert_visitor(ip: str, page: str):
     """
-    Called to record a visitor. Geo lookup is best-effort — silently skips on failure.
+    Upsert a unique visitor record keyed by IP.
+    Same IP always writes to the same item — natural deduplication for the map.
+    Geo lookup is best-effort; silently skips on failure.
     """
     try:
         geo = _lookup_ip(ip)
@@ -15,43 +17,55 @@ def record_visit(ip: str, page: str, user: dict | None = None):
         geo = {}
 
     table = get_table()
+    now = int(time.time())
+    table.update_item(
+        Key={"PK": "VISITORS", "SK": f"VISITOR#{ip}"},
+        UpdateExpression=(
+            "SET last_seen = :now, country = :country, city = :city, "
+            "lat = :lat, lon = :lon, "
+            "first_seen = if_not_exists(first_seen, :now)"
+        ),
+        ExpressionAttributeValues={
+            ":now": now,
+            ":country": geo.get("country") or "",
+            ":city": geo.get("city") or "",
+            ":lat": str(geo.get("lat", "")),
+            ":lon": str(geo.get("lon", "")),
+        },
+    )
+
+
+def record_pageview(ip: str, page: str):
+    """One record per page navigation — used for page view analytics."""
+    table = get_table()
     ts = int(time.time())
-    visit_id = str(uuid.uuid4())
-    item = {
-        "PK": "VISITS",
-        "SK": f"VISIT#{ts}#{visit_id}",
-        "visit_id": visit_id,
-        "ip": ip,
+    table.put_item(Item={
+        "PK": "PAGEVIEWS",
+        "SK": f"VIEW#{ts}#{str(uuid.uuid4())}",
         "page": page,
-        "country": geo.get("country"),
-        "city": geo.get("city"),
-        "lat": str(geo.get("lat", "")),
-        "lon": str(geo.get("lon", "")),
+        "ip": ip,
         "created_at": ts,
-    }
-    if user:
-        item["user_id"] = user.get("sub")
-        item["identity"] = user.get("identity")
-    table.put_item(Item=item)
+    })
 
 
 def _lookup_ip(ip: str) -> dict:
     if ip in ("127.0.0.1", "::1", "testclient"):
         return {}
-    resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,country,city,lat,lon", timeout=3)
+    resp = requests.get(
+        f"http://ip-api.com/json/{ip}?fields=status,country,city,lat,lon",
+        timeout=3,
+    )
     if resp.status_code == 200 and resp.json().get("status") == "success":
         return resp.json()
     return {}
 
 
 def get_visitor_locations() -> list:
-    """Public — returns lat/lon/country/city only (no IP or user data)."""
+    """Public — returns lat/lon/country/city for unique visitors only (no IP data)."""
     table = get_table()
     resp = table.query(
-        KeyConditionExpression=Key("PK").eq("VISITS") & Key("SK").begins_with("VISIT#"),
-        Limit=500,
+        KeyConditionExpression=Key("PK").eq("VISITORS") & Key("SK").begins_with("VISITOR#"),
     )
-    items = resp.get("Items", [])
     return [
         {
             "lat": item.get("lat"),
@@ -59,31 +73,35 @@ def get_visitor_locations() -> list:
             "country": item.get("country"),
             "city": item.get("city"),
         }
-        for item in items
+        for item in resp.get("Items", [])
         if item.get("lat") and item.get("lon")
     ]
 
 
-def get_analytics() -> dict:
-    """Admin only — full breakdown."""
+def get_pageviews() -> dict:
+    """Public — returns page view counts by page name."""
     table = get_table()
     resp = table.query(
-        KeyConditionExpression=Key("PK").eq("VISITS") & Key("SK").begins_with("VISIT#"),
+        KeyConditionExpression=Key("PK").eq("PAGEVIEWS") & Key("SK").begins_with("VIEW#"),
     )
-    items = resp.get("Items", [])
-
-    page_counts: dict = {}
-    identity_counts: dict = {}
-    for item in items:
+    counts: dict = {}
+    for item in resp.get("Items", []):
         page = item.get("page", "unknown")
-        page_counts[page] = page_counts.get(page, 0) + 1
-        if item.get("identity"):
-            identity = item["identity"]
-            identity_counts[identity] = identity_counts.get(identity, 0) + 1
+        counts[page] = counts.get(page, 0) + 1
+    return {"total": sum(counts.values()), "by_page": counts}
 
+
+def get_analytics() -> dict:
+    """Admin only — unique visitor count + full page view breakdown."""
+    table = get_table()
+    visitors_resp = table.query(
+        KeyConditionExpression=Key("PK").eq("VISITORS") & Key("SK").begins_with("VISITOR#"),
+        Select="COUNT",
+    )
+    pageviews_data = get_pageviews()
     return {
-        "total_visits": len(items),
-        "by_page": page_counts,
-        "by_identity": identity_counts,
+        "unique_visitors": visitors_resp.get("Count", 0),
+        "total_pageviews": pageviews_data["total"],
+        "by_page": pageviews_data["by_page"],
         "locations": get_visitor_locations(),
     }
