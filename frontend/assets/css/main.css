@@ -190,6 +190,10 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
 .visitor-map { height: 420px; border-radius: 10px; border: 1px solid var(--border); margin-top: 1rem; }
 @media (max-width: 768px) { .visitor-map { height: 280px; } }
 
+/* Map hint overlay */
+.map-hint { position: absolute; inset: 0; z-index: 800; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.map-hint span { background: rgba(0,0,0,0.55); color: #fff; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; pointer-events: none; }
+
 /* Analytics table */
 .analytics-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
 .analytics-table th, .analytics-table td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }

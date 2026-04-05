@@ -46,10 +46,16 @@ function statsPage() {
 
     initMap() {
       if (this.map) { this.map.remove(); this.map = null; }
+      if (this._outsideClick) document.removeEventListener("click", this._outsideClick);
       const el = document.getElementById("visitor-map");
       if (!el || typeof L === "undefined") return;
 
-      this.map = L.map("visitor-map", { zoomControl: true }).setView([20, 0], 2);
+      this.map = L.map("visitor-map", {
+        zoomControl: true,
+        minZoom: 2,
+        scrollWheelZoom: false,
+      }).setView([20, 0], 2);
+
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 18,
@@ -67,11 +73,31 @@ function statsPage() {
           .bindPopup(`${loc.city || ""}${loc.city ? ", " : ""}${loc.country || "Unknown"}`);
         }
       });
+
+      // Click-to-activate scroll zoom with hint overlay
+      const hint = document.createElement("div");
+      hint.className = "map-hint";
+      hint.innerHTML = "<span>Click to interact</span>";
+      this.map.getContainer().appendChild(hint);
+
+      this.map.on("click", () => {
+        hint.style.display = "none";
+        this.map.scrollWheelZoom.enable();
+      });
+
+      this._outsideClick = (e) => {
+        if (!this.map.getContainer().contains(e.target)) {
+          hint.style.display = "";
+          this.map.scrollWheelZoom.disable();
+        }
+      };
+      document.addEventListener("click", this._outsideClick);
     },
 
     destroy() {
       if (this.map) { this.map.remove(); this.map = null; }
       if (this._themeHandler) window.removeEventListener("themechange", this._themeHandler);
+      if (this._outsideClick) document.removeEventListener("click", this._outsideClick);
     },
   };
 }
