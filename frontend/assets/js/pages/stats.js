@@ -14,6 +14,8 @@ function statsPage() {
       await this.loadLeaflet();
       await this.$nextTick();
       this.initMap();
+      this._themeHandler = () => this.initMap();
+      window.addEventListener("themechange", this._themeHandler);
     },
 
     async loadLeaflet() {
@@ -58,6 +60,7 @@ function statsPage() {
 
     destroy() {
       if (this.map) { this.map.remove(); this.map = null; }
+      if (this._themeHandler) window.removeEventListener("themechange", this._themeHandler);
     },
   };
 }

@@ -10,6 +10,7 @@ function applyTheme(theme) {
     document.documentElement.removeAttribute("data-theme");
   }
   localStorage.setItem("theme", theme);
+  window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
 }
 
 function loadTheme() {
@@ -31,13 +32,3 @@ async function syncThemeToServer(theme) {
   await api.put("/auth/me", { theme });
 }
 
-async function loadThemeFromServer() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return loadTheme();
-  const resp = await api.get("/auth/me");
-  if (resp.ok && resp.data?.theme) {
-    applyTheme(resp.data.theme);
-    return resp.data.theme;
-  }
-  return loadTheme();
-}

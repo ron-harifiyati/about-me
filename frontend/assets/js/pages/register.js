@@ -11,6 +11,34 @@ function registerPage() {
     resendSent: false,
     resendError: null,
 
+    get passwordStrength() {
+      const p = this.form.password;
+      if (!p) return 0;
+      let score = 0;
+      if (p.length >= 8)  score++;
+      if (p.length >= 12) score++;
+      if (/[A-Z]/.test(p)) score++;
+      if (/[0-9]/.test(p)) score++;
+      if (/[^A-Za-z0-9]/.test(p)) score++;
+      return score; // 0–5
+    },
+
+    get passwordStrengthLabel() {
+      const s = this.passwordStrength;
+      if (s <= 1) return "Weak";
+      if (s <= 3) return "Fair";
+      if (s === 4) return "Good";
+      return "Strong";
+    },
+
+    get passwordStrengthColor() {
+      const s = this.passwordStrength;
+      if (s <= 1) return "#DC3545";
+      if (s <= 3) return "#FFC107";
+      if (s === 4) return "#20C997";
+      return "#28A745";
+    },
+
     async init() {
       const token = localStorage.getItem("access_token");
       if (token) window.location.hash = "#/";

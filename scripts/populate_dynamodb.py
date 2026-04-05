@@ -28,7 +28,7 @@ put("CONTENT", "ABOUT", {
     ),
     "mission": "I might not be the smartest in the room — but I'll be the hardest worker in it.",
     "contact": {
-        "email": "personal-ronshadreck@gmail.com",
+        "email": "ronshadreck@gmail.com",
         "location": "Victoria Falls, Zimbabwe",
     },
     "social_links": {

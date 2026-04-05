@@ -4,19 +4,51 @@ function homePage() {
     funFact: null,
     ticker: [],
     loading: true,
-
+    projects: [],
+    testimonial: null,
+    visitorCountries: null,
+    projectCount: null,
+    courseCount: null,
     async init() {
-      const [factResp, tickerResp] = await Promise.all([
-        api.get("/fun-fact"),
-        api.get("/currently-learning"),
-      ]);
-      this.funFact = factResp.data?.fact || null;
-      this.ticker = tickerResp.data?.items || [];
-      this.loading = false;
+      try {
+        const [
+          factResp,
+          tickerResp,
+          projectsResp,
+          testimonialsResp,
+          visitorsResp,
+          coursesResp,
+        ] = await Promise.all([
+          api.get("/fun-fact"),
+          api.get("/currently-learning"),
+          api.get("/projects"),
+          api.get("/testimonials"),
+          api.get("/stats/visitors"),
+          api.get("/courses"),
+        ]);
+
+        this.funFact      = factResp.data?.fact || null;
+        this.ticker       = tickerResp.data?.items || [];
+
+        const allProjects  = projectsResp.data || [];
+        this.projects      = allProjects.slice(0, 3);
+        this.projectCount  = allProjects.length;
+
+        const allTestimonials = testimonialsResp.data || [];
+        this.testimonial   = allTestimonials[0] || null;
+
+        const visitors     = visitorsResp.data || [];
+        const countries    = new Set(visitors.map(v => v.country).filter(Boolean));
+        this.visitorCountries = countries.size;
+
+        this.courseCount   = (coursesResp.data || []).length;
+      } finally {
+        this.loading = false;
+      }
     },
 
     refreshFact() {
-      api.get("/fun-fact").then(r => { this.funFact = r.data?.fact || null; });
+      api.get("/fun-fact").then(r => { this.funFact = r.data?.fact || null; }).catch(() => {});
     },
   };
 }

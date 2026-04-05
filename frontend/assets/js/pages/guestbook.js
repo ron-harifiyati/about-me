@@ -14,11 +14,19 @@ function guestbookPage() {
       this.loading = false;
     },
 
+    get messageCharsLeft() {
+      return 500 - (this.form.message?.length || 0);
+    },
+
     async submit() {
       this.error = null;
       this.success = null;
       if (!this.form.name || !this.form.message) {
         this.error = "Name and message are required.";
+        return;
+      }
+      if (this.form.message.length > 500) {
+        this.error = "Message must be 500 characters or fewer.";
         return;
       }
       this.submitting = true;
