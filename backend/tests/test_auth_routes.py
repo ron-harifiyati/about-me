@@ -157,6 +157,101 @@ def test_verify_email_activates_account(ddb_table, mocker):
 
     fresh = get_user_by_email("ron@example.com")
     assert fresh is not None
+    # Critical: assert email_verified flag is actually set
+    assert fresh["email_verified"] is True, "email_verified should be True after successful verification"
+
+
+def test_verify_email_second_call_returns_400(ddb_table, mocker):
+    """Simulate the double-call race condition: clicking the email link twice."""
+    mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    from models.users import get_user_by_email, create_email_verify_token
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    user = get_user_by_email("ron@example.com")
+    token = create_email_verify_token(user["user_id"])
+
+    # First call — must succeed
+    resp1 = route(make_event("POST", "/auth/verify-email", body={"token": token}))
+    assert resp1["statusCode"] == 200, f"First verify call should return 200, got {resp1['statusCode']}"
+    body1 = json.loads(resp1["body"])
+    assert body1["data"] is not None, "First verify call should return success data"
+    assert body1["error"] is None, "First verify call should have no error"
+
+    # Second call with same token — must fail (token consumed)
+    resp2 = route(make_event("POST", "/auth/verify-email", body={"token": token}))
+    assert resp2["statusCode"] == 400, f"Second verify call should return 400, got {resp2['statusCode']}"
+    body2 = json.loads(resp2["body"])
+    assert body2["error"] == "Invalid or expired token", \
+        f"Expected 'Invalid or expired token', got '{body2['error']}'"
+
+    # Account should still be verified after the second call
+    fresh = get_user_by_email("ron@example.com")
+    assert fresh["email_verified"] is True, "email_verified should remain True after second (failed) call"
+
+
+def test_verify_email_full_happy_path(ddb_table, mocker):
+    """End-to-end: register → capture token from register call → verify → login."""
+    captured = {}
+
+    def capture_send(email, token, name=""):
+        captured["token"] = token
+
+    mocker.patch("routes.auth_routes._send_verification_email", side_effect=capture_send)
+    from router import route
+    from models.users import get_user_by_email
+
+    # Register — captures the verification token sent via email
+    reg_resp = route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    assert reg_resp["statusCode"] == 201
+    assert "token" in captured, "Verification email should have been sent with a token"
+
+    token = captured["token"]
+
+    # User should NOT be verified yet
+    user = get_user_by_email("ron@example.com")
+    assert not user.get("email_verified"), "User should not be verified before clicking the link"
+
+    # Click the verification link (frontend posts the token)
+    verify_resp = route(make_event("POST", "/auth/verify-email", body={"token": token}))
+    assert verify_resp["statusCode"] == 200, \
+        f"Verify should return 200. Got {verify_resp['statusCode']}: {json.loads(verify_resp['body'])}"
+
+    # User should now be verified
+    user = get_user_by_email("ron@example.com")
+    assert user["email_verified"] is True
+
+    # Login should succeed
+    login_resp = route(make_event("POST", "/auth/login", body={
+        "email": "ron@example.com", "password": "Secure123!",
+    }))
+    assert login_resp["statusCode"] == 200, \
+        f"Login should succeed after verification. Got {login_resp['statusCode']}: {json.loads(login_resp['body'])}"
+    login_body = json.loads(login_resp["body"])
+    assert "access_token" in login_body["data"]
+
+
+def test_resend_verification_already_verified_message(ddb_table, mocker):
+    """Resend for already-verified account must return the actionable message, not the vague one."""
+    mock_send = mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    from models.users import mark_email_verified, get_user_by_email
+    route(make_event("POST", "/auth/register", body={
+        "email": "ron@example.com", "password": "Secure123!", "name": "Ron", "identity": "Jamf",
+    }))
+    user = get_user_by_email("ron@example.com")
+    mark_email_verified(user["user_id"])
+    mock_send.reset_mock()
+
+    resp = route(make_event("POST", "/auth/resend-verification", body={"email": "ron@example.com"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert "already verified" in body["data"]["message"].lower(), \
+        f"Expected 'already verified' in message, got: '{body['data']['message']}'"
+    mock_send.assert_not_called()
 
 
 def test_reset_password_happy_path(ddb_table, mocker):
