@@ -251,8 +251,8 @@
               <h1>About me</h1>
 
               <!-- Mission + bio -->
-              <p class="about-mission fade-in" x-text="about.mission"></p>
-              <p class="about-body fade-in" x-text="about.bio"></p>
+              <p class="about-mission" x-text="about.mission"></p>
+              <p class="about-body" x-text="about.bio"></p>
 
               <!-- Social links -->
               <div class="about-links">
@@ -311,7 +311,7 @@
             <template x-if="projects.length === 0">
               <p class="subtitle" style="margin-top: 2rem;">No projects yet.</p>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="p in projects" :key="p.id">
                 <a :href="'#/projects/' + p.id" class="card" style="text-decoration: none; display: block;">
                   <h3 x-text="p.title"></h3>
@@ -419,7 +419,7 @@
             <template x-if="courses.length === 0">
               <p class="subtitle" style="margin-top: 2rem;">No courses yet.</p>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="c in courses" :key="c.id">
                 <a :href="'#/courses/' + c.id" class="card" style="text-decoration: none; display: block;">
                   <h3 x-text="c.title"></h3>
@@ -502,7 +502,7 @@
           <p class="subtitle">My technical toolkit.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && skills">
-            <div style="margin-top: 2rem;" class="fade-in">
+            <div style="margin-top: 2rem;">
               <template x-for="cat in categories()" :key="cat">
                 <div style="margin-bottom: 2rem;">
                   <h2 style="text-transform: capitalize;" x-text="cat.replace('_', ' ')"></h2>
@@ -679,7 +679,7 @@
             <template x-if="filtered.length === 0">
               <p class="subtitle">No testimonials yet.</p>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="t in filtered" :key="t.testimonial_id">
                 <div class="card">
                   <p x-text="'\u201C' + t.body + '\u201D'" style="font-style: italic; margin-bottom: 1rem;"></p>
