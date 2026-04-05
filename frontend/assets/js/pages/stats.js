@@ -57,6 +57,8 @@ function statsPage() {
         scrollWheelZoom: false,
         dragging: false,
         touchZoom: false,
+        maxBounds: L.latLngBounds([[-90, -180], [90, 180]]),
+        maxBoundsViscosity: 1.0,
       }).setView([20, 0], 2);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
