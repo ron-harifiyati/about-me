@@ -22,15 +22,28 @@ function adminApp() {
     get isAdmin() { return this.user?.role === "admin"; },
 
     async loadStats() {
-      const [users, contacts, testimonials] = await Promise.all([
+      const [users, contacts, testimonials, guestbook, analytics] = await Promise.all([
         api.get("/admin/users"),
         api.get("/admin/contacts"),
         api.get("/admin/testimonials/pending"),
+        api.get("/guestbook"),
+        api.get("/stats/analytics"),
       ]);
+      const byPage = analytics.data?.by_page || {};
+      const topPages = Object.entries(byPage)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+      const maxCount = topPages[0]?.[1] || 1;
       this.stats = {
         users: users.data?.length || 0,
         contacts: contacts.data?.length || 0,
         pending_testimonials: testimonials.data?.length || 0,
+        guestbook: guestbook.data?.length || 0,
+        unique_visitors: analytics.data?.unique_visitors || 0,
+        total_pageviews: analytics.data?.total_pageviews || 0,
+        top_pages: topPages,
+        max_page_count: maxCount,
+        recent_contacts: (contacts.data || []).slice(0, 3),
       };
     },
   };
