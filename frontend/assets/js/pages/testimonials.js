@@ -8,6 +8,7 @@ function testimonialsPage() {
     form: { body: "", author: "", identity: "Other", anonymous: false },
     loading: true,
     submitting: false,
+    showModal: false,
     error: null,
     success: null,
 
@@ -19,6 +20,7 @@ function testimonialsPage() {
       const seen = new Set(this.testimonials.map(t => t.identity).filter(Boolean));
       this.identities = ["all", ...Array.from(seen)];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
 
     setFilter(identity) {
@@ -40,6 +42,7 @@ function testimonialsPage() {
       if (resp.ok) {
         this.success = "Thank you! Your testimonial is pending approval.";
         this.form = { body: "", author: "", identity: "Other", anonymous: false };
+        setTimeout(() => { this.showModal = false; this.success = null; }, 2000);
       } else {
         this.error = resp.error;
       }

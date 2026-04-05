@@ -7,6 +7,7 @@ function skillsPage() {
       const resp = await api.get("/skills");
       this.skills = resp.data;
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
     categories() {
       if (!this.skills) return [];

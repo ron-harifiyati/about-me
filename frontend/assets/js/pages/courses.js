@@ -7,6 +7,7 @@ function coursesPage() {
       const resp = await api.get("/courses");
       this.courses = resp.data || [];
       this.loading = false;
+      this.$nextTick(() => initScrollAnimations());
     },
     starsDisplay(avg) {
       if (!avg) return "No ratings yet";
@@ -30,7 +31,7 @@ function courseDetailPage() {
     success: null,
 
     async init() {
-      const appEl = document.querySelector("body");
+      const appEl = document.querySelector("[x-data]");
       const appData = appEl._x_dataStack?.[0];
       const courseId = appData?.currentParams?.id;
       if (!courseId) { this.loading = false; return; }

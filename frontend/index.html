@@ -249,33 +249,45 @@
           <template x-if="!loading && about">
             <div>
               <h1>About me</h1>
-              <p class="subtitle" style="margin-bottom: 1.5rem;" x-text="about.mission"></p>
-              <p x-text="about.bio" class="fade-in" style="margin-bottom: 2rem; line-height: 1.8;"></p>
+
+              <!-- Mission + bio -->
+              <p class="about-mission" x-text="about.mission"></p>
+              <p class="about-body" x-text="about.bio"></p>
 
               <!-- Social links -->
-              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+              <div class="about-links">
                 <template x-if="about.contact?.email">
-                  <a :href="'mailto:' + about.contact.email" class="btn btn-outline btn-sm">Email</a>
+                  <a :href="'mailto:' + about.contact.email" class="btn btn-outline btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    Email
+                  </a>
                 </template>
                 <template x-if="about.social_links?.github">
-                  <a :href="about.social_links.github" target="_blank" class="btn btn-outline btn-sm">GitHub</a>
+                  <a :href="about.social_links.github" target="_blank" class="btn btn-github btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    GitHub
+                  </a>
                 </template>
                 <template x-if="about.social_links?.linkedin">
-                  <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm">LinkedIn</a>
+                  <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm about-linkedin">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                    LinkedIn
+                  </a>
                 </template>
               </div>
 
               <!-- Timeline -->
               <template x-if="timeline.length > 0">
                 <div>
+                  <hr class="about-divider">
                   <h2>Journey</h2>
-                  <div style="border-left: 2px solid var(--accent); padding-left: 1.5rem; margin-top: 1rem;">
+                  <div class="timeline">
                     <template x-for="event in timeline" :key="event.date">
-                      <div style="margin-bottom: 1.5rem; position: relative;" class="fade-in">
-                        <div style="position: absolute; left: -1.85rem; top: 0.2rem; width: 12px; height: 12px; background: var(--accent); border-radius: 50%;"></div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);" x-text="event.date"></p>
-                        <h3 x-text="event.title" style="margin: 0.2rem 0;"></h3>
-                        <p x-text="event.description" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+                      <div class="timeline-item fade-in">
+                        <div class="timeline-dot"></div>
+                        <p class="timeline-date" x-text="event.date"></p>
+                        <h3 class="timeline-title" x-text="event.title"></h3>
+                        <p class="timeline-desc" x-text="event.description"></p>
                       </div>
                     </template>
                   </div>
@@ -299,17 +311,21 @@
             <template x-if="projects.length === 0">
               <p class="subtitle" style="margin-top: 2rem;">No projects yet.</p>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="p in projects" :key="p.id">
-                <a :href="'#/projects/' + p.id" class="card" style="text-decoration: none; display: block;">
+                <a :href="'#/projects/' + p.id" class="card project-card" style="text-decoration: none;">
                   <h3 x-text="p.title"></h3>
-                  <p x-text="p.description" class="subtitle" style="font-size: 0.9rem; margin: 0.5rem 0;"></p>
-                  <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.75rem 0;">
+                  <p x-text="p.description" class="subtitle" style="font-size: 0.9rem; margin: 0.5rem 0 0.75rem;"></p>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
                     <template x-for="tag in (p.tech_stack || [])" :key="tag">
                       <span class="badge badge-outline" x-text="tag"></span>
                     </template>
                   </div>
-                  <p class="stars" style="font-size: 0.85rem;" x-text="starsDisplay(p.avg_rating)"></p>
+                  <div class="card-footer">
+                    <span class="card-rating-pill" x-show="p.avg_rating">★ <span x-text="p.avg_rating"></span></span>
+                    <span class="card-rating-none" x-show="!p.avg_rating">No ratings yet</span>
+                    <span class="card-view">View &rarr;</span>
+                  </div>
                 </a>
               </template>
             </div>
@@ -323,8 +339,8 @@
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && project">
             <div>
-              <a href="#/projects" style="font-size: 0.9rem; color: var(--text-muted);">&larr; Back to Projects</a>
-              <h1 x-text="project.title" style="margin-top: 1rem;"></h1>
+              <a href="#/projects" class="btn btn-outline btn-sm detail-back">&larr; Projects</a>
+              <h1 x-text="project.title"></h1>
               <p x-text="project.description" style="margin: 1rem 0; line-height: 1.8;"></p>
 
               <!-- Tech stack -->
@@ -334,25 +350,22 @@
                 </template>
               </div>
 
-              <!-- Links -->
-              <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                <template x-if="project.links?.github">
-                  <a :href="project.links.github" target="_blank" class="btn btn-outline btn-sm">GitHub</a>
-                </template>
-                <template x-if="project.links?.live">
-                  <a :href="project.links.live" target="_blank" class="btn btn-primary btn-sm">Live Demo</a>
-                </template>
-              </div>
-
-              <!-- Ratings -->
-              <div class="card" style="max-width: 320px; margin-bottom: 2rem;">
-                <h3>Rating</h3>
-                <template x-if="ratings">
-                  <p x-text="ratings.count > 0 ? `${ratings.average} / 5 from ${ratings.count} ratings` : 'No ratings yet'"></p>
-                </template>
-                <div style="margin-top: 0.75rem;">
-                  <p style="font-size: 0.85rem; color: var(--text-muted);">Your rating:</p>
-                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem;">
+              <!-- Links + Rating -->
+              <div class="detail-meta">
+                <div class="detail-links">
+                  <template x-if="project.links?.github">
+                    <a :href="project.links.github" target="_blank" class="btn btn-outline btn-sm">GitHub</a>
+                  </template>
+                  <template x-if="project.links?.live">
+                    <a :href="project.links.live" target="_blank" class="btn btn-primary btn-sm">Live Demo</a>
+                  </template>
+                </div>
+                <div class="card">
+                  <h3>Rate this project</h3>
+                  <template x-if="ratings">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" x-text="ratings.count > 0 ? `${ratings.average} / 5 from ${ratings.count} ratings` : 'No ratings yet'"></p>
+                  </template>
+                  <div class="detail-stars">
                     <template x-for="n in [1,2,3,4,5]" :key="n">
                       <span @click="submitRating(n)"
                             @mouseover="hoverRating = n"
@@ -367,7 +380,7 @@
               <!-- Comments -->
               <h2>Comments (<span x-text="comments.length"></span>)</h2>
               <template x-if="comments.length === 0">
-                <p class="subtitle">No comments yet. Be the first!</p>
+                <div class="comment-empty">No comments yet — be the first!</div>
               </template>
               <div style="margin-top: 1rem;">
                 <template x-for="c in comments" :key="c.comment_id">
@@ -385,10 +398,11 @@
               <div style="margin-top: 1.5rem;">
                 <div x-show="error" class="alert alert-error" x-text="error"></div>
                 <div x-show="success" class="alert alert-success" x-text="success"></div>
-                <textarea x-model="newComment" class="form-input" rows="3"
-                          placeholder="Leave a comment..."></textarea>
-                <button class="btn btn-primary" style="margin-top: 0.5rem;"
-                        @click="submitComment()" :disabled="submitting">
+                <div class="form-group">
+                  <label>Leave a comment</label>
+                  <textarea x-model="newComment" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
+                </div>
+                <button class="btn btn-primary" @click="submitComment()" :disabled="submitting">
                   <span x-text="submitting ? 'Posting...' : 'Post comment'"></span>
                 </button>
               </div>
@@ -407,13 +421,17 @@
             <template x-if="courses.length === 0">
               <p class="subtitle" style="margin-top: 2rem;">No courses yet.</p>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="c in courses" :key="c.id">
-                <a :href="'#/courses/' + c.id" class="card" style="text-decoration: none; display: block;">
+                <a :href="'#/courses/' + c.id" class="card project-card" style="text-decoration: none;">
+                  <span class="badge badge-outline" style="align-self: flex-start; margin-bottom: 0.6rem;" x-text="c.platform"></span>
                   <h3 x-text="c.title"></h3>
-                  <p x-text="c.platform" class="subtitle" style="font-size: 0.85rem; margin: 0.3rem 0;"></p>
-                  <p x-text="c.description" class="subtitle" style="font-size: 0.9rem; margin: 0.5rem 0;"></p>
-                  <p class="stars" style="font-size: 0.85rem;" x-text="starsDisplay(c.avg_rating)"></p>
+                  <p x-text="c.description" class="subtitle" style="font-size: 0.9rem; margin: 0.5rem 0 0.75rem;"></p>
+                  <div class="card-footer">
+                    <span class="card-rating-pill" x-show="c.avg_rating">★ <span x-text="c.avg_rating"></span></span>
+                    <span class="card-rating-none" x-show="!c.avg_rating">No ratings yet</span>
+                    <span class="card-view">View &rarr;</span>
+                  </div>
                 </a>
               </template>
             </div>
@@ -427,25 +445,24 @@
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && course">
             <div>
-              <a href="#/courses" style="font-size: 0.9rem; color: var(--text-muted);">&larr; Back to Courses</a>
-              <h1 x-text="course.title" style="margin-top: 1rem;"></h1>
-              <p class="subtitle" x-text="course.platform"></p>
+              <a href="#/courses" class="btn btn-outline btn-sm detail-back">&larr; Courses</a>
+              <span class="badge badge-outline" x-text="course.platform"></span>
+              <h1 x-text="course.title" style="margin-top: 0.75rem;"></h1>
               <p x-text="course.description" style="margin: 1rem 0; line-height: 1.8;"></p>
-              <template x-if="course.link">
-                <a :href="course.link" target="_blank" class="btn btn-outline btn-sm" style="margin-bottom: 2rem;">
-                  View course
-                </a>
-              </template>
 
-              <!-- Ratings -->
-              <div class="card" style="max-width: 320px; margin-bottom: 2rem;">
-                <h3>Rating</h3>
-                <template x-if="ratings">
-                  <p x-text="ratings.count > 0 ? `${ratings.average} / 5 from ${ratings.count} ratings` : 'No ratings yet'"></p>
-                </template>
-                <div style="margin-top: 0.75rem;">
-                  <p style="font-size: 0.85rem; color: var(--text-muted);">Your rating:</p>
-                  <div style="display: flex; gap: 0.5rem; font-size: 1.5rem;">
+              <!-- Link + Rating -->
+              <div class="detail-meta">
+                <div class="detail-links">
+                  <template x-if="course.link">
+                    <a :href="course.link" target="_blank" class="btn btn-outline btn-sm">View course</a>
+                  </template>
+                </div>
+                <div class="card">
+                  <h3>Rate this course</h3>
+                  <template x-if="ratings">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" x-text="ratings.count > 0 ? `${ratings.average} / 5 from ${ratings.count} ratings` : 'No ratings yet'"></p>
+                  </template>
+                  <div class="detail-stars">
                     <template x-for="n in [1,2,3,4,5]" :key="n">
                       <span @click="submitRating(n)"
                             @mouseover="hoverRating = n"
@@ -459,6 +476,9 @@
 
               <!-- Comments -->
               <h2>Comments (<span x-text="comments.length"></span>)</h2>
+              <template x-if="comments.length === 0">
+                <div class="comment-empty">No comments yet — be the first!</div>
+              </template>
               <div style="margin-top: 1rem;">
                 <template x-for="c in comments" :key="c.comment_id">
                   <div class="card" style="margin-bottom: 0.75rem;">
@@ -473,8 +493,11 @@
               <div style="margin-top: 1.5rem;">
                 <div x-show="error" class="alert alert-error" x-text="error"></div>
                 <div x-show="success" class="alert alert-success" x-text="success"></div>
-                <textarea x-model="newComment" class="form-input" rows="3" placeholder="Leave a comment..."></textarea>
-                <button class="btn btn-primary" style="margin-top: 0.5rem;" @click="submitComment()" :disabled="submitting">
+                <div class="form-group">
+                  <label>Leave a comment</label>
+                  <textarea x-model="newComment" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
+                </div>
+                <button class="btn btn-primary" @click="submitComment()" :disabled="submitting">
                   <span x-text="submitting ? 'Posting...' : 'Post comment'"></span>
                 </button>
               </div>
@@ -490,13 +513,13 @@
           <p class="subtitle">My technical toolkit.</p>
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading && skills">
-            <div style="margin-top: 2rem;" class="fade-in">
+            <div class="skills-grid">
               <template x-for="cat in categories()" :key="cat">
-                <div style="margin-bottom: 2rem;">
-                  <h2 style="text-transform: capitalize;" x-text="cat.replace('_', ' ')"></h2>
-                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <div class="card">
+                  <p class="skill-category-title" x-text="cat.replace(/_/g, ' ')"></p>
+                  <div class="skill-tags">
                     <template x-for="skill in skills[cat]" :key="skill">
-                      <span class="badge" x-text="skill"></span>
+                      <span class="badge badge-outline" x-text="skill"></span>
                     </template>
                   </div>
                 </div>
@@ -530,37 +553,44 @@
           <p class="subtitle">Get in touch.</p>
           <div class="contact-grid">
             <!-- Contact details -->
-            <div>
+            <div class="card">
               <h2>Details</h2>
               <template x-if="about?.contact">
-                <div style="margin-top: 1rem;">
+                <div style="margin-top: 1.25rem;">
                   <template x-if="about.contact.email">
-                    <p style="margin-bottom: 0.75rem;">
+                    <div class="contact-detail-item">
                       <strong>Email:</strong>
                       <a :href="'mailto:' + about.contact.email" x-text="about.contact.email"></a>
-                    </p>
+                    </div>
                   </template>
                   <template x-if="about.contact.location">
-                    <p style="margin-bottom: 0.75rem;">
-                      <strong>Location:</strong> <span x-text="about.contact.location"></span>
-                    </p>
+                    <div class="contact-detail-item">
+                      <strong>Location:</strong>
+                      <span x-text="about.contact.location"></span>
+                    </div>
                   </template>
                 </div>
               </template>
               <template x-if="about?.social_links">
-                <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <div class="about-links" style="margin-top: 1.25rem;">
                   <template x-if="about.social_links.github">
-                    <a :href="about.social_links.github" target="_blank" class="btn btn-outline btn-sm">GitHub</a>
+                    <a :href="about.social_links.github" target="_blank" class="btn btn-outline btn-sm btn-github">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                      GitHub
+                    </a>
                   </template>
                   <template x-if="about.social_links.linkedin">
-                    <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm">LinkedIn</a>
+                    <a :href="about.social_links.linkedin" target="_blank" class="btn btn-outline btn-sm about-linkedin">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                      LinkedIn
+                    </a>
                   </template>
                 </div>
               </template>
             </div>
 
             <!-- Contact form -->
-            <div>
+            <div class="card">
               <h2>Send a message</h2>
               <div x-show="error" class="alert alert-error" x-text="error"></div>
               <div x-show="success" class="alert alert-success" x-text="success"></div>
@@ -593,25 +623,25 @@
           <p class="subtitle">Say hello — everyone's welcome.</p>
 
           <!-- Submit form -->
-          <div class="card" style="max-width: 500px; margin-top: 1.5rem;">
+          <div class="card submit-card">
             <h3>Leave a message</h3>
             <template x-if="!isAuthenticated">
               <p class="subtitle" style="margin-top: 0.75rem;">
-                <a href="#/login">Log in</a> or <a href="#/register">create an account</a> to leave a message.
+                <a href="#/login" class="text-link">Log in</a> or <a href="#/register" class="text-link">create an account</a> to leave a message.
               </p>
             </template>
             <template x-if="isAuthenticated">
-              <div>
-                <div x-show="error" class="alert alert-error" x-text="error" style="margin-top: 0.75rem;"></div>
-                <div x-show="success" class="alert alert-success" x-text="success" style="margin-top: 0.75rem;"></div>
-                <div class="form-group" style="margin-top: 0.75rem;">
+              <div style="margin-top: 0.75rem;">
+                <div x-show="error" class="alert alert-error" x-text="error"></div>
+                <div x-show="success" class="alert alert-success" x-text="success"></div>
+                <div class="form-group">
                   <label>Name</label>
                   <input x-model="form.name" class="form-input" placeholder="Your name" autocomplete="name">
                 </div>
                 <div class="form-group">
-                  <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <div class="label-row">
                     <label>Message</label>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);" x-text="messageCharsLeft + ' left'"></span>
+                    <span class="label-row-counter" x-text="messageCharsLeft + ' left'"></span>
                   </div>
                   <textarea x-model="form.message" class="form-input" rows="3" placeholder="What's on your mind?" maxlength="500"></textarea>
                 </div>
@@ -626,16 +656,16 @@
           <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
           <div x-show="!loading" style="margin-top: 2rem;">
             <template x-if="entries.length === 0">
-              <p class="subtitle">No entries yet. Be the first!</p>
+              <div class="comment-empty">No entries yet — be the first to say hello!</div>
             </template>
             <template x-for="entry in entries" :key="entry.entry_id">
-              <div class="card" style="margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div class="card guestbook-entry">
+                <div class="guestbook-entry-header">
+                  <div class="guestbook-entry-author">
                     <strong x-text="entry.name"></strong>
                     <span class="badge badge-outline" x-text="entry.identity" x-show="entry.identity"></span>
                   </div>
-                  <span style="font-size: 0.8rem; color: var(--text-muted);" x-text="formatDate(entry.created_at)"></span>
+                  <span class="guestbook-entry-date" x-text="formatDate(entry.created_at)"></span>
                 </div>
                 <p x-text="entry.message"></p>
               </div>
@@ -647,11 +677,16 @@
       <!-- TESTIMONIALS -->
       <template x-if="currentPage === 'testimonials'">
         <div class="page" x-data="testimonialsPage()">
-          <h1>Testimonials</h1>
-          <p class="subtitle">What people say.</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h1>Testimonials</h1>
+              <p class="subtitle">What people say.</p>
+            </div>
+            <button class="btn btn-primary" @click="showModal = true">Leave a testimonial</button>
+          </div>
 
           <!-- Identity filter -->
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem;">
+          <div class="filter-pills">
             <template x-for="identity in identities" :key="identity">
               <button class="btn btn-sm"
                       :class="activeFilter === identity ? 'btn-primary' : 'btn-outline'"
@@ -665,14 +700,14 @@
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <div x-show="!loading" style="margin-top: 1.5rem;">
             <template x-if="filtered.length === 0">
-              <p class="subtitle">No testimonials yet.</p>
+              <div class="comment-empty">No testimonials yet — be the first to submit one below!</div>
             </template>
-            <div class="card-grid fade-in">
+            <div class="card-grid">
               <template x-for="t in filtered" :key="t.testimonial_id">
                 <div class="card">
-                  <p x-text="'\u201C' + t.body + '\u201D'" style="font-style: italic; margin-bottom: 1rem;"></p>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong x-text="t.author"></strong>
+                  <p x-text="'\u201C' + t.body + '\u201D'" class="testimonial-body"></p>
+                  <div class="testimonial-author">
+                    <strong x-text="t.anonymous ? 'Anonymous' : t.author"></strong>
                     <span class="badge badge-outline" x-text="t.identity" x-show="t.identity"></span>
                   </div>
                 </div>
@@ -680,37 +715,42 @@
             </div>
           </div>
 
-          <!-- Submit form -->
-          <div class="card" style="max-width: 500px; margin-top: 2.5rem;">
-            <h3>Submit a testimonial</h3>
-            <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 1rem;">Pending admin approval before going live.</p>
-            <div x-show="error" class="alert alert-error" x-text="error"></div>
-            <div x-show="success" class="alert alert-success" x-text="success"></div>
-            <div class="form-group">
-              <label>Your testimonial</label>
-              <textarea x-model="form.body" class="form-input" rows="4" placeholder="What would you like to say?"></textarea>
+          <!-- Modal -->
+          <div class="modal-backdrop" x-show="showModal" @click.self="showModal = false">
+            <div class="modal">
+              <div class="modal-header">
+                <h3>Leave a testimonial</h3>
+                <button class="modal-close" @click="showModal = false">&times;</button>
+              </div>
+              <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 1rem;">Pending admin approval before going live.</p>
+              <div x-show="error" class="alert alert-error" x-text="error"></div>
+              <div x-show="success" class="alert alert-success" x-text="success"></div>
+              <div class="form-group">
+                <label>Your testimonial</label>
+                <textarea x-model="form.body" class="form-input" rows="4" placeholder="What would you like to say?"></textarea>
+              </div>
+              <div class="form-group" x-show="!form.anonymous">
+                <label>Your name (optional)</label>
+                <input x-model="form.author" class="form-input" placeholder="Leave blank to be anonymous">
+              </div>
+              <div class="form-group">
+                <label>Identity</label>
+                <select x-model="form.identity" class="form-input">
+                  <option>Jamf</option>
+                  <option>MCRI</option>
+                  <option>Friend</option>
+                  <option>Family</option>
+                  <option selected>Other</option>
+                </select>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" x-model="form.anonymous" id="anon">
+                <label for="anon">Submit anonymously</label>
+              </div>
+              <button class="btn btn-primary" style="margin-top: 1rem;" @click="submit()" :disabled="submitting">
+                <span x-text="submitting ? 'Submitting...' : 'Submit'"></span>
+              </button>
             </div>
-            <div class="form-group" x-show="!form.anonymous">
-              <label>Your name (optional)</label>
-              <input x-model="form.author" class="form-input" placeholder="Leave blank to be anonymous">
-            </div>
-            <div class="form-group">
-              <label>Identity</label>
-              <select x-model="form.identity" class="form-input">
-                <option>Jamf</option>
-                <option>MCRI</option>
-                <option>Friend</option>
-                <option>Family</option>
-                <option selected>Other</option>
-              </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="checkbox" x-model="form.anonymous" id="anon">
-              <label for="anon" style="margin: 0; cursor: pointer;">Submit anonymously</label>
-            </div>
-            <button class="btn btn-primary" @click="submit()" :disabled="submitting">
-              <span x-text="submitting ? 'Submitting...' : 'Submit'"></span>
-            </button>
           </div>
         </div>
       </template>
@@ -721,39 +761,27 @@
           <h1>Developer</h1>
           <p class="subtitle">Explore the API that powers this portfolio.</p>
 
-          <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+          <div class="stack-cards">
             <div class="card">
               <h3>Interactive API docs</h3>
-              <p style="margin: 0.5rem 0; color: var(--text-muted); font-size: 0.9rem;">
-                Try every endpoint live in your browser.
-              </p>
-              <a :href="apiUrl + '/api'" target="_blank" class="btn btn-primary" style="display: inline-block; margin-top: 0.75rem;">
-                Open Swagger UI
-              </a>
+              <p class="card-desc">Try every endpoint live in your browser.</p>
+              <a :href="apiUrl + '/api'" target="_blank" class="btn btn-primary card-action">Open Swagger UI</a>
             </div>
 
             <div class="card">
               <h3>OpenAPI spec</h3>
-              <p style="margin: 0.5rem 0; color: var(--text-muted); font-size: 0.9rem;">
-                Import into Postman or any OpenAPI-compatible tool.
-              </p>
-              <a :href="apiUrl + '/api/spec'" target="_blank" class="btn btn-outline" style="display: inline-block; margin-top: 0.75rem;">
-                Download spec (JSON)
-              </a>
+              <p class="card-desc">Import into Postman or any OpenAPI-compatible tool.</p>
+              <a :href="apiUrl + '/api/spec'" target="_blank" class="btn btn-outline card-action">Download spec (JSON)</a>
             </div>
 
             <template x-if="meta">
               <div class="card">
                 <h3>Deploy info</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                  <tr><td style="padding: 0.3rem 0; color: var(--text-muted);">Version</td>
-                      <td x-text="meta.version"></td></tr>
-                  <tr><td style="padding: 0.3rem 0; color: var(--text-muted);">Environment</td>
-                      <td x-text="meta.environment"></td></tr>
-                  <tr><td style="padding: 0.3rem 0; color: var(--text-muted);">Git SHA</td>
-                      <td><code x-text="meta.git_sha?.slice(0, 8)"></code></td></tr>
-                  <tr><td style="padding: 0.3rem 0; color: var(--text-muted);">Deployed</td>
-                      <td x-text="meta.deploy_timestamp"></td></tr>
+                <table class="meta-table" style="margin-top: 0.75rem;">
+                  <tr><td>Version</td><td x-text="meta.version"></td></tr>
+                  <tr><td>Environment</td><td x-text="meta.environment"></td></tr>
+                  <tr><td>Git SHA</td><td><code x-text="meta.git_sha?.slice(0, 8)"></code></td></tr>
+                  <tr><td>Deployed</td><td x-text="meta.deploy_timestamp"></td></tr>
                 </table>
               </div>
             </template>
@@ -764,10 +792,10 @@
       <!-- QUIZ (auth required) -->
       <div x-show="currentPage === 'quiz'" class="page">
         <template x-if="!isAuthenticated">
-          <div style="text-align: center; padding: 4rem 0;">
+          <div class="quiz-center" style="padding: 4rem 0;">
             <h1>Quiz</h1>
             <p class="subtitle">Log in to take the quiz and compete on the leaderboard.</p>
-            <a href="#/login" class="btn btn-primary" style="margin-top: 1.5rem; display: inline-block;">Log in</a>
+            <a href="#/login" class="btn btn-primary">Log in</a>
           </div>
         </template>
         <template x-if="isAuthenticated">
@@ -777,28 +805,24 @@
             <div x-show="state === 'loading'" class="loading-center"><div class="spinner"></div></div>
 
             <!-- Start screen -->
-            <div x-show="state === 'start'" style="text-align: center; padding: 3rem 0;">
+            <div x-show="state === 'start'" class="quiz-center">
               <h1>Quiz</h1>
               <p class="subtitle" x-text="`${questions.length} questions · Test your knowledge`"></p>
               <div x-show="error" class="alert alert-error" style="max-width: 400px; margin: 1rem auto;" x-text="error"></div>
-              <button class="btn btn-primary" style="margin-top: 1.5rem;" @click="startQuiz()" x-show="questions.length > 0">
-                Start Quiz
-              </button>
-              <button class="btn btn-outline" style="margin-top: 1rem; display: block; margin-left: auto; margin-right: auto;" @click="showLeaderboard()">
-                View Leaderboard
-              </button>
+              <button class="btn btn-primary" @click="startQuiz()" x-show="questions.length > 0">Start Quiz</button>
+              <button class="btn btn-outline" style="display: block; margin: 0.5rem auto 0;" @click="showLeaderboard()">View Leaderboard</button>
             </div>
 
             <!-- Playing -->
             <div x-show="state === 'playing'">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div class="quiz-header">
                 <h1>Quiz</h1>
                 <span class="subtitle" x-text="`Question ${current + 1} of ${questions.length}`"></span>
               </div>
 
               <!-- Progress bar -->
-              <div style="height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 2rem;">
-                <div :style="`width: ${progress}%; background: var(--accent); height: 100%; border-radius: 3px; transition: width 0.3s;`"></div>
+              <div class="quiz-progress">
+                <div class="quiz-progress-fill" :style="`width: ${progress}%`"></div>
               </div>
 
               <div x-show="error" class="alert alert-error" x-text="error"></div>
@@ -806,12 +830,11 @@
               <!-- Single question -->
               <template x-if="currentQuestion">
                 <div class="card">
-                  <p style="font-weight: 600; margin-bottom: 1rem;" x-text="currentQuestion.question"></p>
-                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <p class="quiz-question" x-text="currentQuestion.question"></p>
+                  <div class="quiz-options">
                     <template x-for="option in currentQuestion.options" :key="option">
-                      <button class="btn"
+                      <button class="btn quiz-option"
                               :class="answers[currentQuestion.question_id] === option ? 'btn-primary' : 'btn-outline'"
-                              style="text-align: left; justify-content: flex-start;"
                               @click="selectAnswer(currentQuestion.question_id, option)"
                               x-text="option">
                       </button>
@@ -821,7 +844,7 @@
               </template>
 
               <!-- Navigation -->
-              <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <div class="quiz-nav">
                 <button class="btn btn-outline"
                         @click="prevQuestion()"
                         :style="current === 0 ? 'visibility: hidden;' : ''">
@@ -845,21 +868,21 @@
             </div>
 
             <!-- Result -->
-            <div x-show="state === 'result'" style="text-align: center; padding: 3rem 0;">
-              <div style="font-size: 3rem;" x-text="scorePercent === 100 ? '🏆' : scorePercent >= 80 ? '🎉' : '📝'"></div>
+            <div x-show="state === 'result'" class="quiz-center">
+              <div class="quiz-emoji" x-text="scorePercent === 100 ? '🏆' : scorePercent >= 80 ? '🎉' : '📝'"></div>
               <h1 x-text="scoreMessage()" style="margin-top: 1rem;"></h1>
               <template x-if="result">
                 <div>
-                  <p class="subtitle" style="font-size: 1.2rem; margin-top: 0.5rem;">
+                  <p class="subtitle quiz-result-score">
                     <span x-text="result.score"></span> / <span x-text="result.total"></span>
                     (<span x-text="scorePercent"></span>%)
                   </p>
-                  <div style="height: 12px; background: var(--border); border-radius: 6px; max-width: 300px; margin: 1.5rem auto;">
-                    <div :style="`width: ${scorePercent}%; background: var(--accent); height: 100%; border-radius: 6px; transition: width 1s;`"></div>
+                  <div class="quiz-result-bar">
+                    <div class="quiz-result-bar-fill" :style="`width: ${scorePercent}%`"></div>
                   </div>
                 </div>
               </template>
-              <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+              <div class="quiz-result-actions">
                 <button class="btn btn-outline" @click="startQuiz()">Try again</button>
                 <button class="btn btn-primary" @click="showLeaderboard()">Leaderboard</button>
               </div>
@@ -867,7 +890,7 @@
 
             <!-- Leaderboard -->
             <div x-show="state === 'leaderboard'">
-              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="leaderboard-header">
                 <h1>Leaderboard</h1>
                 <button class="btn btn-outline btn-sm" @click="state = 'start'">&larr; Back</button>
               </div>
@@ -875,20 +898,18 @@
               <template x-if="!loadingLeaderboard">
                 <div>
                   <template x-if="leaderboard.length === 0">
-                    <p class="subtitle">No scores yet. Be the first!</p>
+                    <div class="comment-empty">No scores yet — be the first to play!</div>
                   </template>
-                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div class="leaderboard-list">
                     <template x-for="(entry, idx) in leaderboard" :key="entry.attempt_id">
-                      <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                          <span style="font-size: 1.2rem; width: 2rem; text-align: center;"
+                      <div class="card leaderboard-entry">
+                        <div class="leaderboard-entry-left">
+                          <span class="leaderboard-rank"
                                 x-text="idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1) + '.'">
                           </span>
                           <span x-text="formatLeader(entry.user_id)"></span>
                         </div>
-                        <span style="font-weight: 700; color: var(--accent);"
-                              x-text="`${entry.score} / ${entry.total}`">
-                        </span>
+                        <span class="leaderboard-score" x-text="`${entry.score} / ${entry.total}`"></span>
                       </div>
                     </template>
                   </div>
@@ -903,61 +924,63 @@
       <!-- LOGIN -->
       <template x-if="currentPage === 'login'">
         <div class="page" x-data="loginPage()">
-          <div style="max-width: 400px; margin: 3rem auto;">
-            <h1>Login</h1>
-            <p class="subtitle">Welcome back.</p>
+          <div class="auth-wrapper">
+            <div class="card">
+              <h1 style="margin-bottom: 0.25rem;">Sign in</h1>
+              <p class="subtitle" style="margin-bottom: 1.5rem;">Welcome back.</p>
 
-            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;">
-              <span x-text="error"></span>
-              <template x-if="unverifiedEmail">
-                <div style="margin-top: 0.75rem;">
-                  <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
-                    <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
-                  </button>
-                  <span x-show="resendSent" style="margin-left: 0.5rem; font-size: 0.85rem; color: var(--alert-success-text);">Email sent!</span>
-                  <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-error-text);"></span>
+              <div x-show="error" class="alert alert-error" style="margin-bottom: 1rem;">
+                <span x-text="error"></span>
+                <template x-if="unverifiedEmail">
+                  <div style="margin-top: 0.75rem;">
+                    <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
+                      <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
+                    </button>
+                    <span x-show="resendSent" style="margin-left: 0.5rem; font-size: 0.85rem; color: var(--alert-success-text);">Email sent!</span>
+                    <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-error-text);"></span>
+                  </div>
+                </template>
+              </div>
+
+              <!-- OAuth buttons -->
+              <div class="oauth-buttons">
+                <button class="btn btn-oauth btn-github" @click="loginWithGithub()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                  Continue with GitHub
+                </button>
+                <button class="btn btn-outline btn-oauth btn-google" @click="loginWithGoogle()">
+                  <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                  Continue with Google
+                </button>
+              </div>
+
+              <div class="auth-divider">
+                <div class="auth-divider-line"></div>
+                <span>or</span>
+                <div class="auth-divider-line"></div>
+              </div>
+
+              <!-- Email/password form -->
+              <form @submit.prevent="submit()" autocomplete="on">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input x-model="form.email" type="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
                 </div>
-              </template>
+                <div class="form-group">
+                  <label>Password</label>
+                  <input x-model="form.password" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <div class="form-check" style="margin-bottom: 1rem;">
+                  <input type="checkbox" x-model="form.remember_me" id="remember">
+                  <label for="remember">Remember me (7 days)</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" :disabled="submitting">
+                  <span x-text="submitting ? 'Logging in...' : 'Log in'"></span>
+                </button>
+              </form>
             </div>
 
-            <!-- OAuth buttons -->
-            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
-              <button class="btn btn-outline" @click="loginWithGithub()" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-                Continue with GitHub
-              </button>
-              <button class="btn btn-outline" @click="loginWithGoogle()" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Continue with Google
-              </button>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 1rem; margin: 1.25rem 0; color: var(--text-muted);">
-              <div style="flex: 1; height: 1px; background: var(--border);"></div>
-              <span style="font-size: 0.85rem;">or</span>
-              <div style="flex: 1; height: 1px; background: var(--border);"></div>
-            </div>
-
-            <!-- Email/password form -->
-            <form @submit.prevent="submit()" autocomplete="on">
-              <div class="form-group">
-                <label>Email</label>
-                <input x-model="form.email" type="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
-              </div>
-              <div class="form-group">
-                <label>Password</label>
-                <input x-model="form.password" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
-              </div>
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                <input type="checkbox" x-model="form.remember_me" id="remember">
-                <label for="remember" style="margin: 0; cursor: pointer; font-size: 0.9rem;">Remember me (7 days)</label>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;" :disabled="submitting">
-                <span x-text="submitting ? 'Logging in...' : 'Log in'"></span>
-              </button>
-            </form>
-
-            <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+            <p class="auth-footer">
               <a href="#/forgot-password">Forgot password?</a>
               &nbsp;&middot;&nbsp;
               Don't have an account? <a href="#/register">Sign up</a>
@@ -969,64 +992,66 @@
       <!-- REGISTER -->
       <template x-if="currentPage === 'register'">
         <div class="page" x-data="registerPage()">
-          <div style="max-width: 420px; margin: 3rem auto;">
-            <h1>Create account</h1>
-            <p class="subtitle">Join and unlock interactive features.</p>
+          <div class="auth-wrapper">
+            <div class="card">
+              <h1 style="margin-bottom: 0.25rem;">Create account</h1>
+              <p class="subtitle" style="margin-bottom: 1.5rem;">Join and unlock interactive features.</p>
 
-            <div x-show="error" class="alert alert-error" style="margin-top: 1rem;" x-text="error"></div>
-            <div x-show="success" class="alert alert-success" style="margin-top: 1rem;">
-              <span x-text="success"></span>
-              <div style="margin-top: 0.75rem;">
-                <p style="font-size: 0.85rem; margin-bottom: 0.4rem;">Didn't receive it?</p>
-                <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
-                  <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
-                </button>
-                <span x-show="resendSent" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-success-text);">New email sent!</span>
-                <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-error-text);"></span>
+              <div x-show="error" class="alert alert-error" style="margin-bottom: 1rem;" x-text="error"></div>
+              <div x-show="success" class="alert alert-success" style="margin-bottom: 1rem;">
+                <span x-text="success"></span>
+                <div style="margin-top: 0.75rem;">
+                  <p style="font-size: 0.85rem; margin-bottom: 0.4rem;">Didn't receive it?</p>
+                  <button class="btn btn-outline btn-sm" @click="resendVerification()" :disabled="resendSending">
+                    <span x-text="resendSending ? 'Sending...' : 'Resend verification email'"></span>
+                  </button>
+                  <span x-show="resendSent" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-success-text);">New email sent!</span>
+                  <span x-show="resendError" x-text="resendError" style="display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--alert-error-text);"></span>
+                </div>
               </div>
+
+              <form @submit.prevent="submit()" x-show="!success" autocomplete="on">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input x-model="form.name" class="form-input" placeholder="Your name" autocomplete="name" required>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input x-model="form.email" type="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                  <label>Password</label>
+                  <input x-model="form.password" type="password" class="form-input" placeholder="Min. 8 characters" autocomplete="new-password" required>
+                  <div x-show="form.password.length > 0" class="password-strength">
+                    <span class="password-strength-label" x-text="passwordStrengthLabel" :style="'color: ' + passwordStrengthColor"></span>
+                    <div class="password-strength-bar">
+                      <div class="password-strength-bar-fill" :style="'background: ' + passwordStrengthColor + '; width: ' + (passwordStrength / 5 * 100) + '%;'"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Identity picker -->
+                <div class="form-group">
+                  <label>How do you know me?</label>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem;">
+                    <template x-for="id in identities" :key="id">
+                      <button type="button"
+                              class="btn btn-sm"
+                              :class="form.identity === id ? 'btn-primary' : 'btn-outline'"
+                              @click="form.identity = id"
+                              x-text="id">
+                      </button>
+                    </template>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" :disabled="submitting">
+                  <span x-text="submitting ? 'Creating account...' : 'Create account'"></span>
+                </button>
+              </form>
             </div>
 
-            <form @submit.prevent="submit()" style="margin-top: 1.5rem;" x-show="!success" autocomplete="on">
-              <div class="form-group">
-                <label>Name</label>
-                <input x-model="form.name" class="form-input" placeholder="Your name" autocomplete="name" required>
-              </div>
-              <div class="form-group">
-                <label>Email</label>
-                <input x-model="form.email" type="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
-              </div>
-              <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                  <label>Password</label>
-                  <span x-show="form.password.length > 0" x-text="passwordStrengthLabel" style="font-size: 0.8rem;" :style="'color: ' + passwordStrengthColor"></span>
-                </div>
-                <input x-model="form.password" type="password" class="form-input" placeholder="Min. 8 characters" autocomplete="new-password" required>
-                <div x-show="form.password.length > 0" style="height: 4px; border-radius: 2px; background: var(--border); margin-top: 0.4rem; overflow: hidden;">
-                  <div :style="'height: 100%; border-radius: 2px; background: ' + passwordStrengthColor + '; width: ' + (passwordStrength / 5 * 100) + '%; transition: width 0.2s, background 0.2s;'"></div>
-                </div>
-              </div>
-
-              <!-- Identity picker -->
-              <div class="form-group">
-                <label>How do you know me?</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem;">
-                  <template x-for="id in identities" :key="id">
-                    <button type="button"
-                            class="btn btn-sm"
-                            :class="form.identity === id ? 'btn-primary' : 'btn-outline'"
-                            @click="form.identity = id"
-                            x-text="id">
-                    </button>
-                  </template>
-                </div>
-              </div>
-
-              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" :disabled="submitting">
-                <span x-text="submitting ? 'Creating account...' : 'Create account'"></span>
-              </button>
-            </form>
-
-            <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+            <p class="auth-footer">
               Already have an account? <a href="#/login">Log in</a>
             </p>
           </div>
@@ -1152,7 +1177,7 @@
   <script src="/assets/js/pages/stats.js?v=1.9"></script>
   <script src="/assets/js/pages/contact.js?v=1.9"></script>
   <script src="/assets/js/pages/guestbook.js?v=1.9"></script>
-  <script src="/assets/js/pages/testimonials.js?v=1.9"></script>
+  <script src="/assets/js/pages/testimonials.js?v=2.0"></script>
   <script src="/assets/js/pages/developer.js?v=1.9"></script>
   <script src="/assets/js/pages/quiz.js?v=1.9"></script>
   <script src="/assets/js/pages/login.js?v=1.9"></script>
