@@ -102,6 +102,18 @@ SPEC = {
         "/auth/verify-email": {
             "post": {"summary": "Verify email", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
         },
+        "/auth/resend-verification": {
+            "post": {"summary": "Resend verification email", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
+        },
+        "/auth/forgot-password": {
+            "post": {"summary": "Request password reset", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
+        },
+        "/auth/reset-password": {
+            "post": {"summary": "Reset password with token", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
+        },
         "/auth/login": {
             "post": {"summary": "Login", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
         },
@@ -138,6 +150,10 @@ SPEC = {
             "post": {"summary": "Sign guestbook", "tags": ["Guestbook"],
                      "responses": {"201": {"description": "Created"}}},
         },
+        "/guestbook/{id}": {
+            "delete": {"summary": "Delete guestbook entry (admin)", "tags": ["Admin"],
+                       "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
         "/quiz/questions": {
             "get": {"summary": "Get quiz questions", "tags": ["Quiz"], "responses": {"200": {"description": "OK"}}}
         },
@@ -154,8 +170,20 @@ SPEC = {
             "post": {"summary": "Submit testimonial", "tags": ["Testimonials"],
                      "responses": {"201": {"description": "Created"}}},
         },
+        "/visits": {
+            "post": {"summary": "Record page visit", "tags": ["Stats"],
+                     "requestBody": {"required": True, "content": {"application/json": {"schema": {
+                         "type": "object", "required": ["page"],
+                         "properties": {"page": {"type": "string", "example": "home"}}
+                     }}}},
+                     "responses": {"200": {"description": "OK"}}}
+        },
         "/stats/visitors": {
-            "get": {"summary": "Visitor locations", "tags": ["Stats"], "responses": {"200": {"description": "OK"}}}
+            "get": {"summary": "Unique visitor locations", "tags": ["Stats"],
+                    "responses": {"200": {"description": "OK"}}}
+        },
+        "/stats/pageviews": {
+            "get": {"summary": "Page view counts", "tags": ["Stats"], "responses": {"200": {"description": "OK"}}}
         },
         "/stats/analytics": {
             "get": {"summary": "Analytics breakdown (admin)", "tags": ["Stats"],

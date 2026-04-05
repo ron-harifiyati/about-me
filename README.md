@@ -101,6 +101,7 @@ The frontend automatically calls the dev Lambda. No configuration needed.
 - **Infrastructure plan:** [`docs/superpowers/plans/2026-04-02-portfolio-infra.md`](docs/superpowers/plans/2026-04-02-portfolio-infra.md)
 - **Backend plan:** [`docs/superpowers/plans/2026-04-02-portfolio-backend.md`](docs/superpowers/plans/2026-04-02-portfolio-backend.md)
 - **Frontend plan:** [`docs/superpowers/plans/2026-04-02-portfolio-frontend.md`](docs/superpowers/plans/2026-04-02-portfolio-frontend.md)
+- **Visitor analytics plan:** [`docs/superpowers/plans/2026-04-05-visitor-analytics.md`](docs/superpowers/plans/2026-04-05-visitor-analytics.md)
 
 ## API
 

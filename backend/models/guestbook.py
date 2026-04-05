@@ -15,6 +15,11 @@ def list_entries() -> list:
     return sorted(items, key=lambda x: x.get("created_at", 0), reverse=True)
 
 
+def delete_entry_by_sk(sk: str):
+    table = get_table()
+    table.delete_item(Key={"PK": "GUESTBOOK", "SK": sk})
+
+
 def create_entry(name: str, message: str, is_authenticated: bool, identity: str | None = None) -> dict:
     table = get_table()
     entry_id = str(uuid.uuid4())

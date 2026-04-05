@@ -89,6 +89,9 @@ function portfolioApp() {
       this.currentPage = routes[base ?? ""] || "not-found";
       this.currentParams = { id: rest[0] };
 
+      // Record page visit (fire-and-forget)
+      api.post("/visits", { page: this.currentPage }).catch(() => {});
+
       // Scroll to top on navigation
       window.scrollTo(0, 0);
 

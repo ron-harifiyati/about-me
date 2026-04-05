@@ -540,8 +540,30 @@
           <div x-show="loading" class="loading-center"><div class="spinner"></div></div>
           <template x-if="!loading">
             <div>
-              <p class="subtitle" style="margin: 0.75rem 0;" x-text="`${total} visit locations recorded`"></p>
+              <p class="subtitle" style="margin: 0.75rem 0;" x-text="`${total} unique visitor${total !== 1 ? 's' : ''}`"></p>
               <div id="visitor-map" class="visitor-map"></div>
+              <template x-if="pageviews && pageviews.total > 0">
+                <div class="card" style="margin-top: 2rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">Page Views</h2>
+                    <span class="subtitle" style="margin: 0;" x-text="`${pageviews.total} total views`"></span>
+                  </div>
+                  <div class="pageviews-list">
+                    <template x-for="([page, count], index) in sortedPageviews" :key="page">
+                      <div class="pageviews-row">
+                        <span class="pageviews-rank"
+                          :class="index === 0 ? 'rank-gold' : index === 1 ? 'rank-silver' : index === 2 ? 'rank-bronze' : 'rank-default'"
+                          x-text="index + 1"></span>
+                        <span class="pageviews-name" x-text="page"></span>
+                        <div class="pageviews-bar-wrap">
+                          <div class="pageviews-bar-fill" :style="`width: ${count / maxPageviews * 100}%`"></div>
+                        </div>
+                        <span class="pageviews-count" x-text="count"></span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
         </div>
