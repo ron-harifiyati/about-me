@@ -151,7 +151,7 @@
               <template x-if="projects.length === 0">
                 <p class="subtitle">No projects yet — check back soon.</p>
               </template>
-              <div class="card-grid fade-in" x-show="projects.length > 0">
+              <div class="card-grid" x-show="projects.length > 0">
                 <template x-for="p in projects" :key="p.id">
                   <a :href="'#/projects/' + p.id" class="card" style="text-decoration: none; display: block;">
                     <h3 x-text="p.title"></h3>
