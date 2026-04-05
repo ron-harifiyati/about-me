@@ -48,6 +48,7 @@
         <aside class="admin-sidebar">
           <h2>Admin Panel</h2>
           <a href="#/dashboard"    :class="{ active: section === 'dashboard' }"    @click.prevent="section='dashboard'">Dashboard</a>
+          <a href="#/analytics"    :class="{ active: section === 'analytics' }"    @click.prevent="section='analytics'">Analytics</a>
           <a href="#/content"      :class="{ active: section === 'content' }"      @click.prevent="section='content'">Content</a>
           <a href="#/users"        :class="{ active: section === 'users' }"        @click.prevent="section='users'">Users</a>
           <a href="#/contacts"     :class="{ active: section === 'contacts' }"     @click.prevent="section='contacts'">Contacts</a>
@@ -82,6 +83,51 @@
                 <p class="subtitle">Pending testimonials</p>
               </div>
             </div>
+          </div>
+
+          <!-- Analytics -->
+          <div x-show="section === 'analytics'" x-data="adminAnalytics()" x-init="init()">
+            <h1>Analytics</h1>
+            <div x-show="loading" class="loading-center" style="margin-top: 2rem;"><div class="spinner"></div></div>
+            <template x-if="!loading && data">
+              <div>
+                <!-- Summary cards -->
+                <div class="card-grid" style="margin-top: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" x-text="data.unique_visitors"></div>
+                    <p class="subtitle">Unique visitors</p>
+                  </div>
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" x-text="data.total_pageviews"></div>
+                    <p class="subtitle">Total page views</p>
+                  </div>
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" x-text="data.locations?.length || 0"></div>
+                    <p class="subtitle">Mapped locations</p>
+                  </div>
+                </div>
+
+                <!-- Page breakdown -->
+                <div class="card" style="margin-top: 1.5rem;">
+                  <h3 style="margin-bottom: 1rem;">Views by page</h3>
+                  <template x-if="pageRows.length === 0"><p class="subtitle">No page view data yet.</p></template>
+                  <template x-for="row in pageRows" :key="row.page">
+                    <div style="margin-bottom: 0.75rem;">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.9rem; text-transform: capitalize;" x-text="row.page"></span>
+                        <span class="subtitle" style="font-size: 0.85rem;" x-text="row.count + ' (' + pct(row.count) + '%)'"></span>
+                      </div>
+                      <div style="height: 6px; background: var(--border); border-radius: 3px;">
+                        <div :style="{ width: pct(row.count) + '%', height: '6px', borderRadius: '3px', background: 'var(--accent)', transition: 'width 0.3s' }"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+            <template x-if="!loading && !data">
+              <p class="subtitle" style="margin-top: 1.5rem;">No analytics data available.</p>
+            </template>
           </div>
 
           <!-- Content editor -->
@@ -177,11 +223,17 @@
                 <template x-if="contacts.length === 0"><p class="subtitle">No contact submissions.</p></template>
                 <template x-for="c in contacts" :key="c.contact_id">
                   <div class="card" style="margin-bottom: 0.75rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
-                      <strong x-text="c.name + ' <' + c.email + '>'"></strong>
-                      <span class="subtitle" style="font-size: 0.8rem;" x-text="formatDate(c.created_at)"></span>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                          <strong x-text="c.name + ' <' + c.email + '>'"></strong>
+                          <span class="subtitle" style="font-size: 0.8rem;" x-text="formatDate(c.created_at)"></span>
+                        </div>
+                        <p x-text="c.message"></p>
+                      </div>
+                      <button class="btn btn-danger btn-sm" style="flex-shrink: 0;"
+                              @click="deleteContact(c)">Delete</button>
                     </div>
-                    <p x-text="c.message"></p>
                   </div>
                 </template>
               </div>

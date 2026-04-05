@@ -96,11 +96,19 @@ function adminContacts() {
   return {
     contacts: [],
     loading: true,
+
     async init() {
       const resp = await api.get("/admin/contacts");
       this.contacts = resp.data || [];
       this.loading = false;
     },
+
+    async deleteContact(contact) {
+      if (!confirm("Delete this contact submission?")) return;
+      const resp = await api.delete(`/admin/contacts/${contact.contact_id}?sk=${encodeURIComponent(contact.SK)}`);
+      if (resp.ok) this.contacts = this.contacts.filter(c => c.contact_id !== contact.contact_id);
+    },
+
     formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ""; },
   };
 }
@@ -119,6 +127,31 @@ function adminTestimonials() {
     async action(id, action) {
       await api.put(`/admin/testimonials/${id}`, { action });
       this.pending = this.pending.filter(t => t.testimonial_id !== id);
+    },
+  };
+}
+
+function adminAnalytics() {
+  return {
+    data: null,
+    loading: true,
+
+    async init() {
+      const resp = await api.get("/stats/analytics");
+      this.data = resp.data || null;
+      this.loading = false;
+    },
+
+    get pageRows() {
+      if (!this.data?.by_page) return [];
+      return Object.entries(this.data.by_page)
+        .map(([page, count]) => ({ page, count }))
+        .sort((a, b) => b.count - a.count);
+    },
+
+    pct(count) {
+      const total = this.data?.total_pageviews || 1;
+      return Math.round((count / total) * 100);
     },
   };
 }
