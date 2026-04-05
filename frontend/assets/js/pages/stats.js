@@ -5,6 +5,7 @@ function statsPage() {
     total: 0,
     pageviews: null,
     sortedPageviews: [],
+    maxPageviews: 1,
     loading: true,
     map: null,
 
@@ -19,6 +20,7 @@ function statsPage() {
         this.pageviews = pageviewsResp.data || { by_page: {}, total: 0 };
         this.sortedPageviews = Object.entries(this.pageviews.by_page)
           .sort((a, b) => b[1] - a[1]);
+        this.maxPageviews = this.sortedPageviews.length > 0 ? this.sortedPageviews[0][1] : 1;
       } finally {
         this.loading = false;
       }

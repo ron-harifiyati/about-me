@@ -187,18 +187,26 @@ h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
 @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
 /* Stats / Visitor map */
-.visitor-map { height: 420px; border-radius: 10px; border: 1px solid var(--border); margin-top: 1rem; }
+.visitor-map { height: 420px; border-radius: 10px; border: 1px solid var(--border); margin-top: 1rem; isolation: isolate; }
 @media (max-width: 768px) { .visitor-map { height: 280px; } }
 
 /* Map hint overlay */
 .map-hint { position: absolute; inset: 0; z-index: 800; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .map-hint span { background: rgba(0,0,0,0.55); color: #fff; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; pointer-events: none; }
 
-/* Analytics table */
-.analytics-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-.analytics-table th, .analytics-table td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
-.analytics-table th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.analytics-table tr:last-child td { border-bottom: none; }
+/* Page views leaderboard */
+.pageviews-list { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.5rem; }
+.pageviews-row { display: grid; grid-template-columns: 2rem 8rem 1fr auto; align-items: center; gap: 0.75rem; }
+@media (max-width: 480px) { .pageviews-row { grid-template-columns: 2rem 5rem 1fr auto; } }
+.pageviews-rank { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
+.rank-gold   { background: #f59e0b; color: #fff; }
+.rank-silver { background: #94a3b8; color: #fff; }
+.rank-bronze { background: #cd7c3f; color: #fff; }
+.rank-default { background: var(--border); color: var(--text-muted); }
+.pageviews-name { font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pageviews-bar-wrap { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; }
+.pageviews-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.4s ease; }
+.pageviews-count { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
 
 /* Quiz */
 .quiz-center { text-align: center; padding: 3rem 0; }
