@@ -48,7 +48,7 @@ function statsPage() {
         if (loc.lat && loc.lon) {
           L.circleMarker([parseFloat(loc.lat), parseFloat(loc.lon)], {
             radius: 5,
-            fillColor: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#007BFF",
+            fillColor: "#e53e3e",
             color: "transparent",
             fillOpacity: 0.7,
           })
