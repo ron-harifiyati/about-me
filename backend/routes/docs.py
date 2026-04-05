@@ -103,13 +103,16 @@ SPEC = {
             "post": {"summary": "Verify email", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
         },
         "/auth/resend-verification": {
-            "post": {"summary": "Resend verification email", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
+            "post": {"summary": "Resend verification email", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
         },
         "/auth/forgot-password": {
-            "post": {"summary": "Request password reset", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
+            "post": {"summary": "Request password reset", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
         },
         "/auth/reset-password": {
-            "post": {"summary": "Reset password with token", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
+            "post": {"summary": "Reset password with token", "tags": ["Auth"],
+                     "responses": {"200": {"description": "OK"}}}
         },
         "/auth/login": {
             "post": {"summary": "Login", "tags": ["Auth"], "responses": {"200": {"description": "OK"}}}
@@ -172,7 +175,8 @@ SPEC = {
                      "responses": {"200": {"description": "OK"}}}
         },
         "/stats/visitors": {
-            "get": {"summary": "Unique visitor locations", "tags": ["Stats"], "responses": {"200": {"description": "OK"}}}
+            "get": {"summary": "Unique visitor locations", "tags": ["Stats"],
+                    "responses": {"200": {"description": "OK"}}}
         },
         "/stats/pageviews": {
             "get": {"summary": "Page view counts", "tags": ["Stats"], "responses": {"200": {"description": "OK"}}}
