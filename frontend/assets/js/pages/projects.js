@@ -31,7 +31,7 @@ function projectDetailPage() {
     success: null,
 
     async init() {
-      const appEl = document.querySelector("body");
+      const appEl = document.querySelector("[x-data]");
       const appData = appEl._x_dataStack?.[0];
       const projectId = appData?.currentParams?.id;
       if (!projectId) { this.loading = false; return; }

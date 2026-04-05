@@ -370,6 +370,30 @@ footer {
   padding-left: 1rem;
 }
 
+/* Project / Course cards */
+.project-card { display: flex; flex-direction: column; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.card-rating-pill { display: inline-block; font-size: 0.78rem; font-weight: 700; color: #7a4f00; background: #F5A623; padding: 0.15rem 0.5rem; border-radius: 20px; }
+.card-rating-none { font-size: 0.82rem; color: var(--text-muted); }
+.card-view { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
+
+/* Detail pages */
+.detail-back { display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1.25rem; }
+.detail-meta { max-width: 480px; margin-bottom: 2rem; }
+.detail-links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.detail-stars { display: flex; gap: 0.4rem; font-size: 2rem; margin-top: 0.4rem; }
+
+/* Comments */
+.comment-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
 /* About page */
 .about-mission {
   border-left: 3px solid var(--accent);
