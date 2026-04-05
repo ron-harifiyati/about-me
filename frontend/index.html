@@ -1038,6 +1038,12 @@
         <div class="page" x-data="verifyEmailPage()">
           <div style="max-width: 400px; margin: 4rem auto; text-align: center;">
             <div x-show="status === 'loading'" class="loading-center"><div class="spinner"></div></div>
+            <div x-show="status === 'ready'">
+              <div style="font-size: 3rem;">✉</div>
+              <h1 style="margin-top: 1rem;">Confirm your email</h1>
+              <p class="subtitle">Click the button below to verify your email address and activate your account.</p>
+              <button @click="verify()" class="btn btn-primary" style="margin-top: 1.5rem;">Verify my email</button>
+            </div>
             <div x-show="status === 'success'">
               <div style="font-size: 3rem;">✓</div>
               <h1 style="margin-top: 1rem;">Email verified!</h1>
@@ -1133,28 +1139,28 @@
   </div>
 
   <!-- Scripts — load order matters -->
-  <script src="/assets/js/api.js?v=1.8"></script>
-  <script src="/assets/js/themes.js?v=1.8"></script>
-  <script src="/assets/js/app.js?v=1.8"></script>
+  <script src="/assets/js/api.js?v=1.9"></script>
+  <script src="/assets/js/themes.js?v=1.9"></script>
+  <script src="/assets/js/app.js?v=1.9"></script>
 
   <!-- Page components -->
-  <script src="/assets/js/pages/home.js?v=1.8"></script>
-  <script src="/assets/js/pages/about.js?v=1.8"></script>
-  <script src="/assets/js/pages/projects.js?v=1.8"></script>
-  <script src="/assets/js/pages/courses.js?v=1.8"></script>
-  <script src="/assets/js/pages/skills.js?v=1.8"></script>
-  <script src="/assets/js/pages/stats.js?v=1.8"></script>
-  <script src="/assets/js/pages/contact.js?v=1.8"></script>
-  <script src="/assets/js/pages/guestbook.js?v=1.8"></script>
-  <script src="/assets/js/pages/testimonials.js?v=1.8"></script>
-  <script src="/assets/js/pages/developer.js?v=1.8"></script>
-  <script src="/assets/js/pages/quiz.js?v=1.8"></script>
-  <script src="/assets/js/pages/login.js?v=1.8"></script>
-  <script src="/assets/js/pages/register.js?v=1.8"></script>
-  <script src="/assets/js/pages/verify-email.js?v=1.8"></script>
+  <script src="/assets/js/pages/home.js?v=1.9"></script>
+  <script src="/assets/js/pages/about.js?v=1.9"></script>
+  <script src="/assets/js/pages/projects.js?v=1.9"></script>
+  <script src="/assets/js/pages/courses.js?v=1.9"></script>
+  <script src="/assets/js/pages/skills.js?v=1.9"></script>
+  <script src="/assets/js/pages/stats.js?v=1.9"></script>
+  <script src="/assets/js/pages/contact.js?v=1.9"></script>
+  <script src="/assets/js/pages/guestbook.js?v=1.9"></script>
+  <script src="/assets/js/pages/testimonials.js?v=1.9"></script>
+  <script src="/assets/js/pages/developer.js?v=1.9"></script>
+  <script src="/assets/js/pages/quiz.js?v=1.9"></script>
+  <script src="/assets/js/pages/login.js?v=1.9"></script>
+  <script src="/assets/js/pages/register.js?v=1.9"></script>
+  <script src="/assets/js/pages/verify-email.js?v=1.9"></script>
 
-  <script src="/assets/js/pages/forgot-password.js?v=1.8"></script>
-  <script src="/assets/js/pages/reset-password.js?v=1.8"></script>
+  <script src="/assets/js/pages/forgot-password.js?v=1.9"></script>
+  <script src="/assets/js/pages/reset-password.js?v=1.9"></script>
 
   <!-- Alpine.js (loaded last) -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
