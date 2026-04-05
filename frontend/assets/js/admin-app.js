@@ -22,15 +22,28 @@ function adminApp() {
     get isAdmin() { return this.user?.role === "admin"; },
 
     async loadStats() {
-      const [users, contacts, testimonials] = await Promise.all([
+      const [users, contacts, testimonials, guestbook, analytics] = await Promise.all([
         api.get("/admin/users"),
         api.get("/admin/contacts"),
         api.get("/admin/testimonials/pending"),
+        api.get("/guestbook"),
+        api.get("/stats/analytics"),
       ]);
+      const byPage = analytics.data?.by_page || {};
+      const topPages = Object.entries(byPage)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+      const maxCount = topPages[0]?.[1] || 1;
       this.stats = {
         users: users.data?.length || 0,
         contacts: contacts.data?.length || 0,
         pending_testimonials: testimonials.data?.length || 0,
+        guestbook: guestbook.data?.length || 0,
+        unique_visitors: analytics.data?.unique_visitors || 0,
+        total_pageviews: analytics.data?.total_pageviews || 0,
+        top_pages: topPages,
+        max_page_count: maxCount,
+        recent_contacts: (contacts.data || []).slice(0, 3),
       };
     },
   };
@@ -115,18 +128,31 @@ function adminContacts() {
 
 function adminTestimonials() {
   return {
+    tab: "pending",
     pending: [],
+    approved: [],
     loading: true,
 
     async init() {
-      const resp = await api.get("/admin/testimonials/pending");
-      this.pending = resp.data || [];
+      this.loading = true;
+      const [p, a] = await Promise.all([
+        api.get("/admin/testimonials/pending"),
+        api.get("/admin/testimonials/approved"),
+      ]);
+      this.pending = p.data || [];
+      this.approved = a.data || [];
       this.loading = false;
     },
 
     async action(id, action) {
       await api.put(`/admin/testimonials/${id}`, { action });
       this.pending = this.pending.filter(t => t.testimonial_id !== id);
+    },
+
+    async deleteApproved(t) {
+      if (!confirm("Remove this approved testimonial?")) return;
+      const resp = await api.delete(`/admin/testimonials/${t.testimonial_id}`);
+      if (resp.ok) this.approved = this.approved.filter(a => a.testimonial_id !== t.testimonial_id);
     },
   };
 }
@@ -179,7 +205,9 @@ function adminGuestbook() {
 
 function adminComments() {
   return {
-    groups: [],
+    tab: "projects",
+    projectGroups: [],
+    courseGroups: [],
     loading: true,
 
     async init() {
@@ -190,26 +218,37 @@ function adminComments() {
       const projects = pResp.data || [];
       const courses = cResp.data || [];
 
-      const fetches = [
-        ...projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` })),
-        ...courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` })),
-      ];
+      const pFetches = projects.map(p => ({ label: p.title, entityPk: `PROJECT#${p.id}`, path: `/projects/${p.id}/comments` }));
+      const cFetches = courses.map(c => ({ label: c.title, entityPk: `COURSE#${c.id}`, path: `/courses/${c.id}/comments` }));
 
-      const results = await Promise.all(fetches.map(f => api.get(f.path)));
-      this.groups = fetches
-        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: results[i].data || [] }))
+      const [pResults, cResults] = await Promise.all([
+        Promise.all(pFetches.map(f => api.get(f.path))),
+        Promise.all(cFetches.map(f => api.get(f.path))),
+      ]);
+
+      this.projectGroups = pFetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: pResults[i].data || [] }))
+        .filter(g => g.comments.length > 0);
+
+      this.courseGroups = cFetches
+        .map((f, i) => ({ label: f.label, entityPk: f.entityPk, comments: cResults[i].data || [] }))
         .filter(g => g.comments.length > 0);
 
       this.loading = false;
     },
 
-    async deleteComment(commentId, entityPk, groupIndex, commentIndex) {
+    get activeGroups() {
+      return this.tab === "projects" ? this.projectGroups : this.courseGroups;
+    },
+
+    async deleteComment(commentId, entityPk) {
       if (!confirm("Delete this comment?")) return;
       const resp = await api.delete(`/comments/${commentId}?entity_pk=${encodeURIComponent(entityPk)}`);
       if (resp.ok) {
-        this.groups[groupIndex].comments.splice(commentIndex, 1);
-        if (this.groups[groupIndex].comments.length === 0) {
-          this.groups.splice(groupIndex, 1);
+        const groups = this.tab === "projects" ? this.projectGroups : this.courseGroups;
+        for (const g of groups) {
+          const idx = g.comments.findIndex(c => c.comment_id === commentId);
+          if (idx !== -1) { g.comments.splice(idx, 1); break; }
         }
       }
     },
