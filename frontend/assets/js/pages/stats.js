@@ -55,6 +55,8 @@ function statsPage() {
         minZoom: 2,
         maxZoom: 18,
         scrollWheelZoom: false,
+        dragging: false,
+        touchZoom: false,
       }).setView([20, 0], 2);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -84,12 +86,16 @@ function statsPage() {
       this.map.on("click", () => {
         hint.style.display = "none";
         this.map.scrollWheelZoom.enable();
+        this.map.dragging.enable();
+        this.map.touchZoom.enable();
       });
 
       this._outsideClick = (e) => {
         if (!this.map.getContainer().contains(e.target)) {
           hint.style.display = "";
           this.map.scrollWheelZoom.disable();
+          this.map.dragging.disable();
+          this.map.touchZoom.disable();
         }
       };
       document.addEventListener("click", this._outsideClick);
