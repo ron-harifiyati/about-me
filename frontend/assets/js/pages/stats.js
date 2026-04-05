@@ -3,14 +3,25 @@ function statsPage() {
   return {
     locations: [],
     total: 0,
+    pageviews: null,
+    sortedPageviews: [],
     loading: true,
     map: null,
 
     async init() {
-      const resp = await api.get("/stats/visitors");
-      this.locations = resp.data || [];
-      this.total = this.locations.length;
-      this.loading = false;
+      try {
+        const [visitorsResp, pageviewsResp] = await Promise.all([
+          api.get("/stats/visitors"),
+          api.get("/stats/pageviews"),
+        ]);
+        this.locations = visitorsResp.data || [];
+        this.total = this.locations.length;
+        this.pageviews = pageviewsResp.data || { by_page: {}, total: 0 };
+        this.sortedPageviews = Object.entries(this.pageviews.by_page)
+          .sort((a, b) => b[1] - a[1]);
+      } finally {
+        this.loading = false;
+      }
       await this.loadLeaflet();
       await this.$nextTick();
       this.initMap();

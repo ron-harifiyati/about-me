@@ -24,20 +24,11 @@ def route(event: dict) -> dict:
     if method == "OPTIONS":
         return cors_response(200, {})
 
-    # Record visit (best-effort)
-    ip = ctx.get("sourceIp", "")
-    if ip:
-        try:
-            from models.visits import record_visit
-            record_visit(ip, path)
-        except Exception:
-            pass
-
     # Import route handlers here to keep imports lazy
     from routes import (
         meta, content, projects, courses, github,
         auth_routes, comments, ratings, guestbook,
-        quiz, testimonials, stats, contact, admin, docs,
+        quiz, testimonials, stats, contact, admin, docs, visits,
     )
 
     # (method, pattern, handler)  — exact strings matched first, regex second
@@ -108,7 +99,10 @@ def route(event: dict) -> dict:
         ("POST",   "/testimonials",                   testimonials.submit_testimonial),
         # Stats
         ("GET",    "/stats/visitors",                 stats.get_visitor_locations),
+        ("GET",    "/stats/pageviews",                stats.get_pageviews),
         ("GET",    "/stats/analytics",                stats.get_analytics),
+        # Visits
+        ("POST",   "/visits",                         visits.record_visit),
         # Contact
         ("POST",   "/contact",                        contact.submit_contact),
         # Admin
