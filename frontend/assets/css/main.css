@@ -133,7 +133,7 @@ nav {
   font-weight: 500;
   transition: background 0.15s, opacity 0.15s;
 }
-.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary { background: var(--accent); color: #fff !important; }
 .btn-primary:hover { background: var(--accent-hover); }
 .btn-outline {
   background: transparent;
