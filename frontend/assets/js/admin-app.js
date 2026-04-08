@@ -59,17 +59,24 @@ function adminContent() {
     skills: {},
     funFacts: { facts: [] },
     currentlyLearning: { items: [] },
+    languagesData: { languages: [] },
+    hobbiesData: { items: [] },
+    valuesData: { values: [] },
     saving: false,
     success: null,
 
     async init() {
-      const [a, s, f, c] = await Promise.all([
+      const [a, s, f, c, l, h, v] = await Promise.all([
         api.get("/about"), api.get("/skills"), api.get("/fun-fact"), api.get("/currently-learning"),
+        api.get("/languages"), api.get("/hobbies"), api.get("/values"),
       ]);
       this.about = a.data || {};
       this.skills = s.data || {};
       this.funFacts = { facts: [] };
       this.currentlyLearning = c.data || { items: [] };
+      this.languagesData = l.data || { languages: [] };
+      this.hobbiesData = h.data || { items: [] };
+      this.valuesData = v.data || { values: [] };
     },
 
     async save(section, data) {

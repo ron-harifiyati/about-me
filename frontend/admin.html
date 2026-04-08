@@ -289,6 +289,9 @@
               <button class="btn btn-sm" :class="activeTab==='skills'?'btn-primary':'btn-outline'" @click="activeTab='skills'">Skills (JSON)</button>
               <button class="btn btn-sm" :class="activeTab==='fun-facts'?'btn-primary':'btn-outline'" @click="activeTab='fun-facts'">Fun Facts</button>
               <button class="btn btn-sm" :class="activeTab==='learning'?'btn-primary':'btn-outline'" @click="activeTab='learning'">Currently Learning</button>
+              <button class="btn btn-sm" :class="activeTab==='languages'?'btn-primary':'btn-outline'" @click="activeTab='languages'">Languages</button>
+              <button class="btn btn-sm" :class="activeTab==='hobbies'?'btn-primary':'btn-outline'" @click="activeTab='hobbies'">Hobbies</button>
+              <button class="btn btn-sm" :class="activeTab==='values'?'btn-primary':'btn-outline'" @click="activeTab='values'">Values</button>
             </div>
             <div x-show="success" class="alert alert-success" x-text="success"></div>
 
@@ -330,6 +333,39 @@
                         :value="(currentlyLearning.items || []).join('\n')"
                         @input="currentlyLearning.items = $event.target.value.split('\n').filter(Boolean)"></textarea>
               <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('currently-learning', currentlyLearning)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Languages tab -->
+            <div x-show="activeTab === 'languages'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">Edit as JSON. Format: {"languages": [{"name": "English", "level": "Fluent"}]}</p>
+              <textarea class="form-input" rows="10"
+                        :value="JSON.stringify(languagesData, null, 2)"
+                        @input="try { languagesData = JSON.parse($event.target.value) } catch(e) {}"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('languages', languagesData)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Hobbies tab -->
+            <div x-show="activeTab === 'hobbies'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">Edit as JSON. Format: {"items": [{"icon": "🏃", "label": "Running"}]}</p>
+              <textarea class="form-input" rows="10"
+                        :value="JSON.stringify(hobbiesData, null, 2)"
+                        @input="try { hobbiesData = JSON.parse($event.target.value) } catch(e) {}"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('hobbies', hobbiesData)" :disabled="saving">
+                <span x-text="saving ? 'Saving...' : 'Save'"></span>
+              </button>
+            </div>
+
+            <!-- Values tab -->
+            <div x-show="activeTab === 'values'" class="card">
+              <p class="subtitle" style="margin-bottom: 0.75rem;">Edit as JSON. Format: {"values": [{"title": "...", "description": "..."}]}</p>
+              <textarea class="form-input" rows="10"
+                        :value="JSON.stringify(valuesData, null, 2)"
+                        @input="try { valuesData = JSON.parse($event.target.value) } catch(e) {}"></textarea>
+              <button class="btn btn-primary" style="margin-top: 0.75rem;" @click="save('values', valuesData)" :disabled="saving">
                 <span x-text="saving ? 'Saving...' : 'Save'"></span>
               </button>
             </div>
