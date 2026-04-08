@@ -293,6 +293,69 @@
                   </div>
                 </div>
               </template>
+
+              <!-- Languages -->
+              <template x-if="languages.length > 0">
+                <div>
+                  <hr class="about-divider">
+                  <h2>Languages I Speak</h2>
+                  <div class="about-lang-badges">
+                    <template x-for="lang in languages" :key="lang.name">
+                      <span class="about-lang-badge">
+                        <span x-text="lang.name"></span>
+                        <span class="about-lang-level"
+                              :class="lang.level.toLowerCase()"
+                              x-text="lang.level"></span>
+                      </span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Beyond Code -->
+              <template x-if="hobbies.length > 0">
+                <div>
+                  <hr class="about-divider">
+                  <h2>Beyond Code</h2>
+                  <div class="about-hobby-grid">
+                    <template x-for="hobby in hobbies" :key="hobby.label">
+                      <div class="about-hobby-card fade-in">
+                        <span class="about-hobby-icon" x-text="hobby.icon"></span>
+                        <span x-text="hobby.label"></span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Currently Learning -->
+              <template x-if="learning.length > 0">
+                <div>
+                  <hr class="about-divider">
+                  <h2>Currently Learning</h2>
+                  <div class="about-lang-badges">
+                    <template x-for="item in learning" :key="item">
+                      <span class="badge badge-outline" x-text="item"></span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <!-- How I Work -->
+              <template x-if="values.length > 0">
+                <div>
+                  <hr class="about-divider">
+                  <h2>How I Work</h2>
+                  <div class="about-values-grid">
+                    <template x-for="val in values" :key="val.title">
+                      <div class="about-value-card fade-in">
+                        <h3 x-text="val.title"></h3>
+                        <p x-text="val.description"></p>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
           <template x-if="!loading && !about">

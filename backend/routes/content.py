@@ -38,6 +38,10 @@ def get_fun_fact(event, path_params, body, query, headers):
     return ok({"fact": random.choice(data["facts"])})
 
 
+def get_all_fun_facts(event, path_params, body, query, headers):
+    return ok(get_content("FUNFACTS"))
+
+
 @require_admin
 def update_fun_facts(event, path_params, body, query, headers, user):
     return ok(update_content("FUNFACTS", body))
@@ -50,3 +54,30 @@ def get_currently_learning(event, path_params, body, query, headers):
 @require_admin
 def update_currently_learning(event, path_params, body, query, headers, user):
     return ok(update_content("CURRENTLY_LEARNING", body))
+
+
+def get_languages(event, path_params, body, query, headers):
+    return ok(get_content("LANGUAGES_SPOKEN"))
+
+
+@require_admin
+def update_languages(event, path_params, body, query, headers, user):
+    return ok(update_content("LANGUAGES_SPOKEN", body))
+
+
+def get_hobbies(event, path_params, body, query, headers):
+    return ok(get_content("HOBBIES"))
+
+
+@require_admin
+def update_hobbies(event, path_params, body, query, headers, user):
+    return ok(update_content("HOBBIES", body))
+
+
+def get_values(event, path_params, body, query, headers):
+    return ok(get_content("VALUES"))
+
+
+@require_admin
+def update_values(event, path_params, body, query, headers, user):
+    return ok(update_content("VALUES", body))

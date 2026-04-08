@@ -32,13 +32,31 @@ SPEC = {
                     "responses": {"200": {"description": "OK"}}},
         },
         "/fun-fact": {
-            "get": {"summary": "Fun facts", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
+            "get": {"summary": "Random fun fact", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
             "put": {"summary": "Update fun facts", "tags": ["Content"], "security": [{"bearerAuth": []}],
                     "responses": {"200": {"description": "OK"}}},
+        },
+        "/fun-facts": {
+            "get": {"summary": "All fun facts", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
         },
         "/currently-learning": {
             "get": {"summary": "Currently learning", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
             "put": {"summary": "Update currently learning", "tags": ["Content"], "security": [{"bearerAuth": []}],
+                    "responses": {"200": {"description": "OK"}}},
+        },
+        "/languages": {
+            "get": {"summary": "Languages spoken", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
+            "put": {"summary": "Update languages", "tags": ["Content"], "security": [{"bearerAuth": []}],
+                    "responses": {"200": {"description": "OK"}}},
+        },
+        "/hobbies": {
+            "get": {"summary": "Hobbies", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
+            "put": {"summary": "Update hobbies", "tags": ["Content"], "security": [{"bearerAuth": []}],
+                    "responses": {"200": {"description": "OK"}}},
+        },
+        "/values": {
+            "get": {"summary": "Values / how I work", "tags": ["Content"], "responses": {"200": {"description": "OK"}}},
+            "put": {"summary": "Update values", "tags": ["Content"], "security": [{"bearerAuth": []}],
                     "responses": {"200": {"description": "OK"}}},
         },
         "/projects": {
