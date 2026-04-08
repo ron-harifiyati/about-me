@@ -72,7 +72,7 @@ function adminContent() {
       ]);
       this.about = a.data || {};
       this.skills = s.data || {};
-      this.funFacts = f.data || { facts: [] };
+      this.funFacts = { facts: [] };
       this.currentlyLearning = c.data || { items: [] };
       this.languagesData = l.data || { languages: [] };
       this.hobbiesData = h.data || { items: [] };
