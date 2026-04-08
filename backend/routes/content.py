@@ -38,6 +38,10 @@ def get_fun_fact(event, path_params, body, query, headers):
     return ok({"fact": random.choice(data["facts"])})
 
 
+def get_all_fun_facts(event, path_params, body, query, headers):
+    return ok(get_content("FUNFACTS"))
+
+
 @require_admin
 def update_fun_facts(event, path_params, body, query, headers, user):
     return ok(update_content("FUNFACTS", body))

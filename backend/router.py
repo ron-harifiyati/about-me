@@ -45,6 +45,7 @@ def route(event: dict) -> dict:
         ("GET",    "/timeline",                       content.get_timeline),
         ("PUT",    "/timeline",                       content.update_timeline),
         ("GET",    "/fun-fact",                       content.get_fun_fact),
+        ("GET",    "/fun-facts",                      content.get_all_fun_facts),
         ("PUT",    "/fun-fact",                       content.update_fun_facts),
         ("GET",    "/currently-learning",             content.get_currently_learning),
         ("PUT",    "/currently-learning",             content.update_currently_learning),
