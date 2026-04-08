@@ -147,6 +147,13 @@ SPEC = {
                     "responses": {"200": {"description": "OK"}}},
             "put": {"summary": "Update profile", "tags": ["Auth"], "security": [{"bearerAuth": []}],
                     "responses": {"200": {"description": "OK"}}},
+            "delete": {"summary": "Delete account (anonymize + remove)", "tags": ["Settings"],
+                       "security": [{"bearerAuth": []}],
+                       "requestBody": {"required": True, "content": {"application/json": {"schema": {
+                           "type": "object", "required": ["confirmation"],
+                           "properties": {"confirmation": {"type": "string", "example": "DELETE"}}
+                       }}}},
+                       "responses": {"200": {"description": "OK"}, "400": {"description": "Missing confirmation"}}},
         },
         "/auth/oauth/github": {
             "get": {"summary": "GitHub OAuth init", "tags": ["Auth"], "responses": {"302": {"description": "Redirect"}}}
@@ -254,6 +261,45 @@ SPEC = {
                     "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
             "delete": {"summary": "Delete quiz question (admin)", "tags": ["Admin"],
                        "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/connections": {
+            "get": {"summary": "List linked OAuth providers", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/oauth/{provider}": {
+            "delete": {"summary": "Disconnect OAuth provider", "tags": ["Settings"],
+                       "security": [{"bearerAuth": []}],
+                       "parameters": [{"name": "provider", "in": "path", "required": True,
+                                       "schema": {"type": "string", "enum": ["github", "google"]}}],
+                       "responses": {"200": {"description": "OK"}, "400": {"description": "Last auth method"}}},
+        },
+        "/auth/me/comments": {
+            "get": {"summary": "List my comments", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/comments/{id}": {
+            "delete": {"summary": "Delete my comment", "tags": ["Settings"],
+                       "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/ratings": {
+            "get": {"summary": "List my ratings", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/quiz-scores": {
+            "get": {"summary": "List my quiz scores", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/guestbook-entries": {
+            "get": {"summary": "List my guestbook entries", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/guestbook-entries/{id}": {
+            "delete": {"summary": "Delete my guestbook entry", "tags": ["Settings"],
+                       "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
+        },
+        "/auth/me/testimonials": {
+            "get": {"summary": "List my testimonials", "tags": ["Settings"],
+                    "security": [{"bearerAuth": []}], "responses": {"200": {"description": "OK"}}},
         },
     },
 }
