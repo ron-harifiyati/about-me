@@ -20,7 +20,8 @@ def delete_entry_by_sk(sk: str):
     table.delete_item(Key={"PK": "GUESTBOOK", "SK": sk})
 
 
-def create_entry(name: str, message: str, is_authenticated: bool, identity: str | None = None) -> dict:
+def create_entry(name: str, message: str, is_authenticated: bool,
+                 identity: str | None = None, user_id: str | None = None) -> dict:
     table = get_table()
     entry_id = str(uuid.uuid4())
     ts = int(time.time())
@@ -35,6 +36,8 @@ def create_entry(name: str, message: str, is_authenticated: bool, identity: str 
     }
     if identity:
         item["identity"] = identity
+    if user_id:
+        item["user_id"] = user_id
     table.put_item(Item=item)
     result = dict(item)
     result.pop("PK", None)

@@ -4,7 +4,7 @@ from db import get_table
 from boto3.dynamodb.conditions import Key
 
 
-def create_testimonial(body_text: str, author: str, identity: str, anonymous: bool) -> dict:
+def create_testimonial(body_text: str, author: str, identity: str, anonymous: bool, user_id: str | None = None) -> dict:
     table = get_table()
     tid = str(uuid.uuid4())
     ts = int(time.time())
@@ -21,6 +21,8 @@ def create_testimonial(body_text: str, author: str, identity: str, anonymous: bo
         "status": "pending",
         "created_at": ts,
     }
+    if user_id:
+        item["user_id"] = user_id
     table.put_item(Item=item)
     result = dict(item)
     result.pop("PK", None)

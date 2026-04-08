@@ -28,7 +28,7 @@ def create_entry(event, path_params, body, query, headers):
         profile = get_user_by_id(user["sub"]) or {}
         display_name = profile.get("name", name)
         identity = profile.get("identity")
-        entry = g.create_entry(display_name, message, True, identity)
+        entry = g.create_entry(display_name, message, True, identity, user_id=user["sub"])
     else:
         entry = g.create_entry(f"{name} (guest)", message, False)
 

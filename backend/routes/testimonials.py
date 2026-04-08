@@ -25,5 +25,6 @@ def submit_testimonial(event, path_params, body, query, headers):
         identity = body.get("identity", "Other")
         anonymous = True  # guests are always anonymous
 
-    testimonial = t.create_testimonial(text, author, identity, anonymous)
+    uid = user["sub"] if user else None
+    testimonial = t.create_testimonial(text, author, identity, anonymous, user_id=uid)
     return created(testimonial)
