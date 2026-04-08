@@ -1,7 +1,7 @@
 # Settings Page Design Spec
 
 **Date:** 2026-04-09
-**Status:** Draft
+**Status:** Approved
 **Goal:** Add a user settings page where authenticated users can manage their profile, appearance, OAuth connections, activity history, and account (including deletion with anonymization).
 
 ---
@@ -13,13 +13,12 @@ A new `#/settings` route in the main SPA, accessible only to authenticated users
 ## Nav Bar Changes
 
 **Logged in:**
-- Remove the theme toggle button from the nav bar.
-- Remove the logout button from the nav bar.
-- Add the user's hash-based identicon (32px circle) in the nav-right area. Clicking it navigates to `#/settings`.
+- Replace the theme toggle button and logout button with the user's hash-based identicon (32px circle). Clicking it navigates to `#/settings`.
+- Theme selection moves to the Appearance section in settings.
 
 **Logged out:**
 - No identicon shown. Login button stays as-is.
-- Theme toggle is removed. Guests use the default theme (light).
+- Theme toggle remains in the nav bar so guests can still switch themes.
 
 ## Identicons
 
