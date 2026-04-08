@@ -1,7 +1,7 @@
 from auth import require_auth
 from models import settings as s
 from utils import ok, not_found, bad_request
-from models.users import user_has_password
+from models.users import user_has_password, delete_user
 
 
 @require_auth
@@ -49,6 +49,19 @@ def delete_my_guestbook_entry(event, path_params, body, query, headers, user):
 def get_connections(event, path_params, body, query, headers, user):
     providers = s.get_user_oauth_links(user["sub"])
     return ok({"providers": providers})
+
+
+@require_auth
+def delete_account(event, path_params, body, query, headers, user):
+    confirmation = body.get("confirmation", "")
+    if confirmation != "DELETE":
+        return bad_request("Type DELETE to confirm account deletion")
+    user_id = user["sub"]
+    s.anonymize_user_content(user_id)
+    s.delete_user_oauth_links(user_id)
+    s.delete_user_sessions(user_id)
+    delete_user(user_id)
+    return ok({"message": "Account deleted"})
 
 
 @require_auth

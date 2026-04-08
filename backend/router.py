@@ -99,6 +99,7 @@ def route(event: dict) -> dict:
         ("DELETE", r"/auth/me/guestbook-entries/(?P<id>[^/]+)$",  settings_routes.delete_my_guestbook_entry),
         ("GET",    "/auth/me/connections",                        settings_routes.get_connections),
         ("DELETE", r"/auth/me/oauth/(?P<provider>[^/]+)$",        settings_routes.disconnect_oauth),
+        ("DELETE", "/auth/me",                                    settings_routes.delete_account),
         ("GET",    "/auth/me",                        auth_routes.get_me),
         ("PUT",    "/auth/me",                        auth_routes.update_me),
         ("GET",    "/auth/oauth/github",              auth_routes.oauth_github_init),

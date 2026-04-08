@@ -299,3 +299,56 @@ def test_disconnect_last_auth_method_rejected(ddb_table, mocker):
     assert resp["statusCode"] == 400
     body = json.loads(resp["body"])
     assert "last" in body["error"].lower() or "sign-in" in body["error"].lower()
+
+
+def test_delete_account_anonymizes_comments(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    admin_token = make_jwt(user_id, "admin")
+    route(make_event("POST", "/projects",
+        body={"title": "Test", "description": "desc", "tech_stack": ["Python"]},
+        headers={"authorization": f"Bearer {admin_token}"}))
+    projects = json.loads(route(make_event("GET", "/projects"))["body"])["data"]
+    pid = projects[0]["id"]
+    route(make_event("POST", f"/projects/{pid}/comments",
+        body={"body": "My comment"},
+        headers={"authorization": f"Bearer {token}"}))
+
+    resp = route(make_event("DELETE", "/auth/me",
+        body={"confirmation": "DELETE"},
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+
+    comments = json.loads(route(make_event("GET", f"/projects/{pid}/comments"))["body"])["data"]
+    assert len(comments) == 1
+    assert comments[0]["name"] == "Deleted User"
+    assert comments[0].get("user_id") is None
+
+
+def test_delete_account_removes_user_profile(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    resp = route(make_event("DELETE", "/auth/me",
+        body={"confirmation": "DELETE"},
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    from models.users import get_user_by_id
+    assert get_user_by_id(user_id) is None
+
+
+def test_delete_account_requires_confirmation(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    resp = route(make_event("DELETE", "/auth/me",
+        body={},
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 400
+
+
+def test_delete_account_wrong_confirmation(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    resp = route(make_event("DELETE", "/auth/me",
+        body={"confirmation": "WRONG"},
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 400

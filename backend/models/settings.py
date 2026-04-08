@@ -113,6 +113,88 @@ def delete_oauth_link(user_id: str, provider: str) -> bool:
     return True
 
 
+def anonymize_user_content(user_id: str):
+    """Anonymize all content by this user: comments, guestbook, testimonials, ratings, quiz scores."""
+    table = get_table()
+
+    # Anonymize comments
+    comments = table.scan(
+        FilterExpression=Attr("SK").begins_with("COMMENT#") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in comments:
+        table.update_item(
+            Key={"PK": item["PK"], "SK": item["SK"]},
+            UpdateExpression="SET #n = :n, #i = :i REMOVE user_id",
+            ExpressionAttributeNames={"#n": "name", "#i": "identity"},
+            ExpressionAttributeValues={":n": "Deleted User", ":i": None},
+        )
+
+    # Anonymize guestbook entries
+    guestbook = table.scan(
+        FilterExpression=Attr("PK").eq("GUESTBOOK") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in guestbook:
+        table.update_item(
+            Key={"PK": item["PK"], "SK": item["SK"]},
+            UpdateExpression="SET #n = :n REMOVE identity, user_id",
+            ExpressionAttributeNames={"#n": "name"},
+            ExpressionAttributeValues={":n": "Deleted User"},
+        )
+
+    # Anonymize testimonials
+    testimonials = table.scan(
+        FilterExpression=Attr("PK").eq("TESTIMONIALS") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in testimonials:
+        table.update_item(
+            Key={"PK": item["PK"], "SK": item["SK"]},
+            UpdateExpression="SET author = :a REMOVE user_id",
+            ExpressionAttributeValues={":a": "Deleted User"},
+        )
+
+    # Anonymize ratings (keep data, clear user_id)
+    ratings = table.scan(
+        FilterExpression=Attr("SK").begins_with("RATING#") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in ratings:
+        table.update_item(
+            Key={"PK": item["PK"], "SK": item["SK"]},
+            UpdateExpression="SET user_id = :d",
+            ExpressionAttributeValues={":d": "DELETED"},
+        )
+
+    # Anonymize quiz scores (keep scores, clear user_id)
+    scores = table.query(
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").begins_with("QUIZ_SCORE#"),
+    ).get("Items", [])
+    for item in scores:
+        table.update_item(
+            Key={"PK": item["PK"], "SK": item["SK"]},
+            UpdateExpression="SET user_id = :d",
+            ExpressionAttributeValues={":d": "DELETED"},
+        )
+
+
+def delete_user_oauth_links(user_id: str):
+    """Delete all OAuth link records for this user."""
+    table = get_table()
+    links = table.scan(
+        FilterExpression=Attr("SK").eq("LINK") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in links:
+        table.delete_item(Key={"PK": item["PK"], "SK": item["SK"]})
+
+
+def delete_user_sessions(user_id: str):
+    """Delete all refresh tokens for this user."""
+    table = get_table()
+    sessions = table.scan(
+        FilterExpression=Attr("SK").eq("SESSION") & Attr("user_id").eq(user_id),
+    ).get("Items", [])
+    for item in sessions:
+        table.delete_item(Key={"PK": item["PK"], "SK": item["SK"]})
+
+
 def delete_user_guestbook_entry(user_id: str, entry_id: str) -> bool:
     """Find and delete a guestbook entry owned by this user."""
     table = get_table()
