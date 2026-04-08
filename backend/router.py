@@ -29,6 +29,7 @@ def route(event: dict) -> dict:
         meta, content, projects, courses, github,
         auth_routes, comments, ratings, guestbook,
         quiz, testimonials, stats, contact, admin, docs, visits,
+        settings_routes,
     )
 
     # (method, pattern, handler)  — exact strings matched first, regex second
@@ -88,6 +89,12 @@ def route(event: dict) -> dict:
         ("POST",   "/auth/login",                     auth_routes.login),
         ("POST",   "/auth/logout",                    auth_routes.logout),
         ("POST",   "/auth/refresh",                   auth_routes.refresh),
+        # Settings — activity
+        ("GET",    "/auth/me/comments",               settings_routes.get_my_comments),
+        ("GET",    "/auth/me/ratings",                 settings_routes.get_my_ratings),
+        ("GET",    "/auth/me/quiz-scores",             settings_routes.get_my_quiz_scores),
+        ("GET",    "/auth/me/guestbook-entries",       settings_routes.get_my_guestbook_entries),
+        ("GET",    "/auth/me/testimonials",            settings_routes.get_my_testimonials),
         ("GET",    "/auth/me",                        auth_routes.get_me),
         ("PUT",    "/auth/me",                        auth_routes.update_me),
         ("GET",    "/auth/oauth/github",              auth_routes.oauth_github_init),

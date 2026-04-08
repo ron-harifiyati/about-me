@@ -61,3 +61,93 @@ def test_get_me_has_password_false_for_oauth_user(ddb_table, mocker):
     assert resp["statusCode"] == 200
     body = json.loads(resp["body"])
     assert body["data"]["has_password"] is False
+
+
+def test_get_my_comments(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    admin_token = make_jwt(user_id, "admin")
+    route(make_event("POST", "/projects",
+        body={"title": "Test Project", "description": "desc", "tech_stack": ["Python"]},
+        headers={"authorization": f"Bearer {admin_token}"}))
+    projects = json.loads(route(make_event("GET", "/projects"))["body"])["data"]
+    pid = projects[0]["id"]
+    route(make_event("POST", f"/projects/{pid}/comments",
+        body={"body": "Great project!"},
+        headers={"authorization": f"Bearer {token}"}))
+    resp = route(make_event("GET", "/auth/me/comments",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]) == 1
+    assert body["data"][0]["body"] == "Great project!"
+
+
+def test_get_my_ratings(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    admin_token = make_jwt(user_id, "admin")
+    route(make_event("POST", "/projects",
+        body={"title": "Test Project", "description": "desc", "tech_stack": ["Python"]},
+        headers={"authorization": f"Bearer {admin_token}"}))
+    projects = json.loads(route(make_event("GET", "/projects"))["body"])["data"]
+    pid = projects[0]["id"]
+    route(make_event("POST", f"/projects/{pid}/ratings",
+        body={"stars": 5},
+        headers={"authorization": f"Bearer {token}"}))
+    resp = route(make_event("GET", "/auth/me/ratings",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]) == 1
+    assert body["data"][0]["stars"] == 5
+
+
+def test_get_my_quiz_scores(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from models.quiz import save_score
+    save_score(user_id, 8, 10)
+    save_score(user_id, 6, 10)
+    from router import route
+    resp = route(make_event("GET", "/auth/me/quiz-scores",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]) == 2
+
+
+def test_get_my_guestbook_entries(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    route(make_event("POST", "/guestbook",
+        body={"name": "Test", "message": "Hello!"},
+        headers={"authorization": f"Bearer {token}"}))
+    route(make_event("POST", "/guestbook",
+        body={"name": "Test", "message": "Second entry!"},
+        headers={"authorization": f"Bearer {token}"}))
+    resp = route(make_event("GET", "/auth/me/guestbook-entries",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]) == 2
+
+
+def test_get_my_testimonials(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    route(make_event("POST", "/testimonials",
+        body={"body": "Awesome!", "author": "Test", "identity": "Other", "anonymous": False},
+        headers={"authorization": f"Bearer {token}"}))
+    resp = route(make_event("GET", "/auth/me/testimonials",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]) == 1
+
+
+def test_activity_requires_auth(ddb_table):
+    from router import route
+    for path in ["/auth/me/comments", "/auth/me/ratings", "/auth/me/quiz-scores",
+                 "/auth/me/guestbook-entries", "/auth/me/testimonials"]:
+        resp = route(make_event("GET", path))
+        assert resp["statusCode"] == 401, f"{path} should require auth"
