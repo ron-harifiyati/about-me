@@ -20,14 +20,21 @@ def _verify_password(password: str, stored: str) -> bool:
         return False
 
 
+_INTERNAL_KEYS = ("PK", "SK", "GSI1PK", "GSI1SK", "GSI2PK", "GSI2SK", "GSI3PK", "GSI3SK", "password_hash")
+
+
+def _strip_internal(item: dict) -> dict:
+    for key in _INTERNAL_KEYS:
+        item.pop(key, None)
+    return item
+
+
 def get_user_by_id(user_id: str) -> dict | None:
     table = get_table()
     resp = table.get_item(Key={"PK": f"USER#{user_id}", "SK": "PROFILE"})
     item = resp.get("Item")
     if item:
-        item.pop("PK", None)
-        item.pop("SK", None)
-        item.pop("password_hash", None)
+        _strip_internal(item)
     return item
 
 
@@ -62,9 +69,7 @@ def create_user(email: str, name: str, identity: str, password: str | None = Non
         item["password_hash"] = _hash_password(password)
     table.put_item(Item=item)
     result = dict(item)
-    result.pop("PK", None)
-    result.pop("SK", None)
-    result.pop("password_hash", None)
+    _strip_internal(result)
     return result
 
 
@@ -81,9 +86,7 @@ def verify_user_password(email: str, password: str) -> dict | None:
     if not _verify_password(password, user.get("password_hash", "")):
         return None
     result = dict(user)
-    result.pop("PK", None)
-    result.pop("SK", None)
-    result.pop("password_hash", None)
+    _strip_internal(result)
     return result
 
 
@@ -209,9 +212,7 @@ def list_all_users() -> list:
     )
     items = resp.get("Items", [])
     for item in items:
-        item.pop("PK", None)
-        item.pop("SK", None)
-        item.pop("password_hash", None)
+        _strip_internal(item)
     return items
 
 

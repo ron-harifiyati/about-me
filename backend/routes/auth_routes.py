@@ -1,5 +1,6 @@
 import os
 import json
+from urllib.parse import urlencode
 import requests as http
 from auth import make_jwt, require_auth
 from models.users import (
@@ -194,6 +195,26 @@ def update_me(event, path_params, body, query, headers, user):
 
 # --- OAuth ---
 
+def _oauth_redirect(access_token, refresh_token):
+    frontend_url = os.environ.get("FRONTEND_URL", "https://dkdwnfmhg75yf.cloudfront.net")
+    params = urlencode({"access_token": access_token, "refresh_token": refresh_token})
+    return {
+        "statusCode": 302,
+        "headers": {"Location": f"{frontend_url}/#/oauth-callback?{params}"},
+        "body": "",
+    }
+
+
+def _oauth_error_redirect(message):
+    frontend_url = os.environ.get("FRONTEND_URL", "https://dkdwnfmhg75yf.cloudfront.net")
+    params = urlencode({"error": message})
+    return {
+        "statusCode": 302,
+        "headers": {"Location": f"{frontend_url}/#/login?{params}"},
+        "body": "",
+    }
+
+
 def oauth_github_init(event, path_params, body, query, headers):
     client_id = os.environ["GITHUB_OAUTH_CLIENT_ID"]
     state = os.urandom(16).hex()
@@ -211,7 +232,7 @@ def oauth_github_init(event, path_params, body, query, headers):
 def oauth_github_callback(event, path_params, body, query, headers):
     code = query.get("code", "")
     if not code:
-        return bad_request("code is required")
+        return _oauth_error_redirect("GitHub login failed")
 
     token_resp = http.post(
         "https://github.com/login/oauth/access_token",
@@ -225,7 +246,7 @@ def oauth_github_callback(event, path_params, body, query, headers):
     )
     gh_token = token_resp.json().get("access_token")
     if not gh_token:
-        return unauthorized("GitHub OAuth failed")
+        return _oauth_error_redirect("GitHub login failed")
 
     user_resp = http.get(
         "https://api.github.com/user",
@@ -247,12 +268,21 @@ def oauth_github_callback(event, path_params, body, query, headers):
     user = get_or_create_oauth_user("github", str(gh_user["id"]), email, gh_user.get("name") or gh_user["login"])
     access_token = make_jwt(user["user_id"], user["role"])
     refresh_token = create_refresh_token(user["user_id"], user["role"])
-    return ok({"access_token": access_token, "refresh_token": refresh_token, "user": user})
+    return _oauth_redirect(access_token, refresh_token)
+
+
+def _google_redirect_uri(event):
+    uri = os.environ.get("GOOGLE_REDIRECT_URI", "")
+    if not uri:
+        domain = event.get("requestContext", {}).get("domainName", "")
+        if domain:
+            uri = f"https://{domain}/auth/oauth/google/callback"
+    return uri
 
 
 def oauth_google_init(event, path_params, body, query, headers):
     client_id = os.environ["GOOGLE_OAUTH_CLIENT_ID"]
-    redirect_uri = os.environ.get("GOOGLE_REDIRECT_URI", "")
+    redirect_uri = _google_redirect_uri(event)
     url = (
         f"https://accounts.google.com/o/oauth2/v2/auth"
         f"?client_id={client_id}"
@@ -270,9 +300,9 @@ def oauth_google_init(event, path_params, body, query, headers):
 def oauth_google_callback(event, path_params, body, query, headers):
     code = query.get("code", "")
     if not code:
-        return bad_request("code is required")
+        return _oauth_error_redirect("Google login failed")
 
-    redirect_uri = os.environ.get("GOOGLE_REDIRECT_URI", "")
+    redirect_uri = _google_redirect_uri(event)
     token_resp = http.post(
         "https://oauth2.googleapis.com/token",
         data={
@@ -287,7 +317,7 @@ def oauth_google_callback(event, path_params, body, query, headers):
     tokens = token_resp.json()
     id_token = tokens.get("id_token")
     if not id_token:
-        return unauthorized("Google OAuth failed")
+        return _oauth_error_redirect("Google login failed")
 
     import base64
     parts = id_token.split(".")
@@ -301,4 +331,4 @@ def oauth_google_callback(event, path_params, body, query, headers):
     user = get_or_create_oauth_user("google", google_id, email, name)
     access_token = make_jwt(user["user_id"], user["role"])
     refresh_token = create_refresh_token(user["user_id"], user["role"])
-    return ok({"access_token": access_token, "refresh_token": refresh_token, "user": user})
+    return _oauth_redirect(access_token, refresh_token)
