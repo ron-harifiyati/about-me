@@ -1200,6 +1200,19 @@
         </div>
       </template>
 
+      <!-- OAUTH CALLBACK -->
+      <template x-if="currentPage === 'oauth-callback'">
+        <div class="page" x-data="oauthCallbackPage()">
+          <div style="max-width: 400px; margin: 4rem auto; text-align: center;">
+            <div x-show="!error" class="loading-center"><div class="spinner"></div></div>
+            <div x-show="error" class="card" style="padding: 2rem;">
+              <p style="color: var(--danger);" x-text="error"></p>
+              <a href="#/login" class="btn btn-primary" style="margin-top: 1rem;">Back to login</a>
+            </div>
+          </div>
+        </div>
+      </template>
+
       <!-- RESET PASSWORD -->
       <template x-if="currentPage === 'reset-password'">
         <div class="page" x-data="resetPasswordPage()">
@@ -1270,6 +1283,7 @@
   <script src="/assets/js/pages/register.js?v=1.9"></script>
   <script src="/assets/js/pages/verify-email.js?v=1.9"></script>
 
+  <script src="/assets/js/pages/oauth-callback.js?v=2.8"></script>
   <script src="/assets/js/pages/forgot-password.js?v=1.9"></script>
   <script src="/assets/js/pages/reset-password.js?v=1.9"></script>
 

@@ -84,6 +84,7 @@ function portfolioApp() {
         "verify-email": "verify-email",
         "forgot-password": "forgot-password",
         "reset-password":  "reset-password",
+        "oauth-callback":  "oauth-callback",
       };
 
       this.currentPage = routes[base ?? ""] || "not-found";
