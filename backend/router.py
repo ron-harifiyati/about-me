@@ -48,6 +48,12 @@ def route(event: dict) -> dict:
         ("PUT",    "/fun-fact",                       content.update_fun_facts),
         ("GET",    "/currently-learning",             content.get_currently_learning),
         ("PUT",    "/currently-learning",             content.update_currently_learning),
+        ("GET",    "/languages",                     content.get_languages),
+        ("PUT",    "/languages",                     content.update_languages),
+        ("GET",    "/hobbies",                       content.get_hobbies),
+        ("PUT",    "/hobbies",                       content.update_hobbies),
+        ("GET",    "/values",                        content.get_values),
+        ("PUT",    "/values",                        content.update_values),
         # Projects
         ("GET",    "/projects",                       projects.list_projects),
         ("POST",   "/projects",                       projects.create_project),
