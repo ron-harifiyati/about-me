@@ -181,7 +181,10 @@ def refresh(event, path_params, body, query, headers):
 
 @require_auth
 def get_me(event, path_params, body, query, headers, user):
+    from models.users import user_has_password
     profile = get_user_by_id(user["sub"])
+    if profile:
+        profile["has_password"] = user_has_password(user["sub"])
     return ok(profile)
 
 

@@ -48,6 +48,16 @@ def get_user_by_email(email: str) -> dict | None:
     return items[0] if items else None
 
 
+def user_has_password(user_id: str) -> bool:
+    """Check if user has a password set (without exposing the hash)."""
+    table = get_table()
+    resp = table.get_item(Key={"PK": f"USER#{user_id}", "SK": "PROFILE"})
+    item = resp.get("Item")
+    if not item:
+        return False
+    return bool(item.get("password_hash"))
+
+
 def create_user(email: str, name: str, identity: str, password: str | None = None) -> dict:
     table = get_table()
     user_id = str(uuid.uuid4())

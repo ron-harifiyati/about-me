@@ -38,3 +38,26 @@ def test_testimonial_stores_user_id(ddb_table, mocker):
     assert resp["statusCode"] == 201
     body = json.loads(resp["body"])
     assert body["data"].get("user_id") == user_id
+
+
+def test_get_me_includes_has_password(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    resp = route(make_event("GET", "/auth/me",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"]["has_password"] is True
+
+
+def test_get_me_has_password_false_for_oauth_user(ddb_table, mocker):
+    from models.users import create_user, mark_email_verified
+    user = create_user("oauth@example.com", "OAuth User", "Other")  # no password
+    mark_email_verified(user["user_id"])
+    token = make_jwt(user["user_id"], "user")
+    from router import route
+    resp = route(make_event("GET", "/auth/me",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"]["has_password"] is False
