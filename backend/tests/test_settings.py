@@ -225,3 +225,77 @@ def test_cannot_delete_other_users_comment(ddb_table, mocker):
     resp = route(make_event("DELETE", f"/auth/me/comments/{comment_id}",
         headers={"authorization": f"Bearer {token2}"}))
     assert resp["statusCode"] == 404
+
+
+def test_get_connections_empty(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    resp = route(make_event("GET", "/auth/me/connections",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"]["providers"] == []
+
+
+def test_get_connections_with_oauth(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from db import get_table
+    table = get_table()
+    table.put_item(Item={
+        "PK": "OAUTH#github#12345",
+        "SK": "LINK",
+        "user_id": user_id,
+        "provider": "github",
+        "provider_id": "12345",
+        "provider_username": "testuser",
+    })
+    from router import route
+    resp = route(make_event("GET", "/auth/me/connections",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert len(body["data"]["providers"]) == 1
+    assert body["data"]["providers"][0]["provider"] == "github"
+
+
+def test_disconnect_oauth_provider(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from db import get_table
+    table = get_table()
+    table.put_item(Item={
+        "PK": "OAUTH#github#12345",
+        "SK": "LINK",
+        "user_id": user_id,
+        "provider": "github",
+        "provider_id": "12345",
+    })
+    from router import route
+    resp = route(make_event("DELETE", "/auth/me/oauth/github",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+    conns = json.loads(route(make_event("GET", "/auth/me/connections",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    assert len(conns["providers"]) == 0
+
+
+def test_disconnect_last_auth_method_rejected(ddb_table, mocker):
+    """OAuth-only user cannot disconnect their only provider."""
+    from models.users import create_user, mark_email_verified
+    user = create_user("oauth@example.com", "OAuth User", "Other")  # no password
+    mark_email_verified(user["user_id"])
+    token = make_jwt(user["user_id"], "user")
+    from db import get_table
+    table = get_table()
+    table.put_item(Item={
+        "PK": "OAUTH#github#12345",
+        "SK": "LINK",
+        "user_id": user["user_id"],
+        "provider": "github",
+        "provider_id": "12345",
+    })
+    from router import route
+    resp = route(make_event("DELETE", "/auth/me/oauth/github",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 400
+    body = json.loads(resp["body"])
+    assert "last" in body["error"].lower() or "sign-in" in body["error"].lower()

@@ -83,6 +83,36 @@ def delete_user_comment(user_id: str, comment_id: str) -> bool:
     return True
 
 
+def get_user_oauth_links(user_id: str) -> list:
+    """Scan for all OAuth links belonging to this user."""
+    table = get_table()
+    resp = table.scan(
+        FilterExpression=Attr("SK").eq("LINK") & Attr("user_id").eq(user_id),
+    )
+    items = resp.get("Items", [])
+    return [
+        {
+            "provider": item.get("provider"),
+            "provider_id": item.get("provider_id"),
+            "provider_username": item.get("provider_username"),
+        }
+        for item in items
+    ]
+
+
+def delete_oauth_link(user_id: str, provider: str) -> bool:
+    """Delete OAuth link for a specific provider. Returns True if found and deleted."""
+    table = get_table()
+    resp = table.scan(
+        FilterExpression=Attr("SK").eq("LINK") & Attr("user_id").eq(user_id) & Attr("provider").eq(provider),
+    )
+    items = resp.get("Items", [])
+    if not items:
+        return False
+    table.delete_item(Key={"PK": items[0]["PK"], "SK": items[0]["SK"]})
+    return True
+
+
 def delete_user_guestbook_entry(user_id: str, entry_id: str) -> bool:
     """Find and delete a guestbook entry owned by this user."""
     table = get_table()

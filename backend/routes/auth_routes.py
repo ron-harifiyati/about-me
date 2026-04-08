@@ -220,10 +220,19 @@ def _oauth_error_redirect(message):
 
 def oauth_github_init(event, path_params, body, query, headers):
     client_id = os.environ["GITHUB_OAUTH_CLIENT_ID"]
-    state = os.urandom(16).hex()
+    link_mode = query.get("link") == "true"
+    state_data = {"csrf": os.urandom(16).hex()}
+    if link_mode:
+        token_str = query.get("token", "")
+        from auth import decode_jwt
+        user = decode_jwt(token_str) if token_str else None
+        if user:
+            state_data["link_user_id"] = user["sub"]
+    import base64
+    state_b64 = base64.urlsafe_b64encode(json.dumps(state_data).encode()).decode()
     url = (
         f"https://github.com/login/oauth/authorize"
-        f"?client_id={client_id}&scope=user:email&state={state}"
+        f"?client_id={client_id}&scope=user:email&state={state_b64}"
     )
     return {
         "statusCode": 302,
@@ -236,6 +245,16 @@ def oauth_github_callback(event, path_params, body, query, headers):
     code = query.get("code", "")
     if not code:
         return _oauth_error_redirect("GitHub login failed")
+
+    link_user_id = None
+    state_raw = query.get("state", "")
+    if state_raw:
+        try:
+            import base64
+            state_data = json.loads(base64.urlsafe_b64decode(state_raw + "==").decode())
+            link_user_id = state_data.get("link_user_id")
+        except Exception:
+            pass
 
     token_resp = http.post(
         "https://github.com/login/oauth/access_token",
@@ -268,7 +287,20 @@ def oauth_github_callback(event, path_params, body, query, headers):
         primary = next((e for e in emails_resp.json() if e.get("primary")), None)
         email = primary["email"] if primary else f"{gh_user['login']}@github.noemail"
 
-    user = get_or_create_oauth_user("github", str(gh_user["id"]), email, gh_user.get("name") or gh_user["login"])
+    if link_user_id:
+        from db import get_table
+        table = get_table()
+        table.put_item(Item={
+            "PK": f"OAUTH#github#{gh_user['id']}",
+            "SK": "LINK",
+            "user_id": link_user_id,
+            "provider": "github",
+            "provider_id": str(gh_user["id"]),
+            "provider_username": gh_user.get("login", ""),
+        })
+        user = get_user_by_id(link_user_id)
+    else:
+        user = get_or_create_oauth_user("github", str(gh_user["id"]), email, gh_user.get("name") or gh_user["login"])
     access_token = make_jwt(user["user_id"], user["role"])
     refresh_token = create_refresh_token(user["user_id"], user["role"])
     return _oauth_redirect(access_token, refresh_token)
@@ -286,12 +318,24 @@ def _google_redirect_uri(event):
 def oauth_google_init(event, path_params, body, query, headers):
     client_id = os.environ["GOOGLE_OAUTH_CLIENT_ID"]
     redirect_uri = _google_redirect_uri(event)
+    link_mode = query.get("link") == "true"
+    state_data = {}
+    if link_mode:
+        token_str = query.get("token", "")
+        from auth import decode_jwt
+        user = decode_jwt(token_str) if token_str else None
+        if user:
+            state_data["link_user_id"] = user["sub"]
+    import base64
+    state_b64 = base64.urlsafe_b64encode(json.dumps(state_data).encode()).decode() if state_data else ""
+    state_param = f"&state={state_b64}" if state_b64 else ""
     url = (
         f"https://accounts.google.com/o/oauth2/v2/auth"
         f"?client_id={client_id}"
         f"&redirect_uri={redirect_uri}"
         f"&response_type=code"
         f"&scope=openid%20email%20profile"
+        f"{state_param}"
     )
     return {
         "statusCode": 302,
@@ -331,7 +375,30 @@ def oauth_google_callback(event, path_params, body, query, headers):
     name = payload.get("name", email.split("@")[0])
     google_id = payload.get("sub", "")
 
-    user = get_or_create_oauth_user("google", google_id, email, name)
+    link_user_id = None
+    state_raw = query.get("state", "")
+    if state_raw:
+        try:
+            import base64 as b64mod
+            state_data = json.loads(b64mod.urlsafe_b64decode(state_raw + "==").decode())
+            link_user_id = state_data.get("link_user_id")
+        except Exception:
+            pass
+
+    if link_user_id:
+        from db import get_table
+        table = get_table()
+        table.put_item(Item={
+            "PK": f"OAUTH#google#{google_id}",
+            "SK": "LINK",
+            "user_id": link_user_id,
+            "provider": "google",
+            "provider_id": google_id,
+            "provider_username": email,
+        })
+        user = get_user_by_id(link_user_id)
+    else:
+        user = get_or_create_oauth_user("google", google_id, email, name)
     access_token = make_jwt(user["user_id"], user["role"])
     refresh_token = create_refresh_token(user["user_id"], user["role"])
     return _oauth_redirect(access_token, refresh_token)

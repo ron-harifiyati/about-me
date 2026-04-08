@@ -1,6 +1,7 @@
 from auth import require_auth
 from models import settings as s
-from utils import ok, not_found
+from utils import ok, not_found, bad_request
+from models.users import user_has_password
 
 
 @require_auth
@@ -42,3 +43,26 @@ def delete_my_guestbook_entry(event, path_params, body, query, headers, user):
     if s.delete_user_guestbook_entry(user["sub"], entry_id):
         return ok({"deleted": True})
     return not_found("Guestbook entry not found")
+
+
+@require_auth
+def get_connections(event, path_params, body, query, headers, user):
+    providers = s.get_user_oauth_links(user["sub"])
+    return ok({"providers": providers})
+
+
+@require_auth
+def disconnect_oauth(event, path_params, body, query, headers, user):
+    provider = path_params["provider"]
+    if provider not in ("github", "google"):
+        return bad_request("Invalid provider")
+    has_pw = user_has_password(user["sub"])
+    links = s.get_user_oauth_links(user["sub"])
+    other_links = [lnk for lnk in links if lnk["provider"] != provider]
+    if not has_pw and len(other_links) == 0:
+        return bad_request(
+            "Cannot disconnect your last sign-in method. Set a password or connect another provider first."
+        )
+    if s.delete_oauth_link(user["sub"], provider):
+        return ok({"disconnected": True})
+    return not_found("Provider not connected")
