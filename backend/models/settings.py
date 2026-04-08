@@ -68,3 +68,30 @@ def get_user_testimonials(user_id: str) -> list:
         item.pop("GSI2PK", None)
         item.pop("GSI2SK", None)
     return sorted(items, key=lambda x: x.get("created_at", 0), reverse=True)
+
+
+def delete_user_comment(user_id: str, comment_id: str) -> bool:
+    """Find and delete a comment owned by this user. Returns True if found and deleted."""
+    table = get_table()
+    filt = Attr("SK").begins_with("COMMENT#") & Attr("comment_id").eq(comment_id) & Attr("user_id").eq(user_id)
+    resp = table.scan(FilterExpression=filt)
+    items = resp.get("Items", [])
+    if not items:
+        return False
+    item = items[0]
+    table.delete_item(Key={"PK": item["PK"], "SK": item["SK"]})
+    return True
+
+
+def delete_user_guestbook_entry(user_id: str, entry_id: str) -> bool:
+    """Find and delete a guestbook entry owned by this user."""
+    table = get_table()
+    resp = table.scan(
+        FilterExpression=Attr("PK").eq("GUESTBOOK") & Attr("entry_id").eq(entry_id) & Attr("user_id").eq(user_id),
+    )
+    items = resp.get("Items", [])
+    if not items:
+        return False
+    item = items[0]
+    table.delete_item(Key={"PK": item["PK"], "SK": item["SK"]})
+    return True

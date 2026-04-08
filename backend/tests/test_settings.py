@@ -151,3 +151,77 @@ def test_activity_requires_auth(ddb_table):
                  "/auth/me/guestbook-entries", "/auth/me/testimonials"]:
         resp = route(make_event("GET", path))
         assert resp["statusCode"] == 401, f"{path} should require auth"
+
+
+def test_delete_own_comment(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    admin_token = make_jwt(user_id, "admin")
+    route(make_event("POST", "/projects",
+        body={"title": "Test", "description": "desc", "tech_stack": ["Python"]},
+        headers={"authorization": f"Bearer {admin_token}"}))
+    projects = json.loads(route(make_event("GET", "/projects"))["body"])["data"]
+    pid = projects[0]["id"]
+    route(make_event("POST", f"/projects/{pid}/comments",
+        body={"body": "My comment"},
+        headers={"authorization": f"Bearer {token}"}))
+
+    comments = json.loads(route(make_event("GET", "/auth/me/comments",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    comment_id = comments[0]["comment_id"]
+
+    resp = route(make_event("DELETE", f"/auth/me/comments/{comment_id}",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+
+    remaining = json.loads(route(make_event("GET", "/auth/me/comments",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    assert len(remaining) == 0
+
+
+def test_delete_own_guestbook_entry(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    from router import route
+    route(make_event("POST", "/guestbook",
+        body={"name": "Test", "message": "Hello!"},
+        headers={"authorization": f"Bearer {token}"}))
+
+    entries = json.loads(route(make_event("GET", "/auth/me/guestbook-entries",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    entry_id = entries[0]["entry_id"]
+
+    resp = route(make_event("DELETE", f"/auth/me/guestbook-entries/{entry_id}",
+        headers={"authorization": f"Bearer {token}"}))
+    assert resp["statusCode"] == 200
+
+    remaining = json.loads(route(make_event("GET", "/auth/me/guestbook-entries",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    assert len(remaining) == 0
+
+
+def test_cannot_delete_other_users_comment(ddb_table, mocker):
+    user_id, token = _register_and_verify(ddb_table, mocker)
+    mocker.patch("routes.auth_routes._send_verification_email")
+    from router import route
+    from models.users import mark_email_verified, create_user
+    user2 = create_user("other@example.com", "Other User", "Other", "Secure123!")
+    mark_email_verified(user2["user_id"])
+    token2 = make_jwt(user2["user_id"], "user")
+
+    admin_token = make_jwt(user_id, "admin")
+    route(make_event("POST", "/projects",
+        body={"title": "Test", "description": "desc", "tech_stack": ["Python"]},
+        headers={"authorization": f"Bearer {admin_token}"}))
+    projects = json.loads(route(make_event("GET", "/projects"))["body"])["data"]
+    pid = projects[0]["id"]
+    route(make_event("POST", f"/projects/{pid}/comments",
+        body={"body": "User1 comment"},
+        headers={"authorization": f"Bearer {token}"}))
+
+    comments = json.loads(route(make_event("GET", "/auth/me/comments",
+        headers={"authorization": f"Bearer {token}"}))["body"])["data"]
+    comment_id = comments[0]["comment_id"]
+
+    resp = route(make_event("DELETE", f"/auth/me/comments/{comment_id}",
+        headers={"authorization": f"Bearer {token2}"}))
+    assert resp["statusCode"] == 404
