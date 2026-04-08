@@ -54,3 +54,96 @@ def test_get_fun_fact_returns_random_fact(ddb_table):
     assert resp["statusCode"] == 200
     body = json.loads(resp["body"])
     assert body["data"]["fact"] in ["Fact A", "Fact B", "Fact C"]
+
+
+# --- Languages ---
+
+def test_get_languages_empty(ddb_table):
+    from router import route
+    resp = route(make_event("GET", "/languages"))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"] is None or isinstance(body["data"], dict)
+
+
+def test_put_and_get_languages(ddb_table):
+    from router import route
+    payload = {"languages": [
+        {"name": "Ndebele", "level": "Native"},
+        {"name": "English", "level": "Fluent"},
+    ]}
+    put_resp = route(make_event("PUT", "/languages", body=payload, headers=_admin_headers()))
+    assert put_resp["statusCode"] == 200
+
+    get_resp = route(make_event("GET", "/languages"))
+    body = json.loads(get_resp["body"])
+    assert len(body["data"]["languages"]) == 2
+    assert body["data"]["languages"][0]["name"] == "Ndebele"
+
+
+def test_put_languages_requires_admin(ddb_table):
+    from router import route
+    resp = route(make_event("PUT", "/languages", body={"languages": []}))
+    assert resp["statusCode"] == 401
+
+
+# --- Hobbies ---
+
+def test_get_hobbies_empty(ddb_table):
+    from router import route
+    resp = route(make_event("GET", "/hobbies"))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"] is None or isinstance(body["data"], dict)
+
+
+def test_put_and_get_hobbies(ddb_table):
+    from router import route
+    payload = {"items": [
+        {"icon": "🏃", "label": "Marathon Running"},
+        {"icon": "🎮", "label": "Gaming"},
+    ]}
+    put_resp = route(make_event("PUT", "/hobbies", body=payload, headers=_admin_headers()))
+    assert put_resp["statusCode"] == 200
+
+    get_resp = route(make_event("GET", "/hobbies"))
+    body = json.loads(get_resp["body"])
+    assert len(body["data"]["items"]) == 2
+    assert body["data"]["items"][0]["label"] == "Marathon Running"
+
+
+def test_put_hobbies_requires_admin(ddb_table):
+    from router import route
+    resp = route(make_event("PUT", "/hobbies", body={"items": []}))
+    assert resp["statusCode"] == 401
+
+
+# --- Values ---
+
+def test_get_values_empty(ddb_table):
+    from router import route
+    resp = route(make_event("GET", "/values"))
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["data"] is None or isinstance(body["data"], dict)
+
+
+def test_put_and_get_values(ddb_table):
+    from router import route
+    payload = {"values": [
+        {"title": "Accountability", "description": "I own my work."},
+        {"title": "Simplicity", "description": "Keep it simple."},
+    ]}
+    put_resp = route(make_event("PUT", "/values", body=payload, headers=_admin_headers()))
+    assert put_resp["statusCode"] == 200
+
+    get_resp = route(make_event("GET", "/values"))
+    body = json.loads(get_resp["body"])
+    assert len(body["data"]["values"]) == 2
+    assert body["data"]["values"][0]["title"] == "Accountability"
+
+
+def test_put_values_requires_admin(ddb_table):
+    from router import route
+    resp = route(make_event("PUT", "/values", body={"values": []}))
+    assert resp["statusCode"] == 401
