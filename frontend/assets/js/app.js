@@ -79,6 +79,7 @@ function portfolioApp() {
         "testimonials": "testimonials",
         "developer":    "developer",
         "quiz":         "quiz",
+        "settings":     "settings",
         "login":        "login",
         "register":     "register",
         "verify-email": "verify-email",

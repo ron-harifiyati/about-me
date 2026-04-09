@@ -77,15 +77,20 @@
               <a href="#/login" class="btn btn-primary btn-sm">Login</a>
             </template>
             <template x-if="isAuthenticated">
-              <button @click="logout()" class="btn btn-outline btn-sm">Logout</button>
+              <a href="#/settings" class="nav-identicon" :title="'Settings (' + user.name + ')'">
+                <img :src="generateIdenticon(user.user_id, 32)" width="32" height="32"
+                     style="border-radius:50%;" alt="Settings">
+              </a>
             </template>
           </div>
 
-          <button class="theme-toggle" @click="toggleTheme()"
-                  :title="`Switch theme (current: ${theme})`"
-                  aria-label="Toggle theme">
-            <span x-text="{ light: '☀️', dark: '🌙', coffee: '☕', terminal: '>_', nordic: '❄️' }[theme] || '☀️'"></span>
-          </button>
+          <template x-if="!isAuthenticated">
+            <button class="theme-toggle" @click="toggleTheme()"
+                    :title="'Switch theme (current: ' + theme + ')'"
+                    aria-label="Toggle theme">
+              <span x-text="{ light: '☀️', dark: '🌙', coffee: '☕', terminal: '>_', nordic: '❄️' }[theme] || '☀️'"></span>
+            </button>
+          </template>
 
           <button class="nav-hamburger" :class="{ open: mobileOpen }"
                   @click="mobileOpen = !mobileOpen"
@@ -1242,6 +1247,238 @@
         </div>
       </template>
 
+      <!-- SETTINGS -->
+      <template x-if="currentPage === 'settings'">
+        <div class="page" x-data="settingsPage()" x-init="init()">
+          <div class="settings-layout">
+            <div class="settings-sidebar">
+              <div class="settings-sidebar-title">Settings</div>
+              <template x-for="s in sections" :key="s">
+                <a class="settings-nav-link"
+                   :class="{ active: activeSection === s, danger: s === 'account' }"
+                   @click.prevent="scrollTo(s)"
+                   href="#"
+                   x-text="s[0].toUpperCase() + s.slice(1)"></a>
+              </template>
+            </div>
+
+            <div class="settings-content">
+              <!-- PROFILE -->
+              <section id="settings-profile" class="settings-section">
+                <h2>Profile</h2>
+                <p class="subtitle">Manage your personal information</p>
+                <div class="settings-profile-header">
+                  <img :src="generateIdenticon(getApp()?.user?.user_id, 52)" width="52" height="52"
+                       style="border-radius:50%;" alt="Avatar">
+                  <div>
+                    <strong x-text="getApp()?.user?.name || ''"></strong>
+                    <div class="text-muted" style="font-size:0.8rem;">
+                      <span x-text="getApp()?.user?.email || ''"></span>
+                      <template x-if="getApp()?.user?.created_at">
+                        <span> · Member since <span x-text="new Date(getApp().user.created_at * 1000).toLocaleDateString('en-US',{month:'short',year:'numeric'})"></span></span>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+                <div class="settings-form-grid">
+                  <div>
+                    <label>Display Name</label>
+                    <input type="text" x-model="profileForm.name" @input="onProfileChange()" maxlength="100">
+                  </div>
+                  <div>
+                    <label>Identity</label>
+                    <select x-model="profileForm.identity" @change="onProfileChange()">
+                      <option>Jamf</option><option>MCRI</option><option>Friend</option><option>Family</option><option>Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="margin-bottom:1rem;">
+                  <label>Email</label>
+                  <div class="text-muted" style="font-size:0.85rem;">
+                    <span x-text="getApp()?.user?.email"></span>
+                    <span class="badge">read-only</span>
+                  </div>
+                </div>
+                <template x-if="profileMessage">
+                  <div class="settings-toast" :class="profileMessage.type" x-text="profileMessage.text"></div>
+                </template>
+                <button class="btn btn-primary" @click="saveProfile()" :disabled="!profileDirty || profileSaving"
+                        x-text="profileSaving ? 'Saving...' : 'Save Changes'"></button>
+              </section>
+
+              <hr class="settings-divider">
+
+              <!-- APPEARANCE -->
+              <section id="settings-appearance" class="settings-section">
+                <h2>Appearance</h2>
+                <p class="subtitle">Choose your theme — synced across devices</p>
+                <div class="theme-grid">
+                  <template x-for="t in themes" :key="t">
+                    <div class="theme-card" :class="{ active: getApp()?.theme === t }" @click="selectTheme(t)">
+                      <div class="theme-preview" :data-theme-preview="t"></div>
+                      <div class="theme-name" x-text="t[0].toUpperCase() + t.slice(1)"></div>
+                      <div class="theme-check" x-show="getApp()?.theme === t">✓</div>
+                    </div>
+                  </template>
+                </div>
+              </section>
+
+              <hr class="settings-divider">
+
+              <!-- CONNECTIONS -->
+              <section id="settings-connections" class="settings-section">
+                <h2>Connections</h2>
+                <p class="subtitle">Manage sign-in methods — must keep at least one active</p>
+                <div x-show="connectionsLoading" class="text-muted">Loading...</div>
+                <div x-show="!connectionsLoading">
+                  <div class="connection-card">
+                    <div class="connection-info">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                      <div>
+                        <strong>GitHub</strong>
+                        <div class="text-muted" x-text="isConnected('github') ? 'Connected as ' + getProviderUsername('github') : 'Not connected'" style="font-size:0.78rem;"></div>
+                      </div>
+                    </div>
+                    <button x-show="isConnected('github')" class="btn btn-outline btn-sm btn-danger" @click="disconnectProvider('github')">Disconnect</button>
+                    <button x-show="!isConnected('github')" class="btn btn-primary btn-sm" @click="connectProvider('github')">Connect</button>
+                  </div>
+                  <div class="connection-card">
+                    <div class="connection-info">
+                      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      <div>
+                        <strong>Google</strong>
+                        <div class="text-muted" x-text="isConnected('google') ? 'Connected as ' + getProviderUsername('google') : 'Not connected'" style="font-size:0.78rem;"></div>
+                      </div>
+                    </div>
+                    <button x-show="isConnected('google')" class="btn btn-outline btn-sm btn-danger" @click="disconnectProvider('google')">Disconnect</button>
+                    <button x-show="!isConnected('google')" class="btn btn-primary btn-sm" @click="connectProvider('google')">Connect</button>
+                  </div>
+                  <div class="connection-card">
+                    <div class="connection-info">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                      <div>
+                        <strong>Password</strong>
+                        <div class="text-muted" style="font-size:0.78rem;">
+                          <template x-if="hasPassword"><span>Set · <a href="#/forgot-password">Reset via email</a></span></template>
+                          <template x-if="!hasPassword"><span>Not set · <a href="#/forgot-password">Set via email</a></span></template>
+                        </div>
+                      </div>
+                    </div>
+                    <span x-show="hasPassword" style="font-size:0.78rem;font-weight:500;color:#27ae60;">✓ Active</span>
+                  </div>
+                </div>
+              </section>
+
+              <hr class="settings-divider">
+
+              <!-- ACTIVITY -->
+              <section id="settings-activity" class="settings-section">
+                <h2>Activity</h2>
+                <p class="subtitle">Your contributions across the site</p>
+                <div class="activity-tabs">
+                  <template x-for="tab in ['comments','ratings','quiz','guestbook','testimonials']" :key="tab">
+                    <button class="activity-tab" :class="{ active: activityTab === tab }" @click="activityTab = tab">
+                      <span x-text="tab[0].toUpperCase() + tab.slice(1)"></span>
+                      <span class="activity-count" x-text="activityCounts[tab]"></span>
+                    </button>
+                  </template>
+                </div>
+                <div x-show="activityLoading" class="text-muted">Loading...</div>
+
+                <div x-show="activityTab === 'comments' && !activityLoading">
+                  <template x-if="activityData.comments.length === 0"><p class="text-muted">No comments yet.</p></template>
+                  <template x-for="c in activityData.comments" :key="c.comment_id">
+                    <div class="activity-item">
+                      <div>
+                        <div class="activity-meta"><span x-text="timeAgo(c.created_at)"></span></div>
+                        <div x-text="c.body"></div>
+                      </div>
+                      <button class="btn btn-outline btn-sm btn-danger" @click="deleteComment(c.comment_id)">Delete</button>
+                    </div>
+                  </template>
+                </div>
+
+                <div x-show="activityTab === 'ratings' && !activityLoading">
+                  <template x-if="activityData.ratings.length === 0"><p class="text-muted">No ratings yet.</p></template>
+                  <template x-for="r in activityData.ratings" :key="r.SK">
+                    <div class="activity-item">
+                      <div>
+                        <div class="activity-meta"><span x-text="timeAgo(r.created_at)"></span></div>
+                        <div x-text="'★'.repeat(r.stars) + '☆'.repeat(5 - r.stars)"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <div x-show="activityTab === 'quiz' && !activityLoading">
+                  <template x-if="activityData.quiz.length === 0"><p class="text-muted">No quiz attempts yet.</p></template>
+                  <template x-for="q in activityData.quiz" :key="q.attempt_id">
+                    <div class="activity-item">
+                      <div>
+                        <div class="activity-meta"><span x-text="timeAgo(q.created_at)"></span></div>
+                        <div>Score: <strong x-text="q.score"></strong> / <span x-text="q.total"></span></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <div x-show="activityTab === 'guestbook' && !activityLoading">
+                  <template x-if="activityData.guestbook.length === 0"><p class="text-muted">No guestbook entries yet.</p></template>
+                  <template x-for="g in activityData.guestbook" :key="g.entry_id">
+                    <div class="activity-item">
+                      <div>
+                        <div class="activity-meta"><span x-text="timeAgo(g.created_at)"></span></div>
+                        <div x-text="g.message"></div>
+                      </div>
+                      <button class="btn btn-outline btn-sm btn-danger" @click="deleteGuestbookEntry(g.entry_id)">Delete</button>
+                    </div>
+                  </template>
+                </div>
+
+                <div x-show="activityTab === 'testimonials' && !activityLoading">
+                  <template x-if="activityData.testimonials.length === 0"><p class="text-muted">No testimonials yet.</p></template>
+                  <template x-for="t in activityData.testimonials" :key="t.testimonial_id">
+                    <div class="activity-item">
+                      <div>
+                        <div class="activity-meta">
+                          <span class="badge" :class="t.status" x-text="t.status"></span>
+                          · <span x-text="timeAgo(t.created_at)"></span>
+                        </div>
+                        <div x-text="t.body"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </section>
+
+              <hr class="settings-divider">
+
+              <!-- ACCOUNT -->
+              <section id="settings-account" class="settings-section">
+                <h2>Account</h2>
+                <p class="subtitle">Session and account management</p>
+                <div class="connection-card" style="margin-bottom:1.5rem;">
+                  <div>
+                    <strong>Sign out</strong>
+                    <div class="text-muted" style="font-size:0.78rem;">Sign out of this device</div>
+                  </div>
+                  <button class="btn btn-primary btn-sm" @click="getApp()?.logout()">Log out</button>
+                </div>
+                <div class="danger-zone">
+                  <h3 style="color:var(--danger,#e74c3c);">Danger Zone</h3>
+                  <p class="text-muted" style="margin-bottom:1rem;">Permanently delete your account. Contributions are anonymized to "Deleted User". This cannot be undone.</p>
+                  <input type="text" x-model="deleteConfirmation" placeholder="Type DELETE to confirm"
+                         style="margin-bottom:0.5rem;max-width:300px;">
+                  <template x-if="deleteError"><div class="settings-toast error" x-text="deleteError"></div></template>
+                  <button class="btn btn-danger" @click="deleteAccount()" :disabled="deleting"
+                          x-text="deleting ? 'Deleting...' : 'Delete My Account'"></button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </template>
+
       <!-- 404 -->
       <div x-show="currentPage === 'not-found'" class="page">
         <h1>404</h1>
@@ -1265,6 +1502,7 @@
   <!-- Scripts — load order matters -->
   <script src="/assets/js/api.js?v=2.0"></script>
   <script src="/assets/js/themes.js?v=2.0"></script>
+  <script src="/assets/js/identicon.js?v=2.9"></script>
   <script src="/assets/js/app.js?v=2.0"></script>
 
   <!-- Page components -->
@@ -1286,6 +1524,7 @@
   <script src="/assets/js/pages/oauth-callback.js?v=2.8"></script>
   <script src="/assets/js/pages/forgot-password.js?v=1.9"></script>
   <script src="/assets/js/pages/reset-password.js?v=1.9"></script>
+  <script src="/assets/js/pages/settings.js?v=2.9"></script>
 
   <!-- Alpine.js (loaded last) -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
