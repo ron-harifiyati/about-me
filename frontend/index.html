@@ -1296,7 +1296,7 @@
                   <label>Email</label>
                   <div class="text-muted" style="font-size:0.85rem;">
                     <span x-text="getApp()?.user?.email"></span>
-                    <span class="badge">read-only</span>
+                    <span class="settings-badge">read-only</span>
                   </div>
                 </div>
                 <template x-if="profileMessage">
@@ -1441,7 +1441,7 @@
                     <div class="activity-item">
                       <div>
                         <div class="activity-meta">
-                          <span class="badge" :class="t.status" x-text="t.status"></span>
+                          <span class="settings-badge" :class="t.status" x-text="t.status"></span>
                           · <span x-text="timeAgo(t.created_at)"></span>
                         </div>
                         <div x-text="t.body"></div>
@@ -1468,7 +1468,7 @@
                   <h3 style="color:var(--danger,#e74c3c);">Danger Zone</h3>
                   <p class="text-muted" style="margin-bottom:1rem;">Permanently delete your account. Contributions are anonymized to "Deleted User". This cannot be undone.</p>
                   <input type="text" x-model="deleteConfirmation" placeholder="Type DELETE to confirm"
-                         style="margin-bottom:0.5rem;max-width:300px;">
+                         style="margin-bottom:0.75rem;">
                   <template x-if="deleteError"><div class="settings-toast error" x-text="deleteError"></div></template>
                   <button class="btn btn-danger" @click="deleteAccount()" :disabled="deleting"
                           x-text="deleting ? 'Deleting...' : 'Delete My Account'"></button>

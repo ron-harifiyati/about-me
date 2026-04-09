@@ -681,10 +681,10 @@ footer {
 .settings-toast { font-size: 0.82rem; padding: 0.4rem 0.6rem; border-radius: 5px; margin-bottom: 0.75rem; }
 .settings-toast.success { background: rgba(39,174,96,0.1); color: #27ae60; }
 .settings-toast.error { background: rgba(231,76,60,0.1); color: #e74c3c; }
-.badge { font-size: 0.68rem; background: var(--bg-alt); padding: 0.1rem 0.35rem; border-radius: 4px; }
-.badge.approved { background: rgba(39,174,96,0.1); color: #27ae60; }
-.badge.pending { background: rgba(241,196,15,0.1); color: #f1c40f; }
-.badge.rejected { background: rgba(231,76,60,0.1); color: #e74c3c; }
+.settings-badge { font-size: 0.7rem; background: var(--bg-alt); padding: 0.15rem 0.5rem; border-radius: 4px; color: var(--text-muted); border: 1px solid var(--border); }
+.settings-badge.approved { background: rgba(39,174,96,0.1); color: #27ae60; border-color: rgba(39,174,96,0.2); }
+.settings-badge.pending { background: rgba(241,196,15,0.1); color: #f1c40f; border-color: rgba(241,196,15,0.2); }
+.settings-badge.rejected { background: rgba(231,76,60,0.1); color: #e74c3c; border-color: rgba(231,76,60,0.2); }
 .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.6rem; }
 .theme-card {
   border: 2px solid var(--border); border-radius: 8px; padding: 0.45rem;
@@ -720,6 +720,11 @@ footer {
 .danger-zone {
   border: 1px solid rgba(231,76,60,0.25); border-radius: 8px; padding: 1rem;
   background: rgba(231,76,60,0.02);
+}
+.danger-zone input[type="text"] {
+  width: 100%; max-width: 300px; padding: 0.55rem 0.75rem; font-size: 0.9rem;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--text);
 }
 .btn-danger { background: var(--danger, #e74c3c); color: #fff; border-color: var(--danger, #e74c3c); }
 .btn-danger:hover { opacity: 0.9; }
